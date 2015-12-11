@@ -4,13 +4,13 @@ tmpdir=/tmp/tmp.$(( $RANDOM * 19318203981230 + 40 ))
 plugin=$(basename ${DIR})
 archive="$(dirname $(dirname ${DIR}))/archive"
 version=$(date +"%Y.%m.%d")
-package="${archive}/${plugin}-${version}.txz"
-md5="${archive}/${plugin}-${version}.md5"
+package="${archive}/${plugin}-${version}-x86_64-1.txz"
+md5="${archive}/${plugin}-${version}-x86_64-1.md5"
 
 if [[ -f $package ]]; then
   for x in a b c d e d f g h ; do
-    package="${archive}/${plugin}-${version}${x}.txz"
-    md5="${archive}/${plugin}-${version}${x}.md5"
+    package="${archive}/${plugin}-${version}${x}-x86_64-1.txz"
+    md5="${archive}/${plugin}-${version}${x}-x86_64-1.md5"
     if [[ ! -f $package ]]; then
       break
     fi
