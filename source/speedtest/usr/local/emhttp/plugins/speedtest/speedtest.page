@@ -1,0 +1,87 @@
+Icon="speedtest.png"
+Menu="NetworkServices"
+Title="Speedtest"
+---
+<?php
+$speedtest_cfg = parse_plugin_cfg("speedtest");
+$speedtest_secure = isset($speedtest_cfg['SECURE']) ? $speedtest_cfg['SECURE'] 	: "no";
+$speedtest_share = isset($speedtest_cfg['SHARE'])   ? $speedtest_cfg['SHARE'] 	: "share";
+$speedtest_units = isset($speedtest_cfg['UNITS'])   ? $speedtest_cfg['UNITS'] 	: "bits";
+$speedtest_server = isset($speedtest_cfg['SERVER']) ? $speedtest_cfg['SERVER'] 	: "none";
+$speedtest_list = isset($speedtest_cfg['LIST']) ? $speedtest_cfg['LIST'] 	: "auto";
+?>
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest.css">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
+
+<form markdown="1" name="speedtest_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="speedtest/speedtest.cfg" />
+
+Enable Secure Connection:
+: <select id="SECURE" name="SECURE" size="1" >
+  <?=mk_option($speedtest_secure, "no", "No");?>
+  <?=mk_option($speedtest_secure, "secure", "Yes");?>
+  </select>
+
+ Save Speed Values As:
+: <select id="UNITS" name="UNITS" size="1" >
+  <?=mk_option($speedtest_units, "bits", "bits");?>
+  <?=mk_option($speedtest_units, "bytes", "bytes");?>
+  </select>
+
+Create Results Image:
+: <select id="SHARE" name="SHARE" size="1" >
+  <?=mk_option($speedtest_share, "no", "No");?>
+  <?=mk_option($speedtest_share, "share", "Yes");?>
+  </select>
+
+Select Speedtest Server:
+: <select id="LIST" name="LIST" size="1" onChange="listChange(this.form);">
+  <?=mk_option($speedtest_list, "auto", "Auto");?>
+  <?=mk_option($speedtest_list, "manual", "Manual");?>
+  </select>
+  <select class="serverlist" id="SERVER" name="SERVER" size="1">
+		<option> ...loading speedtest.net server list </option>
+  </select>
+
+<input id="DEFAULT" type="submit" value="Default" onClick="resetDATA(this.form)">
+: <input id="btnApply" type="submit" value="Apply" ><input id="btnBegin" type="button" value="Begin Test" onClick="beginTEST(this.form)"><input type="button" value="Done" onClick="done()">
+
+&nbsp;
+
+</form>
+<div>
+	<table class="tablesorter speedtest" id="tblData">			
+		<thead>
+			<tr>
+				<th> Date </th>
+				<th> Ping </th>
+				<th> Download </th>
+				<th> Upload </th>
+				<th> Image </th>
+				<th><input id="allData" type="checkbox"></th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	
+</div>
+<button type="button" id="btnRemoveData"/>Remove</button>
+: &nbsp;
+
+<div id="dialog">
+   <img id="shareImage"src=""/>
+</div>
+
+<div id="preload">
+   <img src='/plugins/dynamix/images/loading.gif'>
+</div>
+
+<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.strftime-min.js"></script>
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
+
+<script type="text/javascript">
+var Selected = "<?=$speedtest_server?>";
+var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
+</script>

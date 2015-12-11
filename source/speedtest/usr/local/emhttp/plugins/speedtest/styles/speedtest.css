@@ -1,0 +1,4 @@
+.no-close .ui-dialog-titlebar {display: none;}
+#dialog {position: absolute;}
+div#preload {display: none;}
+.serverlist {display: none;}
