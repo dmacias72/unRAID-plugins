@@ -15,5 +15,5 @@ speedtest: sivel/speedtest-cli
 speedtest: https://github.com/sivel/speedtest-cli
 speedtest: 
 speedtest: dmacias72/unRAID
-speedtest: https://github.com/dmacias72/unRAID
+speedtest: https://github.com/dmacias72/unRAID-plugins
 speedtest:
