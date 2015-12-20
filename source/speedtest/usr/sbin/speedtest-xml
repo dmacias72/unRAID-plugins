@@ -1,0 +1,3 @@
+#!/bin/sh
+echo -e 'Internet bandwidth test started' >&2
+/usr/bin/php /usr/local/emhttp/plugins/speedtest/include/speedtest.php /dev/null 2>&1 &
