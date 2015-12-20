@@ -1,6 +1,8 @@
 <?php
 require("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 
+shell_exec("echo -e 'Internet bandwidth test started' | logger -tspeedtest");
+
 $options = "";
 if ( $speedtest_list == "manual")
 	$options .= " --server ".$speedtest_server;
@@ -33,6 +35,8 @@ $test->addAttribute('download', $array["Download"]);
 $test->addAttribute('upload',   $array["Upload"]);
 $test->addAttribute('share',	  $array["Share"]);
 $xml->asXML($speedtest_filename);
+
+shell_exec("echo -e 'Internet bandwidth test completed' | logger -tspeedtest");
 
 if ($_POST["show"]) 
  echo json_encode($array);
