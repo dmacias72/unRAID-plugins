@@ -1,34 +1,19 @@
 $(function(){
    $('#LIST').change(function () {
        if ($('#LIST option:selected').text() == "Manual"){
+       		$('.serverlist').css('visibility','visible')
            getServerList(Selected);
-           $('.serverlist').hide();
-           $('#SERVER').show();
        } else {
-           $('.serverlist').hide();
+           $('.serverlist').css('visibility','hidden')
        } 
    });
    
    if ($('#LIST option:selected').text() == "Manual"){
+   	$('.serverlist').css('visibility','visible')
 		getServerList(Selected);
-      $('.serverlist').hide();
-      $('#SERVER').show();
-   }
-
-	//create share image dialog
-	$('#dialog').dialog({
-   	autoOpen: false,
-    	dialogClass: 'no-close',
-      open: function(){
-	      $('#shareImage').click(function() {
-	      	 $("#dialog").dialog("close"); 
-	      });
-		}
-	});
-
-	//bind Clear button to clearData function
-	$("#btnRemoveData").bind("click", removeData);
-
+   } else {
+   	$('.serverlist').css('visibility','hidden')
+	}
 	// select all packages switch
 	$('#allData')
 		.switchButton({
@@ -38,28 +23,38 @@ $(function(){
 			checked: false
 		})
 		.change(function() {  //on change
-			if(this.checked) // check select status
-				$('.checkData').each(function() { //loop through each checkbox
-      	   	$(this).switchButton({checked: true});
-    	     	});
-   	   else
-      	   $('.checkData').each(function() { //loop through each checkbox
-         	   $(this).switchButton({checked: false});
-     	 		});
+			$("#tblData tbody").empty(); // empty table
+			$.ajax({ 
+				type: 'POST',
+			   url: "/plugins/speedtest/include/delete_node.php", // delete all nodes
+	  	  		dataType: 'json',
+	  		  	data: {id: "all"},
+		  	  	error: function() {
+	 	 	   	alert("Data could not be written to\n/boot/config/plugins/speedtest/speedtest.xml.");
+	  	  		},
+  			  	success: function () {
+  			  		$('#allData') // reset all remove switch
+					.switchButton({
+						checked: false
+					})
+		  	  	}
+			});
    	});
+   $("#btnBegin").bind("click", beginTEST);// bind click to begin test
 
    //tablesorter
 	$('#tblData').tablesorter({headers:{5:{sorter:false}}});
 
 	//load table from xml
 	parseDataXML();
+	
 });
 
 function getServerList(Selected){
   	$.ajax({
       type: "GET",
       dataType: "json",
-   	url: "/plugins/speedtest/include/speedtest-list.php",
+   	url: "/plugins/speedtest/include/speedtest-list.php", // list all available servers
       data: "{}",
    	success: function(data) {
 	   	var serverList= "<option ";
@@ -91,7 +86,7 @@ function resetDATA(form) {
 function parseDataXML(){
   	$.ajax({
    	type: "GET",
-   	url: "/plugins/speedtest/speedtest.xml",
+   	url: "/boot/config/plugins/speedtest/speedtest.xml",
    	dataType: "xml",
    	success: function(xml) {
 			$(xml).find("test").each(function(){
@@ -103,50 +98,36 @@ function parseDataXML(){
 	  			if (typeof(Share) === "undefined"){
 		   		Share = "";
 		   	}
-		   	var DateTime = strftime(DateTimeFormat, new Date(parseInt(Name)));
-				$("#tblData tbody").append(
-				"<tr>"+
-				"<td>"+DateTime+"</td>"+ //Date and time
+		   	$("#tblData tbody").append(
+				"<tr id="+Name+" >"+
+				"<td>"+strftime(DateTimeFormat, new Date(parseInt(Name)))+"</td>"+ //format time based on unRAID display settings
 				"<td>"+Ping+"</td>"+ //Ping
 				"<td>"+Download+"</td>"+ //Download
 				"<td>"+Upload+"</td>"+ //Upload
-				"<td><a onclick=\"$('#shareImage').attr('src', '"+Share+"');"+
-				"$('#dialog').dialog('open');\" href='#'>"+Share+
+				"<td><a class='share_image'>"+Share+ //Share
 				"</a></td>"+ //Share
-				"<td><input id="+Name+" class='checkData' type='checkbox' value="+Name+"></td>"+ //checkbox
+				"<td><input id='"+Name+"_switch' class='checkData' type='checkbox'></td>"+ //checkbox
 				"</tr>");
-				$('#'+Name)
-					.switchButton({
-						labels_placement: 'right',
-						on_label: 'On',
-  						off_label: 'Off',
-	  					checked: false
-  					});
+				if(Share)
+					$(".share_image").unbind("click", clickImage).bind("click", clickImage); //bind click to image url
+				addSwitchButton(Name); //add switch to each row
 			});
    	},
 		complete : function () {
-		$("#tblData").trigger("update"); //update table for tablesorter
+			$("#tblData").trigger("update"); //update table for tablesorter
+			var Image = $('#tblData tr:last').children("td:nth-child(5)").find('.share_image').html(); // get last row image 
+			if (Image)
+			 	$('#shareImage').attr('src', Image); //change image to last image if it exists
+			else
+				$('#shareImage').attr('src', '/plugins/speedtest/images/blank.png');	// change image to blank if it does not exist
 		},
        error : function() {}
 	});
 };
 
-function beginTEST(form){
-	var Options = '';
-	if (form.LIST.value == "manual") {
-		Options = "--server " + form.SERVER.value + " ";
-  	}
-	if (form.SECURE.value == "secure") {
-		Options += " --secure ";
-	} 
-	if (form.SHARE.value == "share") {
-		Options += " --share ";
-	} 
-	if (form.UNITS.value == "bytes") {
-		Options += " --bytes ";
-	}
-	form.btnBegin.disabled = "disabled";
-	$("#tblData tbody").append(
+function beginTEST(){
+	$("#btnBegin").disabled = "disabled";
+	$("#tblData tbody").append( // create testing row
 		"<tr id='loading'>"+
 		"<td><img src='/plugins/dynamix/images/loading.gif'></td>"+
 		"<td><img src='/plugins/dynamix/images/loading.gif'></td>"+
@@ -161,88 +142,63 @@ function beginTEST(form){
       type: "POST",
       dataType: "json",
    	url: "/plugins/speedtest/include/speedtest.php",
-   	data : {options: Options},
+   	data: { show : true },
    	success: function(data) {
-   		var Name = $.now();
-	   	var DateTime = strftime(DateTimeFormat, new Date(parseInt(Name)));
-   		var Share = "";
-   		if (data.length > 3){
-				Share = data[3][1];
-   			if (typeof(Share) === "undefined"){
-		   		Share = "";
-  				}
-   		} 
  			$("#loading").remove();
 			$('#countdown').empty();
 			$("#tblData tbody").append(
-			"<tr>"+
-			"<td>"+DateTime+"</td>"+ //Date
-			"<td>"+data[0][1]+"</td>"+ //Ping
-			"<td>"+data[1][1]+"</td>"+ //Download
-			"<td>"+data[2][1]+"</td>"+ //Upload
-			"<td><a onclick=\"$('#shareImage').attr('src', '"+Share+"');"+ //Share
-			"$('#dialog').dialog('open');\" href='#'>"+Share+ //Share
+			"<tr id="+data.Name+" >"+
+			"<td>"+strftime(DateTimeFormat, new Date(parseInt(data.Name)))+"</td>"+ // format time based on unRAID display settings 
+			"<td>"+data.Ping+"</td>"+ //Ping
+			"<td>"+data.Download+"</td>"+ //Download
+			"<td>"+data.Upload+"</td>"+ //Upload
+			"<td><a class='share_image'>"+data.Share+ //Share
 			"</a></td>"+ //Share
-			"<td><input id="+Name+" class='checkData' type='checkbox' value="+Name+"></td>"+ //Checkbox
+			"<td><input id='"+data.Name+"_switch' class='checkData' type='checkbox' ></td>"+ //Checkbox
 			"</tr>");
-			$('#'+Name)
-				.switchButton({
-					labels_placement: 'right',
-					on_label: 'On',
- 						off_label: 'Off',
-  					checked: false
-				});
-			form.btnBegin.disabled = false;
-			StoreData();
+			addSwitchButton(data.Name); // add switch
+			if (data.Share){
+				$(".share_image").unbind("click", clickImage).bind("click", clickImage);// bind click to image url
+				$('#shareImage').attr('src', data.Share );
+			}
+			form.btnBegin.disabled = false; // reset test button
  		},
 		complete : function () {
-		$("#tblData").trigger("update"); //update table for tablesorter
+			$("#tblData").trigger("update"); //update table for tablesorter
 		},
        error : function() {},
        cache: false
 	});
 };
 
-function StoreData() {
-	$("#tblData").trigger("update");
-	var tblDataXML = '<?xml version="1.0"?><tests>';
-   $('#tblData tbody tr').each(function(row, tr){
-		var Ping = $(tr).children("td:nth-child(2)").html();
-		var Download = $(tr).children("td:nth-child(3)").html();
-		var Upload = $(tr).children("td:nth-child(4)").html();
-		var Share = $(tr).children("td:nth-child(5)").find('a').text();
-		if (typeof(Share) === "undefined"){
-   		Share = "";
-   	}
-		var Name = $(tr).children("td:nth-child(6)").find('input').val();
-		tblDataXML += '<test name="'+Name+'" ping="'+Ping+'" download="'+Download+'" upload="'+Upload+'" share="'+Share+'"/>';
-	});
-	tblDataXML += '</tests>';
+function addSwitchButton(Name) {
 
-	$.ajax({
-		type: 'POST',
-	   url: "/plugins/speedtest/include/save-xml.php",
-  	  	dataType: 'xml',
-  	  	data: {data: tblDataXML},
-  	  	error: function() {
-  	   	alert("Data could not be written to\n/boot/config/plugins/speedtest/speedtest.xml.");
-  	  	},
-  	  	success: function () {
-  	  	}
+	// add remove switchbutton
+	$("#"+Name+"_switch")
+	.switchButton({
+		labels_placement: 'right',
+		on_label: 'Remove',
+  		off_label: 'Remove',
+	  	checked: false
+  		})
+	.change(function() {
+		var par = $(this).parent().parent();
+		var Name = par.attr("id"); // row id
+		par.remove(); //remove table row
+		$.ajax({
+			type: 'POST',
+		   url: "/plugins/speedtest/include/delete_node.php", //delete node by name
+	  	  	dataType: 'json',
+	  	  	data: {id: Name},
+	  	  	error: function() {
+ 	 	   	alert("Data could not be written to\n/boot/config/plugins/speedtest/speedtest.xml.");
+	  	  	},
+  		  	success: function () {
+	  	  	}
+		});
 	});
 };
 
-
-function removeData() {
-	//if all data checked remove all
-	if($('#allData').prop('checked')) {
- 		$("#tblData tbody").empty();
-		$('#allData').switchButton({checked: false});
-	} else {
-	// clear only checked data
-   $(':checkbox:checked').each(function(){
-  		$(this).parent().parent().remove(); //remove table row
-   	});
-   }
-	StoreData();
+function clickImage() {
+	$('#shareImage').attr('src', $(this).html());
 };

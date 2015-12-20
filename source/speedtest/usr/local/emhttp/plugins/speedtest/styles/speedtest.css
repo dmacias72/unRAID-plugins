@@ -1,4 +1,26 @@
 .no-close .ui-dialog-titlebar {display: none;}
-#dialog {position: absolute;}
+#speedtest {
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+#speedtest_form {
+	display: inline-block;
+	float: left;
+	width: 69%;
+	top: 0px;
+	left: 0px;
+}
+#dialog {
+	display: inline-block;
+	width: 26%;
+	float: right;
+	margin-top: -275px;
+	margin-right: 240px;
+	text-align:center;
+}
+.share_image{
+	cursor:pointer
+}
 div#preload {display: none;}
-.serverlist {display: none;}
+div {outline: none;}
