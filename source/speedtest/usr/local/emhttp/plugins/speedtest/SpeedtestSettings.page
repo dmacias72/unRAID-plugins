@@ -3,12 +3,9 @@ Menu="NetworkServices"
 Title="Speedtest"
 ---
 <?php
-require("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
+require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 ?>
-<link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest.css">
-<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
-<div id="speedtest">
-<div id="speedtest_form">
+
 <form markdown="1" name="speedtest_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="speedtest/speedtest.cfg" />
 
@@ -47,41 +44,10 @@ Select Speedtest Server:
 &nbsp;
 
 </form>
-</div>
 
-<div id="dialog">
-	<img id="shareImage"src="/plugins/speedtest/images/blank.png"/>
-	<input id="btnBegin" type="button" value="Begin Test">
-</div>
+<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest-settings.js"></script>
 
-<div>
-	<table class="tablesorter speedtest" id="tblData">			
-		<thead>
-			<tr>
-				<th> Date </th>
-				<th> Ping </th>
-				<th> Download </th>
-				<th> Upload </th>
-				<th> Image </th>
-				<th><input id="allData" type="checkbox"></th>
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-</div>
-
-<div id="preload">
-   <img src='/plugins/dynamix/images/loading.gif'>
-</div>
-
-</div>
-
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest.js"></script>
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.strftime-min.js"></script>
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script type="text/javascript">
 var Selected = "<?=$speedtest_server?>";
-var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
 </script>
