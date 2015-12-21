@@ -8,7 +8,7 @@ LOCKFILE="/var/lock/$prog"
 PIDFILE="/var/run/$prog.pid"
 
 # no-op if already running
-if [[ $SERVICE == "enable" && ! -r $PIDFILE ]]; then
+if [[ $WOL == "enable" && ! -r $PIDFILE ]]; then
 sleep 1
 nohup /usr/bin/python $LIBVIRTWOL $BRNAME > /dev/null 2>&1 & echo $! > $PIDFILE &
 touch $LOCKFILE
