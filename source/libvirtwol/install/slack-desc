@@ -6,14 +6,14 @@
 # customary to leave one space after the ':' except on otherwise blank lines.
 
          |-----handy-ruler------------------------------------------------------|
-speedtest: Speedtest (Command Line Tool)
-speedtest:
-speedtest: This is a plugin for unRAID 6.1+. It is an interface for testing
-speedtest: internet bandwidth using speedtest.net and speedtest-cli.
-speedtest: 
-speedtest: sivel/speedtest-cli
-speedtest: https://github.com/sivel/speedtest-cli
-speedtest: 
-speedtest: dmacias72/unRAID
-speedtest: https://github.com/dmacias72/unRAID-plugins
-speedtest:
+libvirtwol: Virtual Machine Manager Wake On Lan
+libvirtwol:
+libvirtwol: This is a plugin for unRAID 6.1+. Wake On Lan for Libvirt. Allows you
+libvirtwol: to recieve a wake on lan packet to start up kvm virtual machines.
+libvirtwol: 
+libvirtwol: 
+libvirtwol: 
+libvirtwol: 
+libvirtwol: dmacias72/unRAID
+libvirtwol: https://github.com/dmacias72/unRAID-plugins
+libvirtwol:
