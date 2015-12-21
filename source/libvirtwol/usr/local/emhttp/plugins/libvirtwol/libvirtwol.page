@@ -39,11 +39,9 @@ function checkRUNNING(form) {
 		form.command.value = "/usr/local/emhttp/plugins/libvirtwol/scripts/stop";
 	 	form.btnApply.disabled = (form.SERVICE.value == "enable");	
 	}
-}
-
+};
 
 function verifyDATA(form) {
 		form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
-}
-
+};
 </script>

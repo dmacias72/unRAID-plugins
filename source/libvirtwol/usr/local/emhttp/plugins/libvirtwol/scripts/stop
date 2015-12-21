@@ -1,7 +1,4 @@
 #!/bin/sh
-# read our configuration
-source /boot/config/plugins/libvirtwol/libvirtwol.cfg
-
 prog="libvirtwol"
 LOCKFILE="/var/lock/$prog"
 PIDFILE="/var/run/$prog.pid"
