@@ -1,5 +1,5 @@
 <?php
-require("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
+require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 
 shell_exec("echo -e 'Internet bandwidth test started' | logger -tspeedtest");
 
