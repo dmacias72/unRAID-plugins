@@ -1,0 +1,49 @@
+Menu="VMManager:2"
+Title="Wake On Lan"
+Icon="libvirtwol.png"
+---
+<?php
+$libvirtwol_cfg = parse_plugin_cfg("libvirtwol");
+$libvirtwol_service = isset($libvirtwol_cfg['SERVICE']) ? $libvirtwol_cfg['SERVICE'] 	: "disable";
+$libvirtwol_running = trim(shell_exec( "ps ax | grep 'libvirtwol.py' | grep -v grep &>/dev/null && echo 'yes' || echo 'no' 2> /dev/null" ));
+$libvirtwol_status = ($libvirtwol_running == "yes") ? 
+	"<b><font style='color:green;'>Running</font></b>":
+	"<b><font style='color:orange;'>Stopped</font></b>";
+?>
+
+<form markdown="1" name="libvirtwol_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="libvirtwol/libvirtwol.cfg" />
+<input type="hidden" id="command" name="#command" value="" />
+
+Enable Wake On Lan (<?=$libvirtwol_status;?>):
+: <select id="SERVICE" name="SERVICE" size="1" onChange="checkRUNNING(this.form);">
+  <?=mk_option($libvirtwol_service, "disable", "No");?>
+  <?=mk_option($libvirtwol_service, "enable", "Yes");?>
+  </select>
+
+&nbsp;
+: <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
+</form>
+
+<script type="text/javascript">
+$(function(){
+	checkRUNNING(document.libvirtwol_settings);
+});
+
+function checkRUNNING(form) {
+	if ("<?=$libvirtwol_running;?>" == "yes")
+		form.btnApply.disabled = "disabled";	
+	if (form.SERVICE.value == "enable")
+		form.command.value = "/usr/local/emhttp/plugins/libvirtwol/scripts/start";
+	else {
+		form.command.value = "/usr/local/emhttp/plugins/libvirtwol/scripts/stop";
+	 	form.btnApply.disabled = (form.SERVICE.value == "enable");	
+	}
+}
+
+
+function verifyDATA(form) {
+		form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
+}
+
+</script>

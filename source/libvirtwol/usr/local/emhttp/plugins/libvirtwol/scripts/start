@@ -1,0 +1,24 @@
+#!/bin/sh
+# read our configuration
+source /boot/config/domain.cfg
+
+prog="libvirtwol"
+LIBVIRTWOL="/usr/local/emhttp/plugins/$prog/scripts/$prog.py"
+LOCKFILE="/var/lock/$prog"
+PIDFILE="/var/run/$prog.pid"
+
+# no-op if already running
+if [[ $SERVICE == "enable" && ! -r $PIDFILE ]]; then
+sleep 1
+nohup /usr/bin/python $LIBVIRTWOL $BRNAME > /dev/null 2>&1 & echo $! > $PIDFILE &
+touch $LOCKFILE
+TIMER=0
+while [ ! -e $PIDFILE ]; do
+	sleep 1
+	let TIMER=$TIMER+1
+      if [ $TIMER -gt 5 ]; then
+           echo -n "$PIDFILE not created"
+           break
+     	fi
+done
+fi

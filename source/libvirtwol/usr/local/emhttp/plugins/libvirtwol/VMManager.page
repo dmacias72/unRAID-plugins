@@ -1,0 +1,6 @@
+Menu="OtherSettings"
+Title="VM Manager"
+Type="xmenu"
+Icon="vmmanager.png"
+Tabs="true"
+---
