@@ -5,8 +5,10 @@ Type="xmenu"
 ---
 <?php
 require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
+$speedtest_theme = $display["theme"];
 ?>
 <link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest.css">
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest-<?=$speedtest_theme;?>.css">
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 <div id="speedtest">
 
@@ -19,13 +21,14 @@ require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 </div>
 
 <div>
-	<table class="tablesorter speedtest" id="tblData">			
+ <table class="tablesorter" id="tblData">
 		<thead>
 			<tr>
-				<th> Date </th>
-				<th> Ping </th>
-				<th> Download </th>
-				<th> Upload </th>
+				<th class="filter-date" data-placeholder="filter date"> Date </th>
+				<th class="filter-host" data-placeholder="filter host"> Host</th>
+				<th class="filter-ping" data-placeholder="filter ping"> Ping </th>
+				<th class="filter-download" data-placeholder="filter download"> Download </th>
+				<th class="filter-upload" data-placeholder="filter upload"> Upload </th>
 				<th> Image </th>
 				<th><input id="allData" type="checkbox"></th>
 			</tr>
@@ -42,6 +45,7 @@ require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 </div>
 
 <script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.tablesorter.combined.js"></script>
 <script type="text/javascript" src="/plugins/speedtest/javascript/jquery.strftime-min.js"></script>
 <script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
