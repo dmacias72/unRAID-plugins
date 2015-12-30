@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 6.40 scan initiated Sat Nov 21 11:46:20 2015 as: /usr/bin/nmap -sP -oX /usr/local/emhttp/plugins/wol/scan.xml -&#45;exclude 192.168.69.1 192.168.69.0/24 -->
+<nmaprun scanner="nmap" args="/usr/bin/nmap -sP -oX /usr/local/emhttp/plugins/wol/scan.xml -&#45;exclude 192.168.69.1 192.168.69.0/24" start="1448131580" startstr="Sat Nov 21 11:46:20 2015" version="6.40" xmloutputversion="1.04">
+<verbose level="0"/>
+<debugging level="0"/>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.2" addrtype="ipv4"/>
+<address addr="00:01:2E:48:ED:6A" addrtype="mac" vendor="PC Partner"/>
+<hostnames>
+<hostname name="KODI.Asus" type="PTR"/>
+</hostnames>
+<times srtt="176" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.4" addrtype="ipv4"/>
+<address addr="00:0E:8F:81:38:29" addrtype="mac" vendor="Sercomm"/>
+<hostnames>
+<hostname name="VERA.Asus" type="PTR"/>
+</hostnames>
+<times srtt="349" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.5" addrtype="ipv4"/>
+<address addr="F4:CE:46:9F:C9:B6" addrtype="mac" vendor="Hewlett-Packard Company"/>
+<hostnames>
+<hostname name="HP9FC9B7.Asus" type="PTR"/>
+</hostnames>
+<times srtt="340" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.6" addrtype="ipv4"/>
+<address addr="00:18:DD:31:1A:9E" addrtype="mac" vendor="Silicondust Engineering"/>
+<hostnames>
+<hostname name="HDHR-1311A9ED.Asus" type="PTR"/>
+</hostnames>
+<times srtt="292" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.7" addrtype="ipv4"/>
+<address addr="00:01:2E:48:B9:EB" addrtype="mac" vendor="PC Partner"/>
+<hostnames>
+<hostname name="KODI3.Asus" type="PTR"/>
+</hostnames>
+<times srtt="309" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.8" addrtype="ipv4"/>
+<address addr="B8:27:EB:26:E7:85" addrtype="mac" vendor="Raspberry Pi Foundation"/>
+<hostnames>
+<hostname name="KODI4.Asus" type="PTR"/>
+</hostnames>
+<times srtt="1092" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.9" addrtype="ipv4"/>
+<address addr="00:21:6A:46:49:76" addrtype="mac" vendor="Intel Corporate"/>
+<hostnames>
+<hostname name="E4310.Asus" type="PTR"/>
+</hostnames>
+<times srtt="79925" rttvar="79925" to="399625"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.10" addrtype="ipv4"/>
+<address addr="48:02:2A:4A:4D:AC" addrtype="mac" vendor="B-Link Electronic Limited"/>
+<hostnames>
+<hostname name="ipcam_fd.Asus" type="PTR"/>
+</hostnames>
+<times srtt="91848" rttvar="91848" to="459240"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.11" addrtype="ipv4"/>
+<address addr="FC:C2:DE:65:76:0B" addrtype="mac"/>
+<hostnames>
+<hostname name="android-90bcb220f2f2e17b.Asus" type="PTR"/>
+</hostnames>
+<times srtt="22238" rttvar="22238" to="111190"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.12" addrtype="ipv4"/>
+<address addr="D0:50:99:53:6C:73" addrtype="mac" vendor="ASRock Incorporation"/>
+<hostnames>
+<hostname name="KILLER-M99-PC.Asus" type="PTR"/>
+</hostnames>
+<times srtt="347" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.24" addrtype="ipv4"/>
+<address addr="94:35:0A:82:88:F5" addrtype="mac" vendor="Samsung Electronics Co."/>
+<hostnames>
+<hostname name="android-cae6bcb692245674.Asus" type="PTR"/>
+</hostnames>
+<times srtt="18476" rttvar="18476" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.41" addrtype="ipv4"/>
+<address addr="00:1C:2A:00:2C:EA" addrtype="mac" vendor="Envisacor Technologies"/>
+<hostnames>
+<hostname name="ENVISALINK.Asus" type="PTR"/>
+</hostnames>
+<times srtt="3252" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.42" addrtype="ipv4"/>
+<address addr="AC:CF:23:08:55:B1" addrtype="mac" vendor="Hi-flying electronics technology Co."/>
+<hostnames>
+<hostname name="Link_Wi-Fi.Asus" type="PTR"/>
+</hostnames>
+<times srtt="83941" rttvar="83941" to="419705"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.44" addrtype="ipv4"/>
+<address addr="AC:CF:23:39:97:5E" addrtype="mac" vendor="Hi-flying electronics technology Co."/>
+<hostnames>
+<hostname name="JAMES_LIGHTS.Asus" type="PTR"/>
+</hostnames>
+<times srtt="50736" rttvar="50736" to="253680"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.50" addrtype="ipv4"/>
+<address addr="BC:5F:F4:FB:5F:EE" addrtype="mac" vendor="ASRock Incorporation"/>
+<hostnames>
+<hostname name="IPMI.Asus" type="PTR"/>
+</hostnames>
+<times srtt="665" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.53" addrtype="ipv4"/>
+<address addr="52:54:00:D8:53:D2" addrtype="mac" vendor="QEMU Virtual NIC"/>
+<hostnames>
+<hostname name="MYTHBUNTU.Asus" type="PTR"/>
+</hostnames>
+<times srtt="188" rttvar="5000" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.61" addrtype="ipv4"/>
+<address addr="00:18:DD:31:5E:E1" addrtype="mac" vendor="Silicondust Engineering"/>
+<hostnames>
+<hostname name="HDHR-1315EE13.Asus" type="PTR"/>
+</hostnames>
+<times srtt="232" rttvar="3777" to="100000"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.195" addrtype="ipv4"/>
+<address addr="78:4B:87:D4:4D:C6" addrtype="mac"/>
+<hostnames>
+<hostname name="android-8eb0b382d1ceb124.Asus" type="PTR"/>
+</hostnames>
+<times srtt="104636" rttvar="104636" to="523180"/>
+</host>
+<host><status state="up" reason="arp-response" reason_ttl="0"/>
+<address addr="192.168.69.254" addrtype="ipv4"/>
+<address addr="78:24:AF:95:E8:B8" addrtype="mac"/>
+<hostnames>
+<hostname name="router.asus.com" type="PTR"/>
+</hostnames>
+<times srtt="550" rttvar="5000" to="100000"/>
+</host>
+<runstats><finished time="1448131585" timestr="Sat Nov 21 11:46:25 2015" elapsed="4.61" summary="Nmap done at Sat Nov 21 11:46:25 2015; 255 IP addresses (19 hosts up) scanned in 4.61 seconds" exit="success"/><hosts up="19" down="236" total="255"/>
+</runstats>
+</nmaprun>
