@@ -1,0 +1,60 @@
+#!/usr/bin/php -q
+<?php
+require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
+
+echo "Internet bandwidth test started\n\n";
+shell_exec("echo -e 'Internet bandwidth test started' | logger -tspeedtest");
+
+$options = "";
+if ( $speedtest_list == "manual")
+	$options .= " --server ".$speedtest_server;
+if ($speedtest_secure == "secure")
+	$options .= " --secure";
+if ($speedtest_share == "share")
+	$options .= " --share"; 
+if ($speedtest_units == "bytes")
+		$options .= " --bytes";
+
+$output = array();
+$command = "speedtest  ".$options." 2>/dev/null";
+$handle = popen($command, 'r');
+
+ob_start();
+
+while(!feof($handle)) {
+    $buffer = fgets($handle);
+    $output[] = trim($buffer);
+    echo "$buffer\n";
+    ob_flush();
+}
+pclose($handle);
+
+ob_end_flush();
+
+$xml = simplexml_load_file($speedtest_filename);
+$test = $xml->addChild('test');
+$test->addAttribute('name', round(microtime(true) * 1000));
+$share = '';
+for ($i = 4; $i < sizeof($output); $i++) {
+	$value = explode(": ", $output[$i]);
+	switch ($i) {
+   	case 4:
+			$test->addAttribute('host', substr($value[0],10));
+			$test->addAttribute('ping', $value[1]);
+	   	break;
+	   case 6:
+			$test->addAttribute('download', $value[1]);
+      	break;
+   	case 8:
+ 			$test->addAttribute('upload', $value[1]);
+      	break;
+   	case 9:
+ 			$test->addAttribute('share', $value[1]);
+ 			break;
+	}	
+}
+
+$xml->asXML($speedtest_filename);
+
+shell_exec("echo -e 'Internet bandwidth test completed' | logger -tspeedtest");
+?>
