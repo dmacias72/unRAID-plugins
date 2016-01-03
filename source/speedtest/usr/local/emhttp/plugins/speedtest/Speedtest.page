@@ -9,8 +9,6 @@ $speedtest_theme = $display["theme"];
 ?>
 <link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest.css">
 <link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest-<?=$speedtest_theme;?>.css">
-<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
-<div id="speedtest">
 
 <div id="dialog">
 	<img id="shareImage"src="/plugins/speedtest/images/blank.png"/>
@@ -21,16 +19,16 @@ $speedtest_theme = $display["theme"];
 </div>
 
 <div>
- <table class="tablesorter" id="tblData">
+ <table class="tablesorter hover-highlight" id="tblData">
 		<thead>
 			<tr>
-				<th class="filter-date" data-placeholder="filter date"> Date </th>
-				<th class="filter-host" data-placeholder="filter host"> Host</th>
-				<th class="filter-ping" data-placeholder="filter ping"> Ping </th>
-				<th class="filter-download" data-placeholder="filter download"> Download </th>
-				<th class="filter-upload" data-placeholder="filter upload"> Upload </th>
+				<th class="filter-date" data-placeholder="by date"> Date </th>
+				<th class="filter-host" data-placeholder="by host"> Host</th>
+				<th class="filter-ping" data-placeholder="by ping"> Ping </th>
+				<th class="filter-download" data-placeholder="by download"> Download </th>
+				<th class="filter-upload" data-placeholder="by upload"> Upload </th>
 				<th> Image </th>
-				<th><input id="allData" type="checkbox"></th>
+				<th><a><i class="fa fa-trash" id='allData' title='delete all'> remove all </i></a></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -38,16 +36,27 @@ $speedtest_theme = $display["theme"];
 	</table>
 </div>
 
-<div id="preload">
-   <img src='/plugins/dynamix/images/loading.gif'>
-</div>
-
+<div id="pager" class="pager">
+  <form>
+    <img src="/plugins/speedtest/icons/first.png" class="first"/>
+    <img src="/plugins/speedtest/icons/prev.png" class="prev"/>
+    <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+    <img src="/plugins/speedtest/icons/next.png" class="next"/>
+    <img src="/plugins/speedtest/icons/last.png" class="last"/>
+    <select class="pagesize">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+      <option value="all">All</option>
+    </select>
+  </form>
 </div>
 
 <script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest.js"></script>
 <script type="text/javascript" src="/plugins/speedtest/javascript/jquery.tablesorter.combined.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.tablesorter.pager.js"></script>
 <script type="text/javascript" src="/plugins/speedtest/javascript/jquery.strftime-min.js"></script>
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script type="text/javascript">
 var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");

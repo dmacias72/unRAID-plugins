@@ -2,13 +2,11 @@
 .tablesorter .headerSortUp,
 .tablesorter .tablesorter-headerSortUp,
 .tablesorter .tablesorter-headerAsc {
-	background-image: url(/webGui/images/sort-asc.png);
 	background-color:#101010;
 }
 .tablesorter .headerSortDown,
 .tablesorter .tablesorter-headerSortDown,
 .tablesorter .tablesorter-headerDesc {
-	background-image: url(/webGui/images/sort-desc.png);
 	background-color:#101010;
 }
 /* filter widget */

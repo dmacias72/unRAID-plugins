@@ -1,6 +1,5 @@
 <?php
 $speedtest_filename = "/boot/config/plugins/speedtest/speedtest.xml";
-
 if (is_file($speedtest_filename)) {
 	if ($_POST["id"] == "all"){
 		$xml = new SimpleXMLElement("<tests></tests>");
