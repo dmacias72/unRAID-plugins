@@ -6,14 +6,14 @@
 # customary to leave one space after the ':' except on otherwise blank lines.
 
          |-----handy-ruler------------------------------------------------------|
-libvirtwol: Virtual Machine Manager Wake On Lan
-libvirtwol:
-libvirtwol: This is a plugin for unRAID 6.1+. Wake On Lan for Libvirt. Allows you
-libvirtwol: to recieve a wake on lan packet to start up kvm virtual machines.
-libvirtwol: 
-libvirtwol: 
-libvirtwol: 
-libvirtwol: 
-libvirtwol: dmacias72/unRAID
-libvirtwol: https://github.com/dmacias72/unRAID-plugins
-libvirtwol:
+wakeonlan: Wake On Lan plugin for unRAID 6.1+
+wakeonlan:
+wakeonlan: Wake On Lan plugin allows you to scan your network, add and save
+wakeonlan: computers from your network. Then wake them.
+wakeonlan: 
+wakeonlan: 
+wakeonlan: 
+wakeonlan: 
+wakeonlan: dmacias72/unRAID
+wakeonlan: https://github.com/dmacias72/unRAID-plugins
+wakeonlan:

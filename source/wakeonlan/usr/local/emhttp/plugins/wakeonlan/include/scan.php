@@ -1,5 +1,5 @@
 <?php
-	$filename = '/usr/local/emhttp/plugins/wakeonlan/scan.xml';
+	$filename = '/var/log/wakeonlan/scan.xml';
 	if (is_file($filename))
 		unlink($filename);
 	$ip = $_POST["ip"];

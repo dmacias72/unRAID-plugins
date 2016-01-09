@@ -1,0 +1,24 @@
+Menu="Wakeonlan:2"
+Title="Network Scan"
+---
+<form markdown="1">
+
+<table class="tablesorter hover-highlight" id="tblScan">
+	<thead>
+		<tr>
+  			<th> Hostname </th>
+			<th> IP Address </th>
+			<th> MAC Address </th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+
+&nbsp;
+: <button type="button" id="btnScan"/>scan</button><button type="button" id="btnClear"/>Clear</button>
+</form>
+
+<div id="preload">
+   <img src='/plugins/dynamix/images/loading.gif'>
+</div>

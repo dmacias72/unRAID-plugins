@@ -1,33 +1,105 @@
-table.tablesorter.wol th:first-child{width:1%;text-align:center;}
-table.tablesorter.wol{margin-top:-26px;border-spacing:0 3px;}
-table.tablesorter.wol td:first-child{width:1%;text-align:center;}
-table.tablesorter.wol th:nth-child(2){width:5%;text-align:left;}
-table.tablesorter.wol td:nth-child(2){width:5%;text-align:left;}
-table.tablesorter.wol th:nth-child(3){width:3%;text-align:left;}
-table.tablesorter.wol td:nth-child(3){width:3%;text-align:left;}
-table.tablesorter.wol th:nth-child(4){width:3%;text-align:left;}
-table.tablesorter.wol td:nth-child(4){width:3%;text-align:left;}
-table.tablesorter.wol th:nth-child(5){width:3%;text-align:left;}
-table.tablesorter.wol td:nth-child(5){width:3%;text-align:left;}
-table.tablesorter.wol th:nth-child(6){width:3%;text-align:left;}
-table.tablesorter.wol td:nth-child(6){width:3%;text-align:left;}
-table.tablesorter.wol th:nth-child(7){width:3%;text-align:left;}
-table.tablesorter.wol td:nth-child(7){width:3%;text-align:left;}
-table.tablesorter.wol th:nth-child(8){width:9%;text-align:left;}
-table.tablesorter.wol td:nth-child(8){width:9%;text-align:left;}
-table.tablesorter.wol tr>td+td+td{width:9%;white-space:nowrap;}
-table.tablesorter.wol td:last-child{width:96px;padding:0;}
-table.tablesorter.scan{margin-top:-26px;border-spacing:0 3px;}
-table.tablesorter.scan th:first-child{width:1%;text-align:center;}
-table.tablesorter.scan td:first-child{width:1%;text-align:center;}
-table.tablesorter.scan th:nth-child(2){width:5%;text-align:left;}
-table.tablesorter.scan td:nth-child(2){width:5%;text-align:left;}
-table.tablesorter.scan th:nth-child(3){width:3%;text-align:left;}
-table.tablesorter.scan td:nth-child(3){width:3%;text-align:left;}
-table.tablesorter.scan th:nth-child(4){width:5%;text-align:left;}
-table.tablesorter.scan td:nth-child(4){width:5%;text-align:left;}
-table.tablesorter.scan th:nth-child(5){width:9%;text-align:left;}
-table.tablesorter.scan td:nth-child(5){width:9%;text-align:left;}
-table.tablesorter.scan tr>td+td+td{width:9%;white-space:nowrap;}
-table.tablesorter.scan td:last-child{width:96px;padding:0;}
+#tblData, #tblScan {
+	margin-top:-21px;
+}
+.mac-uppercase {
+	text-transform:uppercase;
+}
+input.edit-name {
+	width: 150px;
+}
+input.edit-ip {
+	width: 85px;
+}
+input.edit-mac {
+	width: 95px;
+}
+.powercfg {
+	display: none;
+}
 div#preload {display: none;}
+/* header */
+.tablesorter .header,
+.tablesorter .tablesorter-header {
+	background-position: center right;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	outline: none;
+}
+.tablesorter .headerSortUp,
+.tablesorter .tablesorter-headerSortUp,
+.tablesorter .tablesorter-headerAsc {
+	background-image: url(/webGui/images/sort-asc.png);
+}
+.tablesorter .headerSortDown,
+.tablesorter .tablesorter-headerSortDown,
+.tablesorter .tablesorter-headerDesc {
+	background-image: url(/webGui/images/sort-desc.png);
+}
+
+/* tbody */
+.tablesorter td {
+	padding:4px 20px 4px 6px;
+	vertical-align:middle;
+	text-align:justify;
+	cursor: pointer;
+}
+tablesorter tbody tr.tr_last td{
+	padding:8px 20px 8px 6px;
+}
+
+/* FOCUS ROW highlight color (touch devices) */
+.focus-highlight td:focus::before, .focus-highlight th:focus::before {
+  background-color: lightblue;
+}
+
+/* HOVER ROW highlight colors */
+table.hover-highlight tbody > tr:hover > td, /* override tablesorter theme row hover */
+table.hover-highlight tbody > tr.odd:hover > td,
+table.hover-highlight tbody > tr.even:hover > td {
+  background-color: #9FC2E6;
+  color: #000000;
+}
+
+/* ************************************************* */
+/* **** No need to modify the definitions below **** */
+/* ************************************************* */
+.hover-highlight td:hover::after, .hover-highlight th:hover::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 999em;
+  left: 0;
+  top: -555em;
+  z-index: -1;
+}
+/* required styles */
+.hover-highlight {
+  overflow: hidden;
+}
+.hover-highlight td, .hover-highlight th {
+  position: relative;
+  outline: 0;
+}
+/* override the tablesorter theme styling */
+table.hover-highlight, table.hover-highlight tbody > tr > td,
+/* override zebra styling */
+table.hover-highlight tbody tr.even > th,
+table.hover-highlight tbody tr.even > td,
+table.hover-highlight tbody tr.odd > th,
+table.hover-highlight tbody tr.odd > td,
+table.focus-highlight tbody tr.even > th,
+table.focus-highlight tbody tr.even > td,
+table.focus-highlight tbody tr.odd > th,
+table.focus-highlight tbody tr.odd > td {
+  background: transparent;
+}
+/* table background positioned under the highlight */
+table.hover-highlight td:before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: -3;
+}
