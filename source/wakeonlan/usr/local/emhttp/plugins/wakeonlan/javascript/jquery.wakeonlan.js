@@ -18,7 +18,7 @@ $(function(){
 	//Add all click functions
 	$(".edit").one("click", Edit);
 	$(".delete").on("click", Delete);
-	$("#btnNew").on("click", New);
+	$("#btnNew").one("click", New);
 	$("#btnScan").on("click", Scan);
 	$(".wake").on("click", Wake);
 	$("#allMac").on("click",function() {
@@ -63,16 +63,17 @@ function Cancel(par){
 	slideRow(par);
 	$(".edit").off("click", Edit).one("click", Edit);
 	$(".delete").off("click", Delete).on("click", Delete);;
-	$("#btnNew").off("click", New).on("click", New);
+	$("#btnNew").off("click", New).one("click", New);
 };
 
 function slideRow(par) {
-par
+	par
 	.children('td')
 	.animate({ padding: 0 })
 	.wrapInner('<div />')
 	.children()
 	.slideUp(function() { par.remove(); });
+	$("#tblData").trigger("update")
 }
 
 function parseScan(){
@@ -164,9 +165,9 @@ function Add(){
   	  	success: function () {
 			slideRow(tr);
 			addRow(hostName, ipAddress, macAddress);
+			$("#tblData").trigger("update");
   	  	}
 	});
-	$("#tblData").trigger("update");
 };
 
 function addRow(hostName, ipAddress, macAddress) {
@@ -178,7 +179,7 @@ function addRow(hostName, ipAddress, macAddress) {
 	"<td class='edit mac-uppercase mac-address' title='mac address'>"+macAddress+"</td>"+
 	"<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a></td>"+
 	"</tr>");
-
+	
 	$(".wake").off("click", Wake).on("click", Wake);
 	$(".edit").off("click", Edit).on("click", Edit);
 	$(".delete").off("click", Delete).on("click", Delete);
@@ -217,11 +218,16 @@ function Edit(){
 	var tdMAC     = par.children("td:nth-child(4)");
 	var tdButtons = par.children("td:nth-child(5)");
 	
-	tdName.html("<input class='edit-name edit-text' title='name' type='text' id='txtName' value='"+tdName.html()+"'/>");
-	tdIP.html("<input class='ip-address edit-ip edit-text' title='ip address' type='text' id='txtIP' value='"+tdIP.html()+"'/>");
-	tdMAC.html("<input class='mac-address edit-mac edit-text' title='mac address' type='text' id='txtMAC' value='"+tdMAC.html()+"'data-mac='"+tdMAC.html()+"'/>");
-	tdButtons.html("<a class='save' title='save'> <i class='fa fa-floppy-o'/> </a>&nbsp;<a class='cancel' title='cancel'> <i class='fa fa-close'/> </a>");
-
+	tdName.html("<input class='edit-name edit-text' title='name' type='text' "+
+		"id='txtName' value='"+tdName.html()+"'/>");
+	tdIP.html("<input class='ip-address edit-ip edit-text' title='ip address' "+
+		"type='text' id='txtIP' value='"+tdIP.html()+"'/>");
+	tdMAC.html("<input class='mac-address edit-mac edit-text' title='mac address' "+
+		"type='text' id='txtMAC' value='"+tdMAC.html()+"'data-mac='"+tdMAC.html()+
+		"'/><i id='edit-error' class='fa fa-exclamation red' style='display:none;'/>");
+	tdButtons.html("<a id='save' title='save'> <i class='fa fa-floppy-o'/> </a>&nbsp;"+
+		"<a id='cancel' title='cancel'> <i class='fa fa-close'/> </a>");
+	
 	//set focus to input in clicked cell
 	if ($(this).hasClass('mac-address'))
 		$("input.edit-mac").focus();
@@ -230,17 +236,17 @@ function Edit(){
 	if ($(this).hasClass('hostname'))
 		$("input.edit-name").focus();
 		
-	$(".cancel").one("click", Refresh);
+	$("#cancel").one("click", Refresh);
 	$(".edit").off("click", Edit);
 	$(".delete").off("click", Delete);
 	$(".wake").off("click", Wake);
 	$("#btnNew").off("click", New);
-	$(".save").one("click", function() {
-		saveEdit($(this));
+	$("#save").one("click", function() {
+		Save($(this), true);
 		});
 	$(".edit-text").keyup(function(e) {
 		if (e.keyCode == 13) { // enter key maps to keycode `27`
-   		saveEdit($(this));
+   		Save($(this), true);
 		}
 		if (e.keyCode == 27) { // escape key maps to keycode `27`
 			Refresh();
@@ -252,68 +258,33 @@ function Edit(){
 	
 };
 
-function saveEdit(par){
-	par 				= par.parent().parent();
-	var tdName    	= par.children("td:nth-child(2)");
-	var tdIP      	= par.children("td:nth-child(3)");
-	var tdMAC		= par.children("td:nth-child(4)");
-	var tdButtons 	= par.children("td:nth-child(5)");
-
-	var hostName 	= tdName.children("input[type=text]").val();
-	var ipAddress 	= tdIP.children("input[type=text]").val();
-	var macAddress = tdMAC.children("input[type=text]").val();
-	var oldMAC 		= tdMAC.children("input[type=text]").data("mac");
-
-	tdName.html(tdName.children("input[type=text]").val());
-	tdIP.html(tdIP.children("input[type=text]").val());
-	tdMAC.html(tdMAC.children("input[type=text]").val());
-	tdButtons.html("<a class='delete' title='delete'><i class='fa fa-trash'/></a>");
-
-	$(".wake").off("click", Wake).on("click", Wake);
-	$(".edit").off("click", Edit).on("click", Edit);
-	$(".delete").off("click", Delete).on("click", Delete);
-	$("#btnNew").off("click", New).on("click", New);
-
-	$.ajax({
-		type: 'POST',
-	   url: "/plugins/wakeonlan/include/edit_node.php",
-  	  	dataType: 'xml',
-  	  	data: {name: hostName, ip: ipAddress, mac: macAddress, oldmac:oldMAC},
-  	  	error: function() {
-  	   	alert("Unknown error. Data could not be written to the file.");
-  	  	},
-  	  	success: function () {
-
-  	  	}
-	});
-	$("#tblData").trigger("update");
-	ScanIP();
-};
-
 function New(){
 	$("#tblData tbody").append(
 	"<tr>"+
 	"<td class='wake' title='wake'><img src='/plugins/dynamix/images/green-on.png'/></td>"+
 	"<td class='edit' title='edit'><input class='edit-name edit-new' type='text'/></td>"+
 	"<td class='edit' title='edit'><input class='ip-address edit-ip edit-new' type='text'/></td>"+
-	"<td class='edit' title='edit'><input class='mac-address edit-mac edit-new' type='text'/></td>"+
-	"<td><a class='save' title='save'><i class='fa fa-floppy-o'/> </a>&nbsp;"+
-	"<a class='cancel' title='cancel'> <i class='fa fa-trash'/> </a></td>"+
+	"<td class='edit' title='edit'><input class='mac-address edit-mac edit-new' type='text'/>"+
+	"<i id='edit-error' class='fa fa-exclamation red' style='display:none;'/></td>"+
+	"<td><a id='save' title='save'><i class='fa fa-floppy-o'/> </a>&nbsp;"+
+	"<a id='cancel' title='cancel'> <i class='fa fa-trash'/> </a></td>"+
 	"</tr>");
+	$("#tblData").trigger("update");
+
 	$("input.edit-name").focus();
 	
 	$(".edit").off("click", Edit);
 	$(".delete").off("click", Delete);
 	$("#btnNew").off("click", New)
-	$(".cancel").one("click", function() {
+	$("#cancel").one("click", function() {
 		Cancel($(this));
 		});
-	$(".save").one("click", function() {
-		saveNew($(this));
+	$("#save").one("click", function() {
+		Save($(this), false);
 		});
 	$(".edit-new").keyup(function(e) {
 		if (e.keyCode == 13) { // enter key maps to keycode `27`
-   		saveNew($(this));
+   		Save($(this), false);
 		}
 		if (e.keyCode == 27) { // escape key maps to keycode `27`
 			Cancel($(this));
@@ -321,27 +292,62 @@ function New(){
 	});
 };
 
-function saveNew(par){
-	par = par.parent().parent();
-	var hostName = par.children("td:nth-child(2)").children("input[type=text]").val();
-	var ipAddress = par.children("td:nth-child(3)").children("input[type=text]").val();
-	var macAddress = par.children("td:nth-child(4)").children("input[type=text]").val();
-	$.ajax({
-		type: 'POST',
-	   url: "/plugins/wakeonlan/include/add_node.php",
-  	  	dataType: 'xml',
-  	  	data: {name: hostName, ip: ipAddress, mac: macAddress},
-  	  	error: function() {
-  	   	alert("Unknown error. Data could not be written to the file.");
-  	  	},
-  	  	success: function () {
-			slideRow(par);
-			addRow(hostName, ipAddress, macAddress);
-			$("#btnNew").off("click", New).on("click", New);
-  	  	}
-	});
-	$("#tblData").trigger("update");
+function Save(par, edit){
+	par 				= par.parent().parent();
+	var tdMAC		= par.children("td:nth-child(4)");
+	var macAddress = tdMAC.children("input[type=text]").val();
+
+	if (macAddress.length < 17) {
+		$("input.edit-mac").focus();
+		$("#edit-error").show();
+		//alert(tdMAC.html());
+	}else{	
+		var tdName    	= par.children("td:nth-child(2)");
+		var tdIP      	= par.children("td:nth-child(3)");
+		var tdButtons 	= par.children("td:nth-child(5)");
+
+		var hostName 	= tdName.children("input[type=text]").val();
+		var ipAddress 	= tdIP.children("input[type=text]").val();
+		var oldMAC 		= tdMAC.children("input[type=text]").data("mac");
+
+		tdName.html(tdName.children("input[type=text]").val());
+		tdIP.html(tdIP.children("input[type=text]").val());
+		tdMAC.html(tdMAC.children("input[type=text]").val());
+		tdButtons.html("<a class='delete' title='delete'><i class='fa fa-trash'/></a>");
+		$("#tblData").trigger("update");
+	
+		$(".wake").off("click", Wake).on("click", Wake);
+		$(".edit").off("click", Edit).on("click", Edit);
+		$(".delete").off("click", Delete).on("click", Delete);
+		$("#btnNew").off("click", New).one("click", New);
+
+		if (edit) {
+			$.ajax({
+				type: 'POST',
+			   url: "/plugins/wakeonlan/include/edit_node.php",
+  	  			dataType: 'xml',
+	  	  		data: {name: hostName, ip: ipAddress, mac: macAddress, oldmac:oldMAC},
+		  	  	error: function() {
+  			   	alert("Unknown error. Data could not be written to the file.");
+	  		  	},
+  		  		success: function () {
+		  	  	}
+			});
+		}else{
+			$.ajax({
+				type: 'POST',
+			   url: "/plugins/wakeonlan/include/add_node.php",
+  			  	dataType: 'xml',
+  	  			data: {name: hostName, ip: ipAddress, mac: macAddress},
+	  	  		error: function() {
+	  		   	alert("Unknown error. Data could not be written to the file.");
+	  	  		},
+  		  		success: function () {
+	  		  	}
+			});
+		}
 	ScanIP();
+	}
 };
 
 function Scan(){
