@@ -33,17 +33,12 @@ function parseDataXML(){
    	success: function(xml) {
 			$(xml).find("test").each(function(){
 				var Name = $(this).attr("name");
-				var Host = $(this).attr("host");
-	  			if (typeof(Host) === "undefined"){
-		   		Host = "";
-		   	}
-				var Ping = $(this).attr("ping");
-				var Download = $(this).attr("download");
-				var Upload = $(this).attr("upload");
-				var Share = $(this).attr("share");
-	  			if (typeof(Share) === "undefined"){
-		   		Share = "";
-		   	}
+				var Host = ($(this).attr("host")) ? $(this).attr("host") : "--";
+				var Ping = ($(this).attr("ping")) ? $(this).attr("ping") : "--";
+				var Download = ($(this).attr("download")) ? $(this).attr("download") : "--";
+				var Upload = ($(this).attr("upload")) ? $(this).attr("upload") : "--";
+				var Share = ($(this).attr("share")) ? $(this).attr("share") : "";
+
 		   	$("#tblData tbody").append(
 				"<tr id="+Name+" class='shareRow' title='click to show image'>"+
 				"<td data-sortValue='"+Name+"' >"+strftime(DateTimeFormat, new Date(parseInt(Name))).trim()+"</td>"+ //format time based on unRAID display settings

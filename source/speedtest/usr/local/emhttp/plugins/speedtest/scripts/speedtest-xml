@@ -15,44 +15,41 @@ if ($speedtest_share == "share")
 if ($speedtest_units == "bytes")
 		$options .= " --bytes";
 
-$output = array();
 $command = "speedtest  ".$options." 2>/dev/null";
 $handle = popen($command, 'r');
-
-ob_start();
-
-while(!feof($handle)) {
-    $buffer = fgets($handle);
-    $output[] = trim($buffer);
-    echo "$buffer\n";
-    ob_flush();
-}
-pclose($handle);
-
-ob_end_flush();
 
 $xml = simplexml_load_file($speedtest_filename);
 $test = $xml->addChild('test');
 $test->addAttribute('name', round(microtime(true) * 1000));
-$share = '';
-for ($i = 4; $i < sizeof($output); $i++) {
-	$value = explode(": ", $output[$i]);
-	switch ($i) {
-   	case 4:
-			$test->addAttribute('host', substr($value[0],10));
-			$test->addAttribute('ping', $value[1]);
-	   	break;
-	   case 6:
-			$test->addAttribute('download', $value[1]);
-      	break;
-   	case 8:
- 			$test->addAttribute('upload', $value[1]);
-      	break;
-   	case 9:
- 			$test->addAttribute('share', $value[1]);
- 			break;
-	}	
+
+ob_start();
+
+while(!feof($handle)) {
+    $buffer = trim(fgets($handle));
+    $msg = "$buffer\n\n";
+    	$output = explode(": ", $buffer);
+    if ((strpos($output[0], "Hosted by")) !== false) {
+    	$test->addAttribute('host', substr($output[0],10));
+    	$test->addAttribute('ping', $output[1]);
+    	$msg .= "Testing download speed...\n\n";
+    	}elseif ((strpos($buffer, "Download")) !== false) {
+    		$test->addAttribute('download', $output[1]);
+    		$msg .= "Testing upload speed...\n\n";
+    		}elseif ((strpos($buffer, "Upload")) !== false) {
+    			$test->addAttribute('upload', $output[1]);
+    			}elseif ((strpos($buffer, "Share results")) !== false) {
+    				$test->addAttribute('share', $output[1]);
+    				}elseif (((strpos($buffer, "Testing download")) !== false) || ((strpos($buffer, "Testing upload")) !== false)) {
+    					$msg = "";
+    				}
+    echo "$msg";
+  
+    ob_flush();
 }
+
+pclose($handle);
+
+ob_end_flush();
 
 $xml->asXML($speedtest_filename);
 
