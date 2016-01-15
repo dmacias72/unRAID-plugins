@@ -2,7 +2,7 @@
 	text-align:center;
 	margin-bottom: 20px;
 }
-.shareRow{
+.shareRow,.reset{
 	cursor:pointer;
 }
 

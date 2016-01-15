@@ -1,23 +1,4 @@
 $(function(){
-	$('#tblData')
-		.bind('filterInit', function() {
-      	// check that storage ulility is loaded
-			if ($.tablesorter.storage) {
-				// get saved filters
-				var f = $.tablesorter.storage(this, 'tablesorter-filters') || [];
-			$(this).trigger('search', [f]);
-			}
-		})
-		.bind('filterEnd', function(){
-			if ($.tablesorter.storage) {
-				// save current filters
-				var f = $(this).find('.tablesorter-filter').map(function(){
-					return $(this).val() || '';
-					}).get();
-				$.tablesorter.storage(this, 'tablesorter-filters', f);
-			}
-		});
-
    $("#btnBegin").click(beginTEST);// bind click to begin test
 
 	//load table from xml
@@ -48,25 +29,23 @@ function parseDataXML(){
 				"<td>"+Upload+"</td>"+ //Upload
 				"<td>"+Share+ //Share
 				"</td>"+ //Share
-				"<td><a><i class='fa fa-trash' title='delete'></i></a>"+ //checkbox
+				"<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a>"+ //delete icon
 				"</tr>");
 
 				if(Share)
 					$('.shareRow').unbind('click',clickRow).bind('click',clickRow); //bind click to row for url image
+
 				$('#tblData tr td:last-child').unbind('click').click(function () {
         			Delete($(this).parent().attr("id"));
     			});
 
 			});
+
 			$("#tblData").trigger("update");
 			$("#tblData tr:last").addClass("lastRow"); // add class to last test
 
   			//tablesorter
 			$('#tblData').tablesorter({
-				headers:{
-					5:{filter:false},
-					6:{sorter:false, filter:false}
-				},
 				textExtraction : function(node, table, cellIndex){
 					n = $(node);
 					return n.attr('data-sortValue') || n.text();
@@ -76,6 +55,9 @@ function parseDataXML(){
 				widgetOptions: {
 					stickyHeaders_filteredToTop: true,
 					filter_hideEmpty : true,
+					filter_liveSearch : true,
+					filter_saveFilters : true,
+					filter_reset : 'a.reset',
 					filter_functions: {
 					'.filter-date' : {
 		          	"3 days"  : function(e, n, f, i, $r, c, data) { return ($.now() - parseInt($r.attr('id')) <= 259200000); }, //3*24*60*60
@@ -103,7 +85,6 @@ function parseDataXML(){
 						"5 - 10 Mbit/s" : function(e, n, f, i, $r, c, data) { return parseInt(n) >= 5 && parseInt(n) <= 10; },
 						"> 10 Mbit/s"    : function(e, n, f, i, $r, c, data) { return parseInt(n) > 10; }
 						}
-
      		  		}
 				}
 			})
@@ -112,10 +93,12 @@ function parseDataXML(){
 				fixedHeight: false,
 				size: 5
 			});
+
    		$("#allData").click(function() {
   				Delete('all');
 			});
-
+   	},
+   	complete: function () {
 			shareImage();
    	},
        error : function() {}

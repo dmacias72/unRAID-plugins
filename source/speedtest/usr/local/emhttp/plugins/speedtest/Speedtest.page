@@ -27,8 +27,8 @@ $speedtest_theme = $display["theme"];
 				<th class="filter-ping" data-placeholder="by ping"> Ping </th>
 				<th class="filter-download" data-placeholder="by download"> Download </th>
 				<th class="filter-upload" data-placeholder="by upload"> Upload </th>
-				<th> Image </th>
-				<th><a><i class="fa fa-trash" id='allData' title='delete all'> remove all </i></a></th>
+				<th class="filter-false"> Image </th>
+				<th class="filter-false sorter-false"><a id='allData' title='delete all'><i class="fa fa-trash"> remove all </i></a></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -50,6 +50,8 @@ $speedtest_theme = $display["theme"];
       <option value="20">20</option>
       <option value="all">All</option>
     </select>
+    &nbsp;
+    <a  title="reset filters" class="reset"><i class="fa fa-undo"></i></a>
   </form>
 </div>
 
