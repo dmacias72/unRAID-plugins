@@ -45,7 +45,7 @@ Select Speedtest Server:
 
 </form>
 
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest-settings.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest-settings.js"></script>
 
 
 <script type="text/javascript">

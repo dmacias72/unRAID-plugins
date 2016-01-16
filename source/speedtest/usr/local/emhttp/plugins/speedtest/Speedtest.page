@@ -5,10 +5,11 @@ Type="xmenu"
 ---
 <?php
 require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
-$speedtest_theme = $display["theme"];
+$theme = $display["theme"];
 ?>
-<link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest.css">
-<link type="text/css" rel="stylesheet" href="/plugins/speedtest/styles/speedtest-<?=$speedtest_theme;?>.css">
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/speedtest.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$theme;?>.css">
 
 <div id="dialog">
 	<img id="shareImage"src="/plugins/speedtest/images/blank.png"/>
@@ -38,11 +39,11 @@ $speedtest_theme = $display["theme"];
 
 <div id="pager" class="pager">
   <form>
-    <img src="/plugins/speedtest/icons/first.png" class="first"/>
-    <img src="/plugins/speedtest/icons/prev.png" class="prev"/>
+    <a class="first"><i class="fa fa-step-backward"></i></a>
+    <a class="prev"><i class="fa fa-backward"></i></a>
     <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-    <img src="/plugins/speedtest/icons/next.png" class="next"/>
-    <img src="/plugins/speedtest/icons/last.png" class="last"/>
+    <a class="next"><i class="fa fa-forward"></i></a>
+    <a class="last"><i class="fa fa-step-forward"></i></a>
     <select class="pagesize">
       <option value="5">5</option>
       <option value="10">10</option>
@@ -55,10 +56,10 @@ $speedtest_theme = $display["theme"];
   </form>
 </div>
 
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.speedtest.js"></script>
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.tablesorter.combined.js"></script>
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.tablesorter.pager.js"></script>
-<script type="text/javascript" src="/plugins/speedtest/javascript/jquery.strftime-min.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.min.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/pager/jquery.tablesorter.pager.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
 
 <script type="text/javascript">
 var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+         |-----handy-ruler------------------------------------------------------|
+tablesorter: tablesorter (FORK)
+tablesorter:
+tablesorter: tablesorter is a jQuery plugin for turning a standard HTML
+tablesorter: table with THEAD and TBODY tags into a sortable table without page
+tablesorter: refreshes. tablesorter can successfully parse and sort many types
+tablesorter: of data including linked data in a cell. This forked version adds 
+tablesorter: lots of new enhancements including: alphanumeric sorting, pager
+tablesorter: callback functons, multiple widgets providing column styling, ui 
+tablesorter: theme application, sticky headers, column filters and resizer, 
+tablesorter: as well as extended documentation with a lot more demos.
+tablesorter: https://github.com/Mottie/tablesorter
