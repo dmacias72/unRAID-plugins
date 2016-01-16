@@ -4,11 +4,12 @@ Title="Wake On Lan"
 <?php
 $excludeip = $var['IPADDR'];
 $ifname = exec("ifconfig | awk 'BEGIN { ifname = 0 } /$excludeip/ { ifname = 1 } /^($|[^\t])/ { if(ifname) print buffer; buffer = $1; ifname = 0 } END { if(ifname) print buffer }' |  sed s/\:/\/g");
-$wakeonlan_theme = $display["theme"]
+$theme = $display["theme"]
 ?>
 
-<link type="text/css" rel="stylesheet" href="/plugins/wakeonlan/styles/wakeonlan.css">
-<link type="text/css" rel="stylesheet" href="/plugins/wakeonlan/styles/wakeonlan-<?=$wakeonlan_theme;?>.css">
+<link type="text/css" rel="stylesheet" href="/plugins/wakeonlan/css/wakeonlan.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$theme;?>.css">
 
 <form markdown="1">
 
@@ -30,10 +31,10 @@ $wakeonlan_theme = $display["theme"]
 : <button type="button" id="btnNew"/>new</button><button type="button" id="btnDone" onclick="done();"/>Done</button>
 </form>
 
-<script type="text/javascript" src="/plugins/wakeonlan/javascript/jquery.mask.js"></script>
-<script type="text/javascript" src="/plugins/wakeonlan/javascript/jquery.tablesorter.combined.js"></script>
-<script type="text/javascript" src="/plugins/wakeonlan/javascript/parsers/parser-network.js"></script>
-<script type="text/javascript" src="/plugins/wakeonlan/javascript/jquery.wakeonlan.js"></script>
+<script type="text/javascript" src="/plugins/wakeonlan/js/jquery.mask.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.min.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/parsers/parser-network.min.js"></script>
+<script type="text/javascript" src="/plugins/wakeonlan/js/jquery.wakeonlan.js"></script>
 
 <script type="text/javascript">
 var ifName = "<?=$ifname?>";
