@@ -1,0 +1,141 @@
+Icon="aesir.png"
+Menu="UserPreferences"
+Title="Aesir webGUI"
+---
+<?php
+$aesir_cfg = parse_plugin_cfg("aesir-plugin");
+$aesir_service = isset($aesir_cfg['SERVICE']) ? $aesir_cfg['SERVICE'] : "disable";
+$aesir_docroot = isset($aesir_cfg['DOCROOT']) ? $aesir_cfg['DOCROOT']	: "/mnt/cache/appdata/Aesir";
+$aesir_runas = isset($aesir_cfg['RUNAS']) ? $aesir_cfg['RUNAS'] : "nobody";
+$aesir_port = (isset($aesir_cfg['PORT']) && is_numeric($aesir_cfg['PORT']) && $aesir_cfg['PORT'] > 0 && $aesir_cfg['PORT'] < 65535 ) ? $aesir_cfg['PORT'] : "8088";
+exec("awk -F':' '{ if ( $3 >= 1000 ) print $1}' /etc/passwd", $aesir_users); // get array of group users
+$aesir_running = trim(shell_exec( "[ -f /proc/`cat /var/run/aesir.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
+
+$aesir_datasize = 0;
+if (is_dir($aesir_docroot))
+	$aesir_datasize = trim(shell_exec("du -shm '$aesir_docroot' | cut -f1 | sed 's/[^0-9]*//g'"));
+
+$aesir_status = ($aesir_running) ? "<span class='green'>Running</span>" : "<span class='orange'>Stopped</span>";	
+$aesir_port_status = ($aesir_running) ? 
+	"<a style='color:green;' href='http://{$var['IPADDR']}:$aesir_port' title='http://{$var['IPADDR']}:$aesir_port' target='_blank'><b>$aesir_port</b></a>":
+	"<b><font style='color:orange;'>$aesir_port</font></b>";
+
+// check for new file and compare
+$aesir_file = '/boot/config/plugins/aesir-plugin/aesir-master.tar.gz';
+$aesir_temp  = '/tmp/aesir-master.tar.gz';
+$update_ready = "<a id='update' onClick='applyUpdate();'><font><i class='fa fa-cloud-download'></i> update ready</font></a>";
+$up_to_date   = "<font style='color:#44B012;white-space:nowrap;'><i class='fa fa-check'></i> up-to-date</font>";
+$aesir_update = (is_file($aesir_temp)) ? $update_ready : $up_to_date;
+
+if (!is_file($aesir_file) && !is_file($aesir_temp))
+	$aesir_update = "<a id='update-check' onClick='checkUpdate();'><font><i class='fa fa-cloud-download'></i> check for update</font></a>";
+?>
+
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.filetree.css">
+<link type="text/css" rel="stylesheet" href="/plugins/aesir-plugin/css/aesir-plugin.css">
+
+<form markdown="1" name="aesir_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="aesir-plugin/aesir-plugin.cfg" />
+<input type="hidden" id="command" name="#command" value="" />
+
+Enable Aesir webGUI (<span id="update-status"><?=$aesir_update;?></span>):
+: <select id="SERVICE" name="SERVICE" size="1" onChange="checkRUNNING(this.form);">
+  <?=mk_option($aesir_service, "disable", "No");?>
+  <?=mk_option($aesir_service, "enable", "Yes");?>
+  </select>
+
+Install directory (<?=$aesir_datasize;?>MB):
+: <input id="DOCROOT" name="DOCROOT" class="running docroot" type="text" maxlength="60" value="<?=$aesir_docroot;?>" data-pickcloseonfile="true" data-pickfilter="." data-pickroot="/mnt/" data-pickfolders="true" required="required" title="must be on cache, array or other drive to survive reboot" placeholder="e.g. /mnt/cache/appdata for persistent data">
+
+Port  (<?=$aesir_port_status;?>):
+: <input  id="PORT" name="PORT" class="running" style="width:135px" type="text" maxlength="40" value="<?=$aesir_port;?>" title="port must be 0-65535" placeholder="Default Port is 8088" >
+
+Run as User:
+: <select id="USERS" class="running" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$aesir_runas;?>');">
+  <?=mk_option($aesir_runas, "nobody", "nobody");?>
+  <?php foreach($aesir_users as $aesir_user){echo mk_option($aesir_runas, trim($aesir_user), trim($aesir_user));};?>
+  <option value='other' <?=($aesir_runas != "root" && $aesir_runas != "nobody" && !in_array($aesir_runas, $aesir_users))?"selected=yes":"";?>>other</option>
+  </select>
+  <input type="hidden" name="RUNAS" style="width:222px" maxlength="40" value=<?=$aesir_runas;?> >
+
+<input id="DEFAULT" class="running" type="submit" value="Default" onClick="resetDATA(this.form)"><input onclick="checkUpdate()" value="Check for Update" type="button" title="update Aesir webGUI">
+: <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
+</form>
+
+<script type="text/javascript" src="/webGui/javascript/jquery.filetree.js"></script>
+<script type="text/javascript">
+$(function(){
+	$('.tabs')
+		.append("<span class='status'>Status: <?=$aesir_status;?> </span>")
+   $("#DOCROOT").fileTreeAttach(null, null, function(folder) {
+      $("#DOCROOT").val(folder+"Aesir").change();
+   });
+	checkRUNNING(document.aesir_settings);
+	checkUSER(document.aesir_settings,'<?=$aesir_runas;?>');
+});
+
+function resetDATA(form) {
+	form.DOCROOT.value = "/mnt/cache/appdata/Aesir";
+	form.PORT.value = "8088";
+	form.RUNAS.value = "nobody";
+	form.USERS.value = "nobody";
+}
+
+function checkRUNNING(form) {
+	if ("<?=$aesir_running;?>" == true)
+	{
+		$(".running").prop("disabled", true);
+		form.btnApply.disabled = "disabled";
+   }else{
+   	$(".running").prop("disabled", false);
+		$("#btnApply").prop("disabled", false);
+	}
+	if (form.SERVICE.value == "enable")
+		form.command.value = "/usr/local/emhttp/plugins/aesir-plugin/scripts/start";
+	else
+		form.command.value = "/usr/local/emhttp/plugins/aesir-plugin/scripts/stop";
+}
+
+function checkUSER(form, currentUSER) {
+	if (form.USERS.value != "other" ) {
+		form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
+		form.RUNAS.type = "hidden";
+	}else{
+		form.RUNAS.value = currentUSER;
+		if (form.RUNAS.value == "root")
+			form.RUNAS.value = "nobody";
+		form.RUNAS.type = "text";
+		form.RUNAS.title = "Run As User Cannot be Root";
+	}
+}
+
+function verifyDATA(form) {
+	if (!isNumber(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
+			form.PORT.value = "8088";
+	}
+	if (form.RUNAS.value == null || form.RUNAS.value == "" || form.RUNAS.value == "root" ){
+		form.RUNAS.value = "nobody";
+		$aesir_runas = "nobody";
+	}
+	form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
+	form.PORT.value = form.PORT.value.replace(/ /g,"_");
+	form.RUNAS.value = form.RUNAS.value.replace(/ /g,"_");
+}
+
+function checkUpdate() {
+	$('#update-status').html("<font style='color:#44B012;white-space:nowrap;'><i class='fa fa-spin fa-spinner'></i></font>");
+	$.getJSON("/plugins/aesir-plugin/include/check_update.php", {}, function(data) {checkUpdateStatus(data);});
+}
+
+function applyUpdate() {
+	$('#update-status').html("<font style='color:#44B012;white-space:nowrap;'><i class='fa fa-spin fa-spinner'></i></font>");
+	$.getJSON("/plugins/aesir-plugin/include/apply_update.php", {DOCROOT:"<?=$aesir_docroot;?>"}, function(data) {checkUpdateStatus(data);});
+}
+
+function checkUpdateStatus(New) {
+	if (New)
+		$('#update-status').html("<?=$update_ready;?>");
+	else
+		$('#update-status').html("<?=$up_to_date;?>");
+}
+</script>

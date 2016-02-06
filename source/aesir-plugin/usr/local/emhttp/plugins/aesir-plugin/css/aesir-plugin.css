@@ -1,0 +1,16 @@
+.errortext{
+	color: #EF3D47;
+	display: none;
+}
+.fileTree{
+	width:305px;
+	max-height:150px;
+	overflow:scroll;
+	position:absolute;
+	z-index:100;
+	display:none;
+}
+#update, #update-status{
+	cursor: pointer;
+	white-space:nowrap; 
+}

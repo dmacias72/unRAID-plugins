@@ -1,0 +1,11 @@
+#!/bin/sh
+PROG="aesir"
+LOCKFILE="/var/lock/$PROG"
+PIDFILE="/var/run/$PROG.pid"
+
+# no-op if not running
+if [ -r $PIDFILE ]; then
+	kill -TERM $(<"$PIDFILE") > /dev/null 2>&1
+	sleep 1
+	rm -f $LOCKFILE && rm -f $PIDFILE
+fi

@@ -1,0 +1,51 @@
+#!/bin/sh
+PROG="aesir"
+LOCKFILE="/var/lock/$PROG"
+PIDFILE="/var/run/$PROG.pid"
+PLGPATH="/boot/config/plugins/$PROG-plugin"
+GITFILE="$PLGPATH/aesir-master.tar.gz"
+CONFIG="$PLGPATH/$PROG-plugin.cfg"
+#DOCROOT="/srv/www/Aesir"
+
+if [ -e $CONFIG ]; then
+
+	# read our configuration
+	source $CONFIG
+
+	# if docroot exist then make directory and extract git file
+	if [ ! -d $DOCROOT ]; then
+		mkdir -p $DOCROOT
+	fi
+
+	# check if git file exists
+	if [ -e $GITFILE ] && [ ! $(ls -A $DOCROOT) ]; then
+		tar -zxf $GITFILE --strip=1 -C $DOCROOT/
+	fi
+
+	# if docroot exists set owner and permissions
+	if [ -d $DOCROOT ]; then
+		chmod -R 0755 $DOCROOT
+		OWNER=$(stat -c %U $DOCROOT)
+		if [ "$OWNER" != "$RUNAS" ]; then
+			chown -R "$RUNAS":users $DOCROOT
+		fi
+	fi
+
+	# no-op if already running
+	if [[ $SERVICE == "enable" && ! -r $PIDFILE ]]; then
+		CMDLINE="sudo -u $RUNAS /usr/bin/php -S 0.0.0.0:$PORT -t $DOCROOT"
+		sleep 1
+		nohup $CMDLINE > /dev/null 2>&1 & echo $! > $PIDFILE &
+		touch $LOCKFILE
+		TIMER=0
+		while [ ! -e $PIDFILE ]; do
+			sleep 1
+			let TIMER=$TIMER+1
+      		if [ $TIMER -gt 5 ]; then
+      			rm -f $LOCKFILE && rm -f $PIDFILE	
+					echo -n "$PIDFILE not created"
+					break
+   		  	fi
+		done
+	fi
+fi

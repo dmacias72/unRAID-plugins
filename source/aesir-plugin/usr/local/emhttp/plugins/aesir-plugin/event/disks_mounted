@@ -1,0 +1,8 @@
+#!/bin/bash
+CFGFILE="/boot/config/plugins/aesir-plugin/aesir-plugin.cfg"
+if [ -f $CFGFILE ]; then
+	source $CFGFILE
+	if [ $SERVICE = enable ]; then
+		/usr/local/emhttp/plugins/aesir-plugin/scripts/start
+	fi
+fi

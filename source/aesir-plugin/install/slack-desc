@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                  |-----handy-ruler------------------------------------------------------|
+aesir-plugin: Aesir webGUI Plugin
+aesir-plugin:
+aesir-plugin: This is a plugin for Aesir webGUI for unRAID. The aim of the Aesir project 
+aesir-plugin: is to create an aesthetically pleasing interface that is easy for anyone to
+aesir-plugin: use and is also responsive so it works well on phones and tablets as well.
+aesir-plugin: 
+aesir-plugin: 
+aesir-plugin: Aesir:  https://github.com/linuxserver/Aesir
+aesir-plugin: 
+aesir-plugin: Plugin: https://github.com/dmacias72/unRAID-plugins
+aesir-plugin:
