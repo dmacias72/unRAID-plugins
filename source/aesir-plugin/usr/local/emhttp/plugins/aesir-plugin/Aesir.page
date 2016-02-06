@@ -6,9 +6,9 @@ Title="Aesir webGUI"
 $aesir_cfg = parse_plugin_cfg("aesir-plugin");
 $aesir_service = isset($aesir_cfg['SERVICE']) ? $aesir_cfg['SERVICE'] : "disable";
 $aesir_docroot = isset($aesir_cfg['DOCROOT']) ? $aesir_cfg['DOCROOT']	: "/mnt/cache/appdata/Aesir";
-$aesir_runas = isset($aesir_cfg['RUNAS']) ? $aesir_cfg['RUNAS'] : "nobody";
+//$aesir_runas = isset($aesir_cfg['RUNAS']) ? $aesir_cfg['RUNAS'] : "root";
 $aesir_port = (isset($aesir_cfg['PORT']) && is_numeric($aesir_cfg['PORT']) && $aesir_cfg['PORT'] > 0 && $aesir_cfg['PORT'] < 65535 ) ? $aesir_cfg['PORT'] : "8088";
-exec("awk -F':' '{ if ( $3 >= 1000 ) print $1}' /etc/passwd", $aesir_users); // get array of group users
+//exec("awk -F':' '{ if ( $3 >= 1000 ) print $1}' /etc/passwd", $aesir_users); // get array of group users
 $aesir_running = trim(shell_exec( "[ -f /proc/`cat /var/run/aesir.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
 
 $aesir_datasize = 0;
@@ -50,13 +50,14 @@ Install directory (<?=$aesir_datasize;?>MB):
 Port  (<?=$aesir_port_status;?>):
 : <input  id="PORT" name="PORT" class="running" style="width:135px" type="text" maxlength="40" value="<?=$aesir_port;?>" title="port must be 0-65535" placeholder="Default Port is 8088" >
 
-Run as User:
+<!-- Run as User:
 : <select id="USERS" class="running" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$aesir_runas;?>');">
+  <?=mk_option($aesir_runas, "root", "root");?>
   <?=mk_option($aesir_runas, "nobody", "nobody");?>
   <?php foreach($aesir_users as $aesir_user){echo mk_option($aesir_runas, trim($aesir_user), trim($aesir_user));};?>
   <option value='other' <?=($aesir_runas != "root" && $aesir_runas != "nobody" && !in_array($aesir_runas, $aesir_users))?"selected=yes":"";?>>other</option>
   </select>
-  <input type="hidden" name="RUNAS" style="width:222px" maxlength="40" value=<?=$aesir_runas;?> >
+  <input type="hidden" name="RUNAS" style="width:222px" maxlength="40" value=<?=$aesir_runas;?>> -->
 
 <input id="DEFAULT" class="running" type="submit" value="Default" onClick="resetDATA(this.form)"><input onclick="checkUpdate()" value="Check for Update" type="button" title="update Aesir webGUI">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
@@ -71,14 +72,14 @@ $(function(){
       $("#DOCROOT").val(folder+"Aesir").change();
    });
 	checkRUNNING(document.aesir_settings);
-	checkUSER(document.aesir_settings,'<?=$aesir_runas;?>');
+//	checkUSER(document.aesir_settings,'<?=$aesir_runas;?>');
 });
 
 function resetDATA(form) {
 	form.DOCROOT.value = "/mnt/cache/appdata/Aesir";
 	form.PORT.value = "8088";
-	form.RUNAS.value = "nobody";
-	form.USERS.value = "nobody";
+//	form.RUNAS.value = "root";
+//	form.USERS.value = "root";
 }
 
 function checkRUNNING(form) {
@@ -96,7 +97,7 @@ function checkRUNNING(form) {
 		form.command.value = "/usr/local/emhttp/plugins/aesir-plugin/scripts/stop";
 }
 
-function checkUSER(form, currentUSER) {
+/*function checkUSER(form, currentUSER) {
 	if (form.USERS.value != "other" ) {
 		form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
 		form.RUNAS.type = "hidden";
@@ -107,19 +108,19 @@ function checkUSER(form, currentUSER) {
 		form.RUNAS.type = "text";
 		form.RUNAS.title = "Run As User Cannot be Root";
 	}
-}
+}*/
 
 function verifyDATA(form) {
 	if (!isNumber(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
 			form.PORT.value = "8088";
 	}
-	if (form.RUNAS.value == null || form.RUNAS.value == "" || form.RUNAS.value == "root" ){
+/*	if (form.RUNAS.value == null || form.RUNAS.value == "" || form.RUNAS.value == "root" ){
 		form.RUNAS.value = "nobody";
 		$aesir_runas = "nobody";
-	}
+	}*/
 	form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
 	form.PORT.value = form.PORT.value.replace(/ /g,"_");
-	form.RUNAS.value = form.RUNAS.value.replace(/ /g,"_");
+//	form.RUNAS.value = form.RUNAS.value.replace(/ /g,"_");
 }
 
 function checkUpdate() {

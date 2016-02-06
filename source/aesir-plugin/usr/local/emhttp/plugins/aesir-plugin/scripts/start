@@ -6,6 +6,7 @@ PLGPATH="/boot/config/plugins/$PROG-plugin"
 GITFILE="$PLGPATH/aesir-master.tar.gz"
 CONFIG="$PLGPATH/$PROG-plugin.cfg"
 #DOCROOT="/srv/www/Aesir"
+RUNAS="root"
 
 if [ -e $CONFIG ]; then
 
@@ -27,7 +28,7 @@ if [ -e $CONFIG ]; then
 		chmod -R 0755 $DOCROOT
 		OWNER=$(stat -c %U $DOCROOT)
 		if [ "$OWNER" != "$RUNAS" ]; then
-			chown -R "$RUNAS":users $DOCROOT
+			chown -R "$RUNAS":"$RUNAS" $DOCROOT
 		fi
 	fi
 
