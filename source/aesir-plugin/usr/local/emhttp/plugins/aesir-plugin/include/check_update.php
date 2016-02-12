@@ -3,8 +3,7 @@ $repo = 'https://api.github.com/repos/linuxserver/Aesir/tarball/master';
 $file = '/boot/config/plugins/aesir-plugin/aesir-master.tar.gz';
 $temp  = '/tmp/aesir-master.tar.gz';
 
-//Only download repo update if the current one is 1 min old or more
-if (!is_file($temp) || (filemtime($temp) < (time() - 60)))
+if (!is_file($temp))
 	get_content_from_github($repo, $temp);
 
 if (is_file($file) && is_file($temp)){
