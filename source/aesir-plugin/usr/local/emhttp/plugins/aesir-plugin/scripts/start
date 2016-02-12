@@ -19,7 +19,7 @@ if [ -e $CONFIG ]; then
 	fi
 
 	# check if git file exists
-	if [ -e $GITFILE ] && [ ! $(ls -A $DOCROOT) ]; then
+	if [[ -e $GITFILE  &&  ! $(ls -A $DOCROOT) ]]; then
 		tar -zxf $GITFILE --strip=1 -C $DOCROOT/
 	fi
 
