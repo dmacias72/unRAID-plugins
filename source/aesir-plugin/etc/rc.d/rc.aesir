@@ -1,0 +1,101 @@
+#!/bin/sh
+# start/stop/restart aesir daemon:
+PROG="aesir"
+LOCKFILE="/var/lock/$PROG"
+PIDFILE="/var/run/$PROG.pid"
+PLGPATH="/boot/config/plugins/$PROG-plugin"
+GITFILE="$PLGPATH/aesir-master.tar.gz"
+CONFIG="$PLGPATH/$PROG-plugin.cfg"
+#DOCROOT="/srv/www/Aesir"
+RUNAS="root"
+
+# read our configuration
+[ -e "$CONFIG" ] && source "$CONFIG"
+
+# Start aesir:
+aesir_start() {
+	# if docroot exist then make directory and extract git file
+	if [ ! -d $DOCROOT ]; then
+		mkdir -p $DOCROOT
+	fi
+
+	# check if git file exists
+	if [[ -e $GITFILE  &&  ! $(ls -A $DOCROOT) ]]; then
+		tar -zxf $GITFILE --strip=1 -C $DOCROOT/
+	fi
+
+	# if docroot exists set owner and permissions
+	if [ -d $DOCROOT ]; then
+		chmod -R 0755 $DOCROOT
+		OWNER=$(stat -c %U $DOCROOT)
+		if [ "$OWNER" != "$RUNAS" ]; then
+			chown -R "$RUNAS":"$RUNAS" $DOCROOT
+		fi
+	fi
+
+	# no-op if already running
+	if [[ $SERVICE == "enable" && ! -r $PIDFILE ]]; then
+		CMDLINE="sudo -u $RUNAS /usr/bin/php -S 0.0.0.0:$PORT -t $DOCROOT"
+
+		echo "starting $PROG..."
+		sleep 1
+		nohup $CMDLINE > /dev/null 2>&1 | echo $! > $PIDFILE &
+		touch $LOCKFILE
+
+		TIMER=0
+		while [ ! -e $PIDFILE ]; do
+			sleep 1
+			let TIMER=$TIMER+1
+      		if [ $TIMER -gt 5 ]; then
+      			rm -f $LOCKFILE && rm -f $PIDFILE	
+					echo -n "$PIDFILE not created"
+					break
+   		  	fi
+		done
+	else
+		echo "$PROG is running"
+	fi
+}
+
+# Stop aesir:
+aesir_stop() {
+	if [ -r $PIDFILE ]; then
+		echo "stopping $PROG..."
+		kill -TERM $(<"$PIDFILE") > /dev/null 2>&1
+		sleep 1
+		TIMER=0
+		while `killall $PROG 2>/dev/null`; do
+			sleep 1
+			TIMER=$((TIMER+1))
+			if [ $TIMER -ge 30 ]; then
+				killall -9 $PROG
+				sleep 1
+				break
+			fi
+	 done
+	 rm -f $LOCKFILE && rm -f $PIDFILE
+	else
+		echo "$PROG is stopped"
+	fi
+}
+
+# Restart aesir:
+aesir_restart() {
+	aesir_stop
+	sleep 1
+	aesir_start
+}
+
+case "$1" in
+'start')
+  aesir_start
+  ;;
+'stop')
+  aesir_stop
+  ;;
+'restart')
+  aesir_restart
+  ;;
+*)
+  echo "usage rc.aesir: start|stop|restart"
+esac
