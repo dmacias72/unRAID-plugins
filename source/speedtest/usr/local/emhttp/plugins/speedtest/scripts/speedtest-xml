@@ -32,16 +32,15 @@ while(!feof($handle)) {
     	$test->addAttribute('host', substr($output[0],10));
     	$test->addAttribute('ping', $output[1]);
     	$msg .= "Testing download speed...\n\n";
-    	}elseif ((strpos($buffer, "Download")) !== false) {
-    		$test->addAttribute('download', $output[1]);
-    		$msg .= "Testing upload speed...\n\n";
-    		}elseif ((strpos($buffer, "Upload")) !== false) {
-    			$test->addAttribute('upload', $output[1]);
-    			}elseif ((strpos($buffer, "Share results")) !== false) {
-    				$test->addAttribute('share', $output[1]);
-    				}elseif (((strpos($buffer, "Testing download")) !== false) || ((strpos($buffer, "Testing upload")) !== false)) {
-    					$msg = "";
-    				}
+    }elseif ((strpos($buffer, "Download")) !== false) {
+    	$test->addAttribute('download', $output[1]);
+    	$msg .= "Testing upload speed...\n\n";
+    }elseif ((strpos($buffer, "Upload")) !== false) {
+    	$test->addAttribute('upload', $output[1]);
+    }elseif ((strpos($buffer, "Share results")) !== false) {
+    	$test->addAttribute('share', $output[1]);
+    }elseif (((strpos($buffer, "Testing download")) !== false) || ((strpos($buffer, "Testing upload")) !== false)) {
+    	$msg = "";}
     echo "$msg";
   
     ob_flush();
