@@ -1,4 +1,4 @@
-/*! tablesorter (FORK) - updated 01-15-2016 (v2.25.2)*/
+/*! tablesorter (FORK) - updated 01-21-2016 (v2.25.3)*/
 /* Includes widgets ( storage,uitheme,columns,filter,stickyHeaders,resizable,saveSort ) */
 (function(factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -366,7 +366,7 @@
 
 })(jQuery);
 
-/*! Widget: filter - updated 1/15/2016 (v2.25.2) *//*
+/*! Widget: filter - updated 1/21/2016 (v2.25.3) *//*
  * Requires tablesorter v2.8+ and jQuery 1.7+
  * by Rob Garrison
  */
@@ -983,7 +983,9 @@
 				mode = encode ? encodeURIComponent : decodeURIComponent,
 				len = filters.length;
 			for ( indx = 0; indx < len; indx++ ) {
-				filters[ indx ] = mode( filters[ indx ] );
+				if ( filters[ indx ] ) {
+					filters[ indx ] = mode( filters[ indx ] );
+				}
 			}
 			return filters;
 		},
@@ -1170,7 +1172,7 @@
 					event.preventDefault();
 					// init search with no delay
 					$( this ).attr( 'data-lastSearchTime', new Date().getTime() );
-					tsf.searching( table, false, true );
+					tsf.searching( table, event.type !== 'keypress', true );
 				}
 			});
 		},
