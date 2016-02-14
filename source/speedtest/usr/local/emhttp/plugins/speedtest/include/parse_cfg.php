@@ -1,7 +1,5 @@
 <?php
-require_once("/usr/local/emhttp/webGui/include/Wrappers.php");
-
-$speedtest_cfg = parse_plugin_cfg("speedtest");
+$speedtest_cfg = parse_ini_file("/boot/config/plugins/speedtest/speedtest.cfg");
 $speedtest_filename = "/boot/config/plugins/speedtest/speedtest.xml";
 $speedtest_secure = isset($speedtest_cfg['SECURE']) ? $speedtest_cfg['SECURE'] 	: "no";
 $speedtest_share = isset($speedtest_cfg['SHARE'])   ? $speedtest_cfg['SHARE'] 	: "share";
