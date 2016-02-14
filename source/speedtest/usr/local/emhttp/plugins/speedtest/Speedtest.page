@@ -5,22 +5,73 @@ Type="xmenu"
 ---
 <?php
 require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
-$theme = $display["theme"];
 ?>
-<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/speedtest.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$theme;?>.css">
 
-<div id="dialog">
+<!-- Google charts -->
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.charts.loader.js"></script>
+
+<!-- tablesorter -->
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
+<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.min.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/widgets/widget-chart.min.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/widgets/widget-columnSelector.min.js"></script>
+
+<!-- buttons -->
+<link rel="stylesheet" href="/plugins/speedtest/css/bootstrap.css">
+<link rel="stylesheet" href="/plugins/speedtest/css/bootstrap-<?=$display["theme"];?>.css">
+<script src="/plugins/speedtest/js/bootstrap.min.js"></script>
+
+<!-- switch button -->
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
+
+<!-- speedtest -->
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/speedtest.css">
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
+
+<span id="switch" class="status" style="display: inline-block;margin-top: -45px;"><label><i class="fa fa-pie-chart"></i>Chart</label><input id="chartSelect" class="hidden" type="checkbox"></span>
+
+<div id="chart-container">
+    <div id="chart"></div>
+    <p></p>
+    <div id="chartbar">
+	 <!-- row selector -->
+	<span class="wrapper">
+		<div class="btn-group chart-filter-all" data-toggle="buttons">
+			<label class="btn btn-default btn-sm active" title="Chart filtered rows">
+				<input name="getrows" data-type="filter" checked="checked" type="radio"> Filtered
+			</label>
+			<label class="btn btn-default btn-sm" title="Chart visible rows">
+				<input name="getrows" data-type="visible" type="radio"> Visible
+			</label>
+			<label class="btn btn-default btn-sm" title="Chart all rows">
+				<input name="getrows" data-type="all" type="radio"> All
+			</label>
+		</div>
+	</span>
+      <i class="fa fa-lg fa-line-chart clickable" title="Line Graph"></i>
+      <i class="fa fa-area-chart clickable" title="Area Graph"></i>
+      <i class="fa fa-bar-chart clickable" title="Vertical Bar Chart"></i>
+      <i class="fa fa-tasks fa-rotate-90 clickable" title="Stacking Vertical Bar Chart"></i>
+      <i class="fa fa-align-left clickable" title="Horizontal Bar Chart"></i>
+      <i class="fa fa-tasks fa-rotate-180 clickable" title="Stacking Horizontal Bar Chart"></i>
+	</div>
+	<p></p>
+</div>
+
+<div id="dialog" class="speedtest">
 	<img id="shareImage"src="/plugins/speedtest/images/blank.png"/>
 </div>
 
-<div id="image">
+<div id="image" class="speedtest">
 	<input id="btnBegin" type="button" value="Begin Test">
 </div>
 
 <div>
- <table class="tablesorter hover-highlight" id="tblData">
+ <table class="tablesorter hover-highlight" id="tblTests">
 		<thead>
 			<tr>
 				<th class="filter-date" data-placeholder="by date"> Date </th>
@@ -29,7 +80,7 @@ $theme = $display["theme"];
 				<th class="filter-download" data-placeholder="by download"> Download </th>
 				<th class="filter-upload" data-placeholder="by upload"> Upload </th>
 				<th class="filter-false"> Image </th>
-				<th class="filter-false sorter-false"><a id='allData' title='delete all'><i class="fa fa-trash"> remove all </i></a></th>
+				<th class="filter-false sorter-false"><a id='allTests' title='delete all'><i class="fa fa-trash"></i> remove all </a></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -56,11 +107,7 @@ $theme = $display["theme"];
   </form>
 </div>
 
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest.js"></script>
-<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.min.js"></script>
-<script type="text/javascript" src="/plugins/tablesorter/js/pager/jquery.tablesorter.pager.js"></script>
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
-
 <script type="text/javascript">
-var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
+//var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
+var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
 </script>
