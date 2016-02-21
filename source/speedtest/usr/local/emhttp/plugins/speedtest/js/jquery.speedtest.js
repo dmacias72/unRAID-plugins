@@ -3,7 +3,10 @@ google.charts.load('current', {'packages':['bar','line','corechart']});
 $(function(){
 	//load table from xml
 	parseDataXML();
-	
+	var ActiveChart = ($.cookie("speedtest_chart")) ? $.cookie("speedtest_chart") : 'area';
+	$("#"+ActiveChart).addClass('active');
+	var DataType = ($.cookie("speedtest_datatype")) ? $.cookie("speedtest_datatype") : 'filter';
+	$('.btn-group label#'+DataType).addClass('active');
    $("#btnBegin").click(beginTEST);// bind click to begin test
    
 	//tablesorter
@@ -81,7 +84,7 @@ $(function(){
     $bar = $('#chartbar'),
     $rowType = $('[name=getrows]'),
     $icons = $('#chart-container i'),
-    initType = 'area', // graph types ('pie', 'pie3D', 'line', 'area', 'vbar', 'vstack', 'hbar' or 'hstack')
+    initType = ($.cookie("speedtest_chart")) ? $.cookie("speedtest_chart") : 'area', // graph types ('pie', 'pie3D', 'line', 'area', 'vbar', 'vstack', 'hbar' or 'hstack')
     chartTitle = 'Speedtest Results',
     hAxisTitle = 'Date',
     vAxisTitle = Units,
@@ -194,17 +197,20 @@ $(function(){
     $.each(types, function(i, v){
       if ($t.hasClass(v.icon)) {
         settings.type = i;
+        $.cookie("speedtest_chart", i, { expires: 3650 });
       }
     });
     drawChart();
   });
 
   $rowType.on('change', function(){
-    $table[0].config.widgetOptions.chart_incRows = $rowType.filter(':checked').attr('data-type');
-    // update data, then draw new chart
-    $table.trigger('chartData');
-    drawChart();
-  });
+		DataType = $rowType.filter(':checked').attr('data-type')
+		$.cookie("speedtest_datatype", DataType, { expires: 3650 });
+		$table[0].config.widgetOptions.chart_incRows = DataType;
+		// update data, then draw new chart
+		$table.trigger('chartData');
+		drawChart();
+	});
 
   $table.on('columnUpdate pagerComplete', function(e) {
     var table = this,
@@ -251,13 +257,13 @@ function parseDataXML(){
 			var Share = ($(this).attr("share")) ? $(this).attr("share") : "";
 
 	   	$("#tblTests tbody").append(
-			"<tr id='"+Name+"' class='shareRow' title='click to show image'>"+
-			"<td data-sortValue='"+Name+"' >"+strftime('%Y-%m-%d %H:%M %a', new Date(parseInt(Name))).trim()+"</td>"+ //DateTimeFormat for format time based on unRAID display settings
-			"<td>"+Host+"</td>"+ //Host
-			"<td>"+Ping+"</td>"+ //Ping
-			"<td>"+Download+"</td>"+ //Download
-			"<td>"+Upload+"</td>"+ //Upload
-			"<td>"+Share+"</td>"+ //Share
+			"<tr id='"+Name+"' title='click to show image'>"+
+			"<td class='shareRow' data-sortValue='"+Name+"' >"+strftime('%Y-%m-%d %H:%M %a', new Date(parseInt(Name))).trim()+"</td>"+ //DateTimeFormat for format time based on unRAID display settings
+			"<td class='shareRow'>"+Host+"</td>"+ //Host
+			"<td class='shareRow'>"+Ping+"</td>"+ //Ping
+			"<td class='shareRow'>"+Download+"</td>"+ //Download
+			"<td class='shareRow'>"+Upload+"</td>"+ //Upload
+			"<td class='shareRow'>"+Share+"</td>"+ //Share
 			"<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a>"+ //delete icon
 			"</tr>");
 
@@ -268,7 +274,7 @@ function parseDataXML(){
 		});
 
 		$('.shareRow').click(function () { //bind click to row for url image
-     		shareImage($(this))});
+     		shareImage($(this).parent())});
 
 		$('.delete').click(function () { //bind delete to each delete icon
      		Delete($(this).parent().parent().attr("id"));
