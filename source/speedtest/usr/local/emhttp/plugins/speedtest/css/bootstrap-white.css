@@ -98,3 +98,6 @@ i.active.clickable,
 i.clickable:hover {
   color: #000000;
 }
+.shareRow {
+	background-color:rgba(255,255,255,0.1);
+}
