@@ -257,13 +257,13 @@ function parseDataXML(){
 			var Share = ($(this).attr("share")) ? $(this).attr("share") : "";
 
 	   	$("#tblTests tbody").append(
-			"<tr id='"+Name+"' title='click to show image'>"+
-			"<td class='shareRow' data-sortValue='"+Name+"' >"+strftime('%Y-%m-%d %H:%M %a', new Date(parseInt(Name))).trim()+"</td>"+ //DateTimeFormat for format time based on unRAID display settings
-			"<td class='shareRow'>"+Host+"</td>"+ //Host
-			"<td class='shareRow'>"+Ping+"</td>"+ //Ping
-			"<td class='shareRow'>"+Download+"</td>"+ //Download
-			"<td class='shareRow'>"+Upload+"</td>"+ //Upload
-			"<td class='shareRow'>"+Share+"</td>"+ //Share
+			"<tr class='shareRow' id='"+Name+"' title='click to show image'>"+
+			"<td data-sortValue='"+Name+"' >"+strftime('%Y-%m-%d %H:%M %a', new Date(parseInt(Name))).trim()+"</td>"+ //DateTimeFormat for format time based on unRAID display settings
+			"<td>"+Host+"</td>"+ //Host
+			"<td>"+Ping+"</td>"+ //Ping
+			"<td>"+Download+"</td>"+ //Download
+			"<td>"+Upload+"</td>"+ //Upload
+			"<td>"+Share+"</td>"+ //Share
 			"<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a>"+ //delete icon
 			"</tr>");
 
@@ -274,7 +274,7 @@ function parseDataXML(){
 		});
 
 		$('.shareRow').click(function () { //bind click to row for url image
-     		shareImage($(this).parent())});
+     		shareImage($(this))});
 
 		$('.delete').click(function () { //bind delete to each delete icon
      		Delete($(this).parent().parent().attr("id"));
@@ -296,8 +296,8 @@ function beginTEST() {
 }
 
 // show image or display blank
-function shareImage(Image) {
-	Image = Image.children("td:nth-child(6)").text(); // get last row image
+function shareImage(tdImage) {
+	Image = tdImage.children("td:nth-child(6)").text(); // get last row image
 	if (Image)
 	 	$('#shareImage').attr('src', Image); //change image if it exists
 	else

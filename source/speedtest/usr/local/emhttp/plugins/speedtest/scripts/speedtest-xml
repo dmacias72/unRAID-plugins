@@ -15,7 +15,7 @@ if ($speedtest_share == "share")
 if ($speedtest_units == "bytes")
 		$options .= " --bytes";
 
-$command = "speedtest  ".$options." 2>/dev/null";
+$command = "/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest.py  ".$options." 2>/dev/null";
 $handle = popen($command, 'r');
 
 $xml = simplexml_load_file($speedtest_filename);
@@ -23,20 +23,24 @@ $test = $xml->addChild('test');
 $test->addAttribute('name', round(microtime(true) * 1000));
 
 ob_start();
-
+$results = '';
 while(!feof($handle)) {
     $buffer = trim(fgets($handle));
     $msg = "$buffer\n\n";
     	$output = explode(": ", $buffer);
     if ((strpos($output[0], "Hosted by")) !== false) {
-    	$test->addAttribute('host', substr($output[0],10));
+    	$host = substr($output[0],10);
+    	$test->addAttribute('host', $host);
     	$test->addAttribute('ping', $output[1]);
+    	$result .= 'Ping: '.$output[1];
     	$msg .= "Testing download speed...\n\n";
     }elseif ((strpos($buffer, "Download")) !== false) {
     	$test->addAttribute('download', $output[1]);
+    	$result .= ', Download: '.$output[1];
     	$msg .= "Testing upload speed...\n\n";
     }elseif ((strpos($buffer, "Upload")) !== false) {
     	$test->addAttribute('upload', $output[1]);
+    	$result .= ', Upload: '.$output[1];
     }elseif ((strpos($buffer, "Share results")) !== false) {
     	$test->addAttribute('share', $output[1]);
     }elseif (((strpos($buffer, "Testing download")) !== false) || ((strpos($buffer, "Testing upload")) !== false)) {
@@ -51,6 +55,10 @@ pclose($handle);
 ob_end_flush();
 
 $xml->asXML($speedtest_filename);
+
+shell_exec("echo -e 'Host: ${host}' | logger -tspeedtest");
+
+shell_exec("echo -e '${result}' | logger -tspeedtest");
 
 shell_exec("echo -e 'Internet bandwidth test completed' | logger -tspeedtest");
 ?>

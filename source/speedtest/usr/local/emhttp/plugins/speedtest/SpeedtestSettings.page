@@ -38,7 +38,7 @@ Select Speedtest Server:
 		<option value=""> ...loading speedtest.net server list </option>
   </select>
 
-<input id="DEFAULT" type="submit" value="Default" onClick="resetDATA(this.form)">
+<input id="DEFAULT" type="submit" value="Default" onClick="resetDATA(this.form)"><input type="button" value="History" onClick="javascript:location.href='/Tools/Speedtest'"><input type="button" value="Scheduler" onClick="javascript:location.href='/Settings/Scheduler'">
 : <input id="btnApply" type="submit" value="Apply" ><input type="button" value="Done" onClick="done()">
 
 &nbsp;
