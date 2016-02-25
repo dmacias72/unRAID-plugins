@@ -204,7 +204,7 @@ $(function(){
   });
 
   $rowType.on('change', function(){
-		DataType = $rowType.filter(':checked').attr('data-type')
+		DataType = $rowType.filter(':checked').attr('data-type');
 		$.cookie("speedtest_datatype", DataType, { expires: 3650 });
 		$table[0].config.widgetOptions.chart_incRows = DataType;
 		// update data, then draw new chart
@@ -241,8 +241,6 @@ $(function(){
       }
     }, 10);
   });
-
-console.log($table[0]);
 })
 
 // parse speedtest xml data
@@ -274,7 +272,7 @@ function parseDataXML(){
 		});
 
 		$('.shareRow').click(function () { //bind click to row for url image
-     		shareImage($(this))});
+     		shareImage($(this).children("td:nth-child(6)").html())});
 
 		$('.delete').click(function () { //bind delete to each delete icon
      		Delete($(this).parent().parent().attr("id"));
@@ -283,7 +281,7 @@ function parseDataXML(){
 		$("#tblTests tr:last").addClass("lastRow"); // add class to last test
 
 		$("#tblTests").trigger("update");
-		shareImage($('#tblTests .lastRow')); // show image for last test
+		shareImage($('#tblTests .lastRow').children("td:nth-child(6)").html()); // show image for last test
 	});
 }
 
@@ -296,23 +294,11 @@ function beginTEST() {
 }
 
 // show image or display blank
-function shareImage(tdImage) {
-	Image = tdImage.children("td:nth-child(6)").text(); // get last row image
+function shareImage(Image) {
 	if (Image)
 	 	$('#shareImage').attr('src', Image); //change image if it exists
 	else
 		$('#shareImage').attr('src', '/plugins/speedtest/images/blank.png');	// change image to blank if it does not exist
-}
-
-// animate row deletion
-function slideRow(par) {
-	par
-	.children('td')
-	.animate({ padding: 0 })
-	.wrapInner('<div />')
-	.children()
-	.slideUp(function() { par.remove(); });
-	$("#tblTests").trigger("update")
 }
 
 // delete table row or entire table
@@ -327,22 +313,25 @@ function Delete(Row) {
 		}, function() {
 		$.get("/plugins/speedtest/include/delete_node.php", {id: Row}, function() {
 			$("#tblTests tbody").empty(); // empty table
+			shareImage(false); // show blank image
 			}
 		);
     });
 	} else {
 		$.get("/plugins/speedtest/include/delete_node.php", {id: Row}, function() {
-			if ($('#'+Row).hasClass("lastRow")){
-				if ($('.filter-date').hasClass('tablesorter-headerDesc'))
-					$('#'+Row).next('tr').addClass('lastRow');
-				else
-					$('#'+Row).prev('tr').addClass('lastRow');
+			
+			// add class lastrow and show image of next row
+			$('#'+Row).next('tr').addClass('lastRow');
+			shareImage($('#'+Row).next('tr').children("td:nth-child(6)").html());
 
-				slideRow($('#'+Row)); //remove table row
-				shareImage($('#tblTests .lastRow'));
-			} else{
-				slideRow($('#'+Row)); //remove table row
-			}
+			// animate row deletion
+			$('#'+Row)
+			.children('td')
+			.animate({ padding: 0 })
+			.wrapInner('<div />')
+			.children()
+			.slideUp(function() { par.remove(); });
 		});
 	}
+	$("#tblTests").trigger("update")
 }
