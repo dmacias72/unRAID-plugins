@@ -1,6 +1,6 @@
 $(function(){
    $('#LIST').change(function () {
-       if ($('#LIST option:selected').text() == "Manual"){
+       if ($('#LIST')[0].selectedIndex){
        		$('.serverlist').css('visibility','visible')
            getServerList(Selected);
        } else {
@@ -8,7 +8,7 @@ $(function(){
        } 
    });
    
-   if ($('#LIST option:selected').text() == "Manual"){
+   if ($('#LIST')[0].selectedIndex){
    	$('.serverlist').css('visibility','visible')
 		getServerList(Selected);
    } else {
@@ -16,35 +16,28 @@ $(function(){
 	}
 });
 
+// list all available servers
 function getServerList(Selected){
-  	$.ajax({
-      type: "GET",
-      dataType: "json",
-   	url: "/plugins/speedtest/include/speedtest-list.php", // list all available servers
-      data: "{}",
-   	success: function(data) {
-	   	var serverList= "<option ";
-	   	if (Selected === ""){
+  	$.getJSON('/plugins/speedtest/include/speedtest-list.php', {}, function(data) {
+	   var serverList= '<option ';
+	   if (Selected === ''){
+	   	serverList+= "selected='' ";
+	   }
+   	for (var i = 0; i < data.length; i++){
+	   	serverList+= '<option '; 
+	   	if (data[i][0] === Selected){
 	   		serverList+= "selected='' ";
 	   	}
-   		for (var i = 0; i < data.length; i++){
-	   		serverList+= "<option "; 
-	   		if (data[i][0] === Selected){
-	   			serverList+= "selected='' ";
-	   		}
-	   		serverList+= "value='" + data[i][0] + "'>" + data[i][1] + "</option>";
-			}
-		   $("#SERVER").html(serverList);
-		},
-      error : function() {},
-      cache: true
+	   	serverList+= "value='" + data[i][0] + "'>" + data[i][1] + "</option>";
+		}
+	   $('#SERVER').html(serverList);
 	});
 };
 
 function resetDATA(form) {
-	form.SECURE.value = "";
-	form.SHARE.value = "--share";
-	form.UNITS.value = "";
-	form.LIST.value = "auto";
-	form.SERVER.value = "";
+	form.SECURE.value = '';
+	form.SHARE.value = '--share';
+	form.UNITS.value = '';
+	form.LIST.value = 'auto';
+	form.SERVER.value = '';
 };
