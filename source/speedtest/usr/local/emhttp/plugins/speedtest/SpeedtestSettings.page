@@ -28,7 +28,7 @@ Create Results Image:
   </select>
 
 Select Speedtest Server:
-: <select id="LIST" name="LIST" size="1" onChange="listChange(this.form);">
+: <select id="LIST" name="LIST" size="1">
   <?=mk_option($speedtest_list, "auto", "Auto");?>
   <?=mk_option($speedtest_list, "manual", "Manual");?>
   </select>
