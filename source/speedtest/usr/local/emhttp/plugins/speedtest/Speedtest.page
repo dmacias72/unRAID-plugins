@@ -6,9 +6,13 @@ Type="xmenu"
 <?php
 require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 ?>
+<script type="text/javascript">
+//var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
+var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
+</script>
 
 <!-- Google charts -->
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.charts.loader.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
 
 <!-- tablesorter -->
 <link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
@@ -32,13 +36,13 @@ require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 <script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest.js"></script>
 <script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
 
-<span id="switch" class="status" style="display: inline-block;margin-top: -45px;"><label><i class="fa fa-pie-chart"></i>Chart</label><input id="chartSelect" class="hidden" type="checkbox"></span>
-
+<div id="wait"></div>
 <div id="chart-container">
     <div id="chart"></div>
     <p></p>
     <div id="chartbar">
-	 <!-- row selector -->
+	&nbsp;
+	<!-- row selector -->
 	<span class="wrapper">
 		<div class="btn-group chart-filter-all" data-toggle="buttons">
 			<label id="filter" class="btn btn-default btn-sm" title="Chart filtered rows">
@@ -52,22 +56,23 @@ require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 			</label>
 		</div>
 	</span>
+		&nbsp;
+		<label class="btnBegin btn btn-default btn-sm active"> Begin Test </label>
+		<i id="scatter" class="fa fa-lg fa-ellipsis-h  clickable" title="Scatter Graph"></i>
       <i id="line" class="fa fa-lg fa-line-chart clickable" title="Line Graph"></i>
-      <i id="area" class="fa fa-area-chart clickable" title="Area Graph"></i>
-      <i id="vbar" class="fa fa-bar-chart clickable" title="Vertical Bar Chart"></i>
-      <i id="vstack" class="fa fa-tasks fa-rotate-90 clickable" title="Stacking Vertical Bar Chart"></i>
-      <i id="hbar" class="fa fa-align-left clickable" title="Horizontal Bar Chart"></i>
-      <i id="hstack" class="fa fa-tasks fa-rotate-180 clickable" title="Stacking Horizontal Bar Chart"></i>
+  	   <i id="area" class="fa fa-area-chart clickable" title="Area Graph"></i>
+     	<i id="vbar" class="fa fa-bar-chart clickable" title="Vertical Bar Chart"></i>
+      <!--<i id="vstack" class="fa fa-tasks fa-rotate-90 clickable" title="Stacking Vertical Bar Chart"></i>-->
+  	   <i id="hbar" class="fa fa-align-left clickable" title="Horizontal Bar Chart"></i>
+     	<!--<i id="hstack" class="fa fa-tasks fa-rotate-180 clickable" title="Stacking Horizontal Bar Chart"></i>-->
 	</div>
 	<p></p>
 </div>
-
-<div id="dialog" class="speedtest">
-	<img id="shareImage"src="/plugins/speedtest/images/blank.png"/>
-</div>
-
-<div id="image" class="speedtest">
-	<input id="btnBegin" type="button" value="Begin Test">
+<div id="shareImage">
+	<img id="image" src="/plugins/speedtest/images/blank.png"/>
+	<div id="begin">
+		<label class="btnBegin btn btn-default btn-sm active"> Begin Test </label>
+	</div>
 </div>
 
 <div>
@@ -76,6 +81,7 @@ require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 			<tr>
 				<th class="filter-date" data-placeholder="by date"> Date </th>
 				<th class="filter-host" data-placeholder="by host"> Host</th>
+				<th class="filter-distance" data-placeholder="by distance"> Distance </th>
 				<th class="filter-ping" data-placeholder="by ping"> Ping </th>
 				<th class="filter-download" data-placeholder="by download"> Download </th>
 				<th class="filter-upload" data-placeholder="by upload"> Upload </th>
@@ -106,8 +112,4 @@ require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
     <a  title="reset filters" class="reset"><i class="fa fa-undo"></i></a>
   </form>
 </div>
-
-<script type="text/javascript">
-//var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
-var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
-</script>
+<br>
