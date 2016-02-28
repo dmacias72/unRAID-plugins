@@ -1,5 +1,6 @@
 <?php
-$speedtest_cfg = parse_ini_file("/boot/config/plugins/speedtest/speedtest.cfg");
+$speedtest_cfg_file = "/boot/config/plugins/speedtest/speedtest.cfg";
+$speedtest_cfg = is_file($speedtest_cfg_file) ?parse_ini_file($speedtest_cfg_file) : [];
 $speedtest_filename = "/boot/config/plugins/speedtest/speedtest.xml";
 $speedtest_secure = isset($speedtest_cfg['SECURE']) ? $speedtest_cfg['SECURE'] 	: "no";
 $speedtest_share = isset($speedtest_cfg['SHARE'])   ? $speedtest_cfg['SHARE'] 	: "share";
