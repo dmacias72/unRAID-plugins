@@ -12,17 +12,17 @@ Icon="sensorspage.png"
 		<thead>
 			<tr>
 				<th class="sorter-false filter-false"> Status </th>
-				<th class="network"> IP Address </th>
-				<th> ID </th>
-				<th> Sensor </th>
-				<th class="advanced"> Lower <br> Non-Recover </th>
-				<th class="advanced"> Lower <br> Critical </th>
-				<th class="advanced"> Lower <br> Non-Critical </th>
-				<th> Reading </th>
-				<th> Units </th>
-				<th class="advanced"> Upper <br> Non-Critical </th>
-				<th class="advanced"> Upper <br> Critical </th>
-				<th class="advanced"> Upper <br> Non-Recover </th>
+				<th class="network sorter-ipv4Address filter-ip" data-placeholder="by IP Address"> IP Address </th>
+				<th class="filter-false"> ID </th>
+				<th class="filter-false"> Sensor </th>
+				<th class="advanced filter-false"> Lower <br> Non-Recover </th>
+				<th class="advanced filter-false"> Lower <br> Critical </th>
+				<th class="advanced filter-false"> Lower <br> Non-Critical </th>
+				<th class="filter-false"> Reading </th>
+				<th class="filter-type" data-placeholder="by type"> Units </th>
+				<th class="advanced filter-false"> Upper <br> Non-Critical </th>
+				<th class="advanced filter-false"> Upper <br> Critical </th>
+				<th class="advanced filter-false"> Upper <br> Non-Recover </th>
 			</tr>
 		</thead>
 		<tbody>

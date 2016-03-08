@@ -61,7 +61,9 @@ function ipmi_sensors($options=null) {
 		$sensor = ($size_raw < 13) ? []: array_combine($keys, array_slice($sensor_raw,0,13,true));
 		  /*array_combine(array_slice($keys,0,$size_raw,true), $sensor_raw)*/
 
-		if (!empty($options)){
+		if (empty($options)){
+			$sensors[$sensor['ID']] = $sensor;
+		}else{
 			//split id into host and id
 			$id = explode(':',$sensor['ID']);
 			$sensor['IP'] = trim($id[0]);
@@ -71,9 +73,8 @@ function ipmi_sensors($options=null) {
 
 			// add sensor to array of sensors
 			$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
-		}else
-			$sensors[$sensor['ID']] = $sensor;
 	}
+}
 	return $sensors;
 }
 
@@ -96,7 +97,9 @@ function ipmi_events($options=null){
 		$size_raw = sizeof($event_raw);
 		$event = ($size_raw < 7) ? []: array_combine($keys, array_slice($event_raw,0,7,true));
 
-		if (!empty($options)){
+		if (empty($options)){
+			$events[$event['ID']] = $event;
+		}else{
 		//split id into host and id
 		$id = explode(':',$event['ID']);
 		$event['IP'] = trim($id[0]);
@@ -106,28 +109,27 @@ function ipmi_events($options=null){
 
 		// add event to array of events
 		$events[ip2long($event['IP']).'-'.$event['ID']] = $event;
-		}else
-			$events[$event['ID']] = $event;
 	}
+}
 	return $events;
 }
 
 /* get select options for a given sensor type */
 function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
 	if ($hdd)
-		$sensors[] = ['ID' => 'localhost: HDD', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
+		$sensors[] = ['IP' => '', 'ID' => 'HDD', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
 	$options = "";
 	foreach($sensors as $id => $sensor){
 		if ($sensor["Type"] == $type && $sensor["State"] != "N/A"){ //ns
 			$name = $sensor['Name'];
-			$ip = $sensor['IP'];
+			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
 			$options .= "<option value='$id'";
 
 			// set saved option as selected
 			if ($selected == $id)
 				$options .= " selected";
 
-		$options .= ">$name ($ip)</option>";
+		$options .= ">$name$ip</option>";
 		}
 	}
 	return $options;
@@ -171,10 +173,20 @@ function ipmi_get_readings($options=null) {
 		$size_raw = sizeof($sensor_raw);
 		$sensor = ($size_raw < 5) ? []: array_combine($keys, array_slice($sensor_raw,0,5,true));
 
-		// add sensor to array of sensors
-		$sensors[$sensor['ID']] = $sensor;
-	}
+		if (empty($options)){
+			$sensors[$sensor['ID']] = $sensor;
+		}else{
+			//split id into host and id
+			$id = explode(':',$sensor['ID']);
+			$sensor['IP'] = trim($id[0]);
+			$sensor['ID'] = trim($id[1]);
+			if ($sensor['IP'] == 'localhost')
+				$sensor['IP'] = '127.0.0.1';
 
+			// add sensor to array of sensors
+			$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
+	}
+}
 	return $sensors; // sensor readings
 }
 
@@ -185,5 +197,4 @@ function ipmi_get_fans($sensors){
 	}
 	return $fans;
 }
-//echo json_encode(ipmi_events());
 ?>
