@@ -1,0 +1,51 @@
+/* header */
+table.tablesorter{
+	margin-top:-21px;
+}
+
+.tablesorter td.reading{
+	font-weight: bold;
+}
+
+#settings {
+	cursor: pointer;
+}
+
+.advanced, .network {
+		display: none;
+}
+
+input[type="text"].ipmi-ipaddr {
+	width: 345px;
+}
+
+input[type="text"].ipmi-user,
+input[type="password"].ipmi-password {
+	width: 205px;
+}
+
+select.display {
+	min-width: 220px;
+}
+/* filters */
+select .tablesorter input.tablesorter-filter,
+.tablesorter select.tablesorter-filter {
+	width: 50%;
+	min-width: 100px;
+	max-width: 150px;
+}
+/* optional disabled input styling */ table.tablesorter thead tr.tablesorter-filter-row input.disabled {
+		opacity: 0.0;
+		filter: alpha(opacity=0);
+}
+
+table.tablesorter.events th:first-child{width:9%;text-align:center;}
+table.tablesorter.events td:first-child{width:9%;text-align:center;}
+table.tablesorter.events th:nth-child(2){width:9%;text-align:left;}
+table.tablesorter.events td:nth-child(2){width:9%;text-align:left;}
+table.tablesorter.events th:nth-child(3){width:9%;text-align:left;}
+table.tablesorter.events td:nth-child(3){width:9%;text-align:left;}
+table.tablesorter.events th:nth-child(4){width:18%;text-align:left;}
+table.tablesorter.events td:nth-child(4){width:18%;text-align:left;}
+table.tablesorter.events th:nth-child(7){width:24%;text-align:left;}
+table.tablesorter.events td:nth-child(7){width:24%;text-align:left;}

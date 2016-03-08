@@ -1,0 +1,37 @@
+Menu="IPMITools:1"
+Title="Sensors"
+Icon="sensorspage.png"
+---
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
+
+<div>
+	<table class="tablesorter sensors" id="tblSensor">
+		<thead>
+			<tr>
+				<th class="sorter-false filter-false"> Status </th>
+				<th class="network"> IP Address </th>
+				<th> ID </th>
+				<th> Sensor </th>
+				<th class="advanced"> Lower <br> Non-Recover </th>
+				<th class="advanced"> Lower <br> Critical </th>
+				<th class="advanced"> Lower <br> Non-Critical </th>
+				<th> Reading </th>
+				<th> Units </th>
+				<th class="advanced"> Upper <br> Non-Critical </th>
+				<th class="advanced"> Upper <br> Critical </th>
+				<th class="advanced"> Upper <br> Non-Recover </th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	<button type="button" onClick="done();">Done</button>
+</div>
+
+<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
+<script type="text/javascript" src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
+<script type="text/javascript" src="/plugins/ipmi/js/jquery.ipmi.js"></script>

@@ -1,0 +1,6 @@
+Menu="SystemInformation"
+Icon="ipmi.png"
+Title="IPMI"
+Type="xmenu"
+Tabs="true"
+---

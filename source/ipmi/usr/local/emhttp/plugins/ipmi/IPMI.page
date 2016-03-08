@@ -1,0 +1,6 @@
+Menu="OtherSettings"
+Icon="ipmi.png"
+Title="IPMI"
+Type="xmenu"
+Tabs="true"
+---

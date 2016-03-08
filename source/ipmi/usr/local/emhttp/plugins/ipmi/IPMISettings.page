@@ -1,0 +1,155 @@
+Menu="IPMI:1"
+Title="Settings"
+---
+<?php require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php'; ?>
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
+<script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
+
+<form markdown="1" name="ipmi_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
+<input type="hidden" id="COMMAND" name="#command" value="" />
+
+Enable Event Notifications:
+: <select id="IPMISELD" name="IPMISELD" size="1" onChange="checkIPMISELD(this.form);" title="Enable event notifications and local system logging for ipmi events">
+  <?=mk_option($ipmiseld, "disable", "No");?>
+  <?=mk_option($ipmiseld, "enable", "Yes");?>
+  </select>
+
+<label class="ipmi-seld">Event Polling Time:</label>
+: <select id="IPMIPOLL" class="ipmi-seld ipmiseld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
+  <?=mk_option($ipmipoll, "30", "15 sec");?>
+  <?=mk_option($ipmipoll, "60", "30 sec");?>
+  <?=mk_option($ipmipoll, "120", "1 min");?>
+  <?=mk_option($ipmipoll, "180", "3 min");?>
+  <?=mk_option($ipmipoll, "300", "5 min");?>
+  </select>
+
+&nbsp;
+
+Enable Network Connection(s):
+: <select id="NETWORK" class="ipmiseld-run" name="NETWORK" size="1" onChange="checkNETWORK(this.form);"  title="Enable connection to network based ipmi, not necessary for local onboard ipmi">
+  <?=mk_option($ipmi_network, "disable", "No");?>
+  <?=mk_option($ipmi_network, "enable", "Yes");?>
+  </select>
+
+<label class="ipmi-lan">Enable Localhost Connection:</label>
+: <select id="LOCAL" class="ipmiseld-run ipmi-lan" name="LOCAL" size="1" onChange="checkLOCAL(this.form);" title="Enable localhost connection along with network connections">
+  <?=mk_option($ipmi_local, "disable", "No");?>
+  <?=mk_option($ipmi_local, "enable", "Yes");?>
+  </select>
+
+<label class="ipmi-lan">IPMI IP Address(es):</label>
+: <input id="IPADDR" type="text" class="ipmiseld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipmi_ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$ipmi_conn;?></label>
+
+<label class="ipmiseld-run ipmi-lan">IPMI User Name:</label>
+: <input id="USER" type="text" class="ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$ipmi_user;?>" title="username for network access IPMI" placeholder="username for network access" >
+
+<label class="ipmi-lan">IPMI Password:</label>
+: <input id="PASSWORD" type="password" class="ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$ipmi_password;?>" title="password for network access IPMI" placeholder="password for network access" >
+
+&nbsp;
+
+Display Temperature #1:
+: <select name="DISP_TEMP1" class="display">
+		<option value='false'>None</option>
+		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $ipmi_disp_temp1);?>
+  </select>
+
+Display Temperature #2:
+: <select name="DISP_TEMP2" class="display">
+		<option value='false'>None</option>	
+		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $ipmi_disp_temp2);?>
+	</select>
+
+Display Fan Speed #1:
+: <select name="DISP_FAN1" class="display">
+		<option value='false'>None</option>
+		<?=ipmi_get_options($ipmi_sensors, 'Fan', $ipmi_disp_fan1);?>
+	</select>
+
+Display Fan Speed #2:
+: <select name="DISP_FAN2" class="display">
+		<option value='false'>None</option>
+		<?=ipmi_get_options($ipmi_sensors, 'Fan', $ipmi_disp_fan2);?>
+	</select>
+
+<input id="DEFAULT" class="ipmiseld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
+: <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
+</form>
+
+<script type="text/javascript">
+$(function(){
+	$('.tabs')
+		.append("<span class='status'>Fan Control: <?=$ipmifan_status;?> </span>")
+		.append("<span class='status'>Event Notification: <?=$ipmiseld_status;?> </span>");
+	checkIPMISELD(document.ipmi_settings);
+	//checkIPMIFAN(document.ipmifan_settings);
+	checkNETWORK(document.ipmi_settings);
+	checkLOCAL(document.ipmi_settings);
+	decData(document.ipmi_settings);
+	//ip address input mask
+	//$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+});
+
+function resetDATA(form) {
+	form.IPMIPOLL.selectedIndex = 2;
+	form.NETWORK.selectedIndex = 0;
+	form.LOCAL.selectedIndex = 0;
+	form.IPADDR.value = "";
+	form.USER.value = "";
+	form.PASSWORD.value = "";
+	form.DISP_TEMP1.selectedIndex = 0;
+	form.DISP_TEMP2.selectedIndex = 0;
+	form.DISP_FAN1.selectedIndex = 0;
+	form.DISP_FAN2.selectedIndex = 0;
+	form.submit();
+}
+
+function checkIPMISELD(form) {
+	if (form.IPMISELD.selectedIndex < 1 ){
+		$(".ipmi-seld").hide();
+		form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seldstop";
+	}else {
+   	$(".ipmi-seld").show();
+   	$(".ipmi-seld").prop("disabled", (form.IPMISELD.value == "enable"));
+   	form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seldstart";
+   }
+
+	if ("<?=$ipmiseld_running;?>" == true)
+	{
+		$(".ipmiseld-run").prop("disabled", true);
+		form.btnApply.disabled = "disabled";
+   }else{
+   	$(".ipmiseld-run").prop("disabled", false);
+		$("#btnApply").prop("disabled", false);
+	}
+}
+
+function decData(form) {
+ form.PASSWORD.value = atob(form.PASSWORD.value);
+}
+
+function checkNETWORK(form) {
+	if (form.NETWORK.selectedIndex < 1 )
+		$(".ipmi-lan").hide();
+	else {
+   	$(".ipmi-lan").show();
+   	$(".ipmi-lan").prop("disabled", (form.IPMISELD.value == "enable"));
+   }
+}
+
+function checkLOCAL(form) {
+	if (form.LOCAL.selectedIndex < 1 )
+		$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+	else 
+		$('.ipmi-ipaddr').mask('localhost, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+}
+
+function verifyDATA(form) {
+	form.IPMISELD.value = form.IPMISELD.value.replace(/ /g,"_");
+	form.NETWORK.value = form.NETWORK.value.replace(/ /g,"_");
+	form.USER.value = form.USER.value.replace(/ /g,"_");
+	form.PASSWORD.value = btoa(form.PASSWORD.value);
+}
+
+</script>

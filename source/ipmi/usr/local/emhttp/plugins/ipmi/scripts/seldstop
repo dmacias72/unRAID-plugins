@@ -1,0 +1,4 @@
+#!/bin/sh
+/etc/rc.d/rc.ipmiseld stop
+sleep 1
+/etc/rc.d/rc.ipmitail stop
