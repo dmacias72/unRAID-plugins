@@ -156,7 +156,7 @@ function temp_get_options($range, $selected=null){
 
 /* get reading for a given sensor by name */
 function ipmi_get_readings($options=null) {
-	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --ignore-not-available-sensors --no-header-output --no-sensor-type-output --interpret-oem-data --always-prefix $options 2>/dev/null";
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --ignore-not-available-sensors --no-header-output --no-sensor-type-output --interpret-oem-data $options 2>/dev/null";
 	exec($cmd, $output, $return);
 
 	if ($return)
