@@ -17,7 +17,7 @@ do
 
 # only notify when ipmiseld: is in the system log
 [[ "$LINE" != *$DAEMON* ]] && continue
-MESSAGE=$(echo "$LINE" | sed -e 's/.*$DAEMON//')
+MESSAGE=$(echo "$LINE" | sed -e 's/.* IPMI Event: //')
 sleep 1 |
 exec /usr/local/emhttp/webGui/scripts/notify -s "Notice [$HOSTNAME]" -d "$MESSAGE" -i "warning" && continue 2
 done
