@@ -32,20 +32,20 @@ Enable Network Connection(s):
   <?=mk_option($ipmi_network, "enable", "Yes");?>
   </select>
 
-<label class="ipmi-lan">Enable Localhost Connection:</label>
+<label class="ipmiseld-run ipmi-lan">Enable Localhost Connection:</label>
 : <select id="LOCAL" class="ipmiseld-run ipmi-lan" name="LOCAL" size="1" onChange="checkLOCAL(this.form);" title="Enable localhost connection along with network connections">
   <?=mk_option($ipmi_local, "disable", "No");?>
   <?=mk_option($ipmi_local, "enable", "Yes");?>
   </select>
 
-<label class="ipmi-lan">IPMI IP Address(es):</label>
+<label class="ipmiseld-run ipmi-lan">IPMI IP Address(es):</label>
 : <input id="IPADDR" type="text" class="ipmiseld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipmi_ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$ipmi_conn;?></label>
 
 <label class="ipmiseld-run ipmi-lan">IPMI User Name:</label>
-: <input id="USER" type="text" class="ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$ipmi_user;?>" title="username for network access IPMI" placeholder="username for network access" >
+: <input id="USER" type="text" class="ipmiseld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$ipmi_user;?>" title="username for network access IPMI" placeholder="username for network access" >
 
-<label class="ipmi-lan">IPMI Password:</label>
-: <input id="PASSWORD" type="password" class="ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$ipmi_password;?>" title="password for network access IPMI" placeholder="password for network access" >
+<label class="ipmiseld-run ipmi-lan">IPMI Password:</label>
+: <input id="PASSWORD" type="password" class="ipmiseld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$ipmi_password;?>" title="password for network access IPMI" placeholder="password for network access" >
 
 &nbsp;
 
@@ -87,8 +87,6 @@ $(function(){
 	checkNETWORK(document.ipmi_settings);
 	checkLOCAL(document.ipmi_settings);
 	decData(document.ipmi_settings);
-	//ip address input mask
-	//$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
 });
 
 function resetDATA(form) {
@@ -140,9 +138,9 @@ function checkNETWORK(form) {
 
 function checkLOCAL(form) {
 	if (form.LOCAL.selectedIndex < 1 )
-		$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+		$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
 	else 
-		$('.ipmi-ipaddr').mask('localhost, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ, 0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+		$('.ipmi-ipaddr').mask('localhost,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
 }
 
 function verifyDATA(form) {

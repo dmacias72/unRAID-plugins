@@ -107,8 +107,7 @@ function sensorRefresh() {
 //load ipmi sensor table
 function sensorArray(Refresh){
 	var Host;
-  	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php',
-   	{ }, function(sensors) {
+  	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
    		$.each(sensors, function (i, sensor) {
    			if (sensor.State != 'N/A') {
    				var Reading = parseFloat(sensor.Reading);
@@ -168,30 +167,22 @@ function sensorArray(Refresh){
 					}
 				}
    		});
-/*		if (!Refresh) {
-			$('.tabs')
-			.append("<div class='tab' style='padding:50px;'></div>"
-			)
-   		.append("<div class='tab'><input id='localhost' type='radio' onclick='' name='servers'>"+
-			"<label for='localhost'><i class='fa fa-th-list'></i> localhost </label></div>"
-			)
-   		.append("<div class='tab'><input id='1921686950' type='radio' onclick='' name='servers'>"+
-			"<label for='1921686950'><i class='fa fa-th-list'></i> 192.168.68.50 </label></div>"
-			);
-		}
-*/		
 
-		if(Host)
-			$('.network').show();
-			else
+		if(Host == '')
 			$('.network').hide();
+			else
+			$('.network').show();
 
 		if ($('#advancedview')[0].checked)
 			$('.advanced').show();
 		else
 			$('.advanced').hide();
 			
-		$('#tblSensor').trigger('update'); //update sensor table
+		//$('#tblSensor').trigger('update'); //update sensor table
+		// restore filters
+		var lastSearch = $('#tblSensor')[0].config.lastSearch;
+		$('#tblSensor').trigger('update');
+		$('#tblSensor').trigger('search', [lastSearch]);
 
  	});
 };
@@ -200,12 +191,7 @@ function sensorArray(Refresh){
 function eventArray(){
 	var Host;
 	$('#tblEvent tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
-  	$.ajax({
-  		cache: false,
-  		type: 'GET',
-  		dataType: 'json',
-  		url: '/plugins/ipmi/include/ipmi_events.php',
-  		success: function(events) {
+  	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
   		$('#tblEvent tbody').empty();
    		$.each(events, function (i, event) {
    			var State = (event.State == 'Asserted') ? 'red' : 'green';
@@ -223,10 +209,10 @@ function eventArray(){
 				"</tr>");
    		});
  
-				if(Host)
-					$('.network').show();
-				else
+				if(Host == '')
 					$('.network').hide();
+				else
+					$('.network').show();
 
 			$('.delete').click(function () {
 				Delete($(this).parent().parent().attr('id'));
@@ -239,7 +225,6 @@ function eventArray(){
 			$('#allEvents').click(function() {
   				Delete('all');
 			});
- 		}
  	});
 }
 
@@ -253,8 +238,7 @@ function Delete(ID) {
 			showCancelButton: true,
 			closeOnConfirm: true,
 		}, function() {
-		$.get(EventDelete, {event: ID}, function(data) {
-			alert(data);
+		$.get(EventDelete, {event: ID}, function() {
 			$('#tblEvent tbody').empty(); // empty table
 			}
 		);
@@ -262,8 +246,7 @@ function Delete(ID) {
 	} else {
 		var trID = $('#'+ID);
 		$.get(EventDelete, {event: ID},
-			function(data) {
-				alert(data);
+			function() {
 				//remove table row
 				trID
 				.children('td')

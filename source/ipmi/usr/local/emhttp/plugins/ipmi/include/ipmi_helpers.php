@@ -29,8 +29,8 @@ $ipmi_user     = isset($ipmi_cfg['USER'])     ? $ipmi_cfg['USER']     : ""; // u
 $ipmi_password = isset($ipmi_cfg['PASSWORD']) ? $ipmi_cfg['PASSWORD'] : ""; // password for network access
 
 // options for network access or not
-$ipmi_options = ($ipmi_network == 'enable') ? "--always-prefix -h '$ipmi_ipaddr' -u $ipmi_user -p ".
-	base64_decode($ipmi_password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
+$ipmi_options = ($ipmi_network == 'enable') ? "--always-prefix -h $ipmi_ipaddr -u $ipmi_user -p ".
+	base64_decode($ipmi_password)." --session-timeout=10000 --retransmission-timeout=1000" : '';
 
 // Get sensor info and check connection 
 $ipmi_sensors = ipmi_sensors($ipmi_options);

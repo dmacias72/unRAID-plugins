@@ -15,7 +15,7 @@ ipmiseld_start() {
 	# no-op if already running
 	if [ ! -r "$PIDFILE" ]; then
 		if [ "$IPMISELD" == "enable" ]; then
-			if [ $REMOTE == "enable" ]; then
+			if [ $NETWORK == "enable" ]; then
 				OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
 			fi
 			echo "starting $PROG..."

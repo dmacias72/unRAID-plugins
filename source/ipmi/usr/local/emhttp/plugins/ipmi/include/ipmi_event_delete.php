@@ -8,16 +8,16 @@ if($event == 'all') {
 	if($ipmi_network == 'enable')
 		$options .= " -h '$ipmi_ipaddr'";
 }else{
-	$options = "--delete="
-	if($ipmi_network == 'enable')
+	$options = "--delete=";
+	if($ipmi_network == 'enable'){
 		$id = explode("-", $event);
-		$options = $id[1]." -h ".long2ip($id[0])." -u $ipmi_user";
-	else
+		$options .= $id[1]." -h ".long2ip($id[0])." -u $ipmi_user";
+	}else{
 		$options .= $event;
+		}
 }
 if($ipmi_network == 'enable')
-	$options .= " -p '".base64_decode($ipmi_password)."' --session-timeout=5000 --retransmission-timeout=1000 ";
+	$options .= " -p ".base64_decode($ipmi_password)." --session-timeout=5000 --retransmission-timeout=1000 ";
 
-//shell_exec($cmd.$options);
-echo $cmd.$options;
+shell_exec($cmd.$options);
 ?>
