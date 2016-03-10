@@ -38,7 +38,7 @@ $(function(){
 			filter_hideEmpty : true,
 			filter_liveSearch : true,
 			filter_saveFilters : true,
-			filter_reset : '.sensorreset',
+			filter_reset : '.sreset',
 			filter_functions: {
 				'.filter-ip' : true,
 				'.filter-type' : true,
@@ -54,7 +54,7 @@ $(function(){
 			filter_hideEmpty : true,
 			filter_liveSearch : true,
 			filter_saveFilters : true,
-			filter_reset : '.eventreset',
+			filter_reset : '.ereset',
 			filter_functions: {
 				'.filter-ip' : true,
 				'.filter-type' : true,
@@ -78,7 +78,7 @@ $(function(){
 	.tablesorterPager({
 		container: $('.pager'),
 		fixedHeight: false,
-		size: 10
+		size: 20
 	});
 
 	// add network class to ip address filter row cells

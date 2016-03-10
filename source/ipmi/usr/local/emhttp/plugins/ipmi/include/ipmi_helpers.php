@@ -191,9 +191,9 @@ function ipmi_get_readings($options=null) {
 }
 
 function ipmi_get_fans($sensors){
-	foreach($sensors as $sensor){
+	foreach($sensors as $key => $sensor){
 		if ($sensor['Type'] == 'Fan' && $sensor['State'] != 'N/A')
-			$fans[] = $sensor['Name']; 
+			$fans[] = $key; 
 	}
 	return $fans;
 }

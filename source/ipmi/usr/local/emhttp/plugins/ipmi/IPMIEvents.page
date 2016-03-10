@@ -34,7 +34,7 @@ Title="Event Log"
       <option value="all">All</option>
     </select>
     &nbsp;
-    <a  title="reset filters" class="eventreset"><i class="fa fa-undo"></i></a>
+    <a  title="reset filters" class="ereset"><i class="fa fa-undo"></i></a>
   </form>
 </div>
 <script type="text/javascript" src="/plugins/tablesorter/js/parsers/parser-network.min.js"></script>

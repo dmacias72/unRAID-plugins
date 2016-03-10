@@ -28,7 +28,7 @@ Icon="sensorspage.png"
 		<tbody>
 		</tbody>
 	</table>
-	<button type="button" onClick="done();">Done</button>
+	<button type="button" onClick="done();">Done</button><button type="button" class="sreset" title="reset table sorting filters">Reset</button>
 </div>
 
 <script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
