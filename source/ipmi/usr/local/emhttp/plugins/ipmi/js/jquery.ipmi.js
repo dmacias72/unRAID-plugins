@@ -42,7 +42,7 @@ $(function(){
 			filter_functions: {
 				'.filter-ip' : true,
 				'.filter-type' : true,
-				}
+			}
 		}
 	});
 
@@ -81,15 +81,15 @@ $(function(){
 		size: 10
 	});
 
-// add network class to ip address filter row cells
-$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
-$('#tblEvent tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
+	// add network class to ip address filter row cells
+	$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
+	$('#tblEvent tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
 
-// add advanced class to select tablesorter filter row cells
-var tdAdv = [5, 6, 7, 10, 11, 12];
-$.each(tdAdv , function (index, value) {
-	 	$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
-	 });
+	// add advanced class to select tablesorter filter row cells
+	var tdAdv = [5, 6, 7, 10, 11, 12];
+	$.each(tdAdv , function (index, value) {
+		$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
+	});
 
 	sensorArray(false);
 	eventArray();
@@ -101,89 +101,87 @@ $.each(tdAdv , function (index, value) {
 //sensor refresh
 function sensorRefresh() {
   sensorArray(true);
-   setTimeout(sensorRefresh, 5000);
+   setTimeout(sensorRefresh, 20000);
 };
 
 //load ipmi sensor table
 function sensorArray(Refresh){
 	var Host;
   	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
-   		$.each(sensors, function (i, sensor) {
-   			if (sensor.State != 'N/A') {
-   				var Reading = parseFloat(sensor.Reading);
-   				var LowerNR = parseFloat(sensor.LowerNR);
-   				var LowerC = parseFloat(sensor.LowerC);
-   				var LowerNC = parseFloat(sensor.LowerNC);
-   				var UpperNC = parseFloat(sensor.UpperNC);
-   				var UpperC = parseFloat(sensor.UpperC);
-   				var UpperNR = parseFloat(sensor.UpperNR);
-   				var Color = 'green';
+  		$.each(sensors, function (i, sensor) {
+  			if (sensor.State != 'N/A') {
+  				var Reading = parseFloat(sensor.Reading);
+  				var LowerNR = parseFloat(sensor.LowerNR);
+  				var LowerC = parseFloat(sensor.LowerC);
+  				var LowerNC = parseFloat(sensor.LowerNC);
+  				var UpperNC = parseFloat(sensor.UpperNC);
+  				var UpperC = parseFloat(sensor.UpperC);
+  				var UpperNR = parseFloat(sensor.UpperNR);
+  				var Color = 'green';
 
+  				if (sensor.Type == 'Voltage'){
 
-   				if (sensor.Type == 'Voltage'){
+  					// if voltage is less than lower non-critical
+  					// or voltage is greater than upper non-critical show critical
+  					if (Reading < LowerNC && Reading > UpperNC)
+  						Color = 'orange';
 
-   					// if voltage is less than lower non-critical
-   					// or voltage is greater than upper non-critical show critical
-   					if (Reading < LowerNC && Reading > UpperNC)
-   						Color = 'orange';
+  					// if voltage is less than lower critical
+  					// or voltage is greater than upper critical show non-recoverable
+  					if (Reading < LowerC || Reading > UpperC)
+  						Color = 'red';
 
-   					// if voltage is less than lower critical
-   					// or voltage is greater than upper critical show non-recoverable
-   					if (Reading < LowerC || Reading > UpperC)
-   						Color = 'red';
-
-   				} else if (sensor.Type == 'Fan'){
+  				} else if (sensor.Type == 'Fan'){
  
-   					// if Fan RPMs are less than lower non-critical
-   					if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
-   						Color = "red";
+  					// if Fan RPMs are less than lower non-critical
+  					if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
+  						Color = "red";
 
-   				} else if (sensor.Type == 'Temperature'){
+  				} else if (sensor.Type == 'Temperature'){
 
-   					// if Temperature is greater than upper non-critical
-   					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
-   						Color = 'red';
-   				}
+  					// if Temperature is greater than upper non-critical
+  					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
+  						Color = 'red';
+  				}
    				
-   				if (Refresh) {
-						$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+"</font>");
-					} else {
-						Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
-						$('#tblSensor tbody')
-						.append("<tr id='"+i+"'>"+
-						"<td title='"+sensor.State+"'><img src='/plugins/ipmi/images/green-on.png'/></td>"+ //state
-						"<td class='network'>"+Host+"</td>"+ // sensor host ip address
-						"<td>"+sensor.ID+"</td>"+ // sensor id
-						"<td>"+sensor.Name+"</td>"+ //sensor name
-	   				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+
-						"<td class='advanced'>"+ sensor.LowerC +"</td>"+
-						"<td class='advanced'>"+ sensor.LowerNC +"</td>"+
-						"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +"</font></td>"+ //sensor reading
-						"<td>"+sensor.Units+"</td>"+ //sensor units
-						"<td class='advanced'>"+ sensor.UpperNC +"</td>"+
-						"<td class='advanced'>"+ sensor.UpperC +"</td>"+
-						"<td class='advanced'>"+ sensor.UpperNR +"</td>"+
-						"</tr>");
-					}
+  				if (Refresh) {
+					$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+"</font>");
+				} else {
+					Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
+					$('#tblSensor tbody')
+					.append("<tr id='"+i+"'>"+
+					"<td title='"+sensor.State+"'><img src='/plugins/ipmi/images/green-on.png'/></td>"+ //state
+					"<td class='network'>"+Host+"</td>"+ // sensor host ip address
+					"<td>"+sensor.ID+"</td>"+ // sensor id
+					"<td>"+sensor.Name+"</td>"+ //sensor name
+   				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+
+					"<td class='advanced'>"+ sensor.LowerC +"</td>"+
+					"<td class='advanced'>"+ sensor.LowerNC +"</td>"+
+					"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +"</font></td>"+ //sensor reading
+					"<td>"+sensor.Units+"</td>"+ //sensor units
+					"<td class='advanced'>"+ sensor.UpperNC +"</td>"+
+					"<td class='advanced'>"+ sensor.UpperC +"</td>"+
+					"<td class='advanced'>"+ sensor.UpperNR +"</td>"+
+					"</tr>");
 				}
-   		});
-
-		if(Host == '')
-			$('.network').hide();
+			}
+  		});
+		if (!Refresh) {
+			if(Host === '')
+				$('.network').hide();
 			else
-			$('.network').show();
+				$('.network').show();
 
-		if ($('#advancedview')[0].checked)
-			$('.advanced').show();
-		else
-			$('.advanced').hide();
+			if ($('#advancedview')[0].checked)
+				$('.advanced').show();
+			else
+				$('.advanced').hide();
 			
-		//$('#tblSensor').trigger('update'); //update sensor table
-		// restore filters
-		var lastSearch = $('#tblSensor')[0].config.lastSearch;
-		$('#tblSensor').trigger('update');
-		$('#tblSensor').trigger('search', [lastSearch]);
-
+			// restore filters
+			var lastSearch = $('#tblSensor')[0].config.lastSearch;
+			$('#tblSensor').trigger('update');
+			$('#tblSensor').trigger('search', [lastSearch]);
+		}
  	});
 };
 
@@ -193,38 +191,39 @@ function eventArray(){
 	$('#tblEvent tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
   	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
   		$('#tblEvent tbody').empty();
-   		$.each(events, function (i, event) {
-   			var State = (event.State == 'Asserted') ? 'red' : 'green';
-   			Host = (typeof event.IP == 'undefined') ? '' : event.IP;
- 				$('#tblEvent tbody')
- 				.append("<tr id='"+i+"'>"+
-				"<td title='"+ event.State +"'><img src='/plugins/ipmi/images/"+ State +"-on.png'/></td>"+ //state
-				"<td class='network'>"+ Host +"</td>"+ //event host ip address
-				"<td>"+ event.ID +"</td>"+ //event id
-				"<td>"+ event.DATE +" "+event.Time+"</td>"+ //time stamp
-				"<td>"+ event.Name +"</td>"+ //sensor name
-				"<td>"+ event.Type +"</td>"+ //event type
-				"<td>"+ event.Event +"</td>"+ //event description
-				"<td><a class='delete'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
-				"</tr>");
-   		});
+		$.each(events, function (i, event) {
+   		var State = (event.State == 'Asserted') ? 'red' : 'green';
+   		Host = (typeof event.IP == 'undefined') ? '' : event.IP;
+ 			$('#tblEvent tbody')
+ 			.append("<tr id='"+i+"'>"+
+			"<td title='"+ event.State +"'><img src='/plugins/ipmi/images/"+ State +"-on.png'/></td>"+ //state
+			"<td class='network'>"+ Host +"</td>"+ //event host ip address
+			"<td>"+ event.ID +"</td>"+ //event id
+			"<td>"+ event.DATE +" "+event.Time+"</td>"+ //time stamp
+			"<td>"+ event.Name +"</td>"+ //sensor name
+			"<td>"+ event.Type +"</td>"+ //event type
+			"<td>"+ event.Event +"</td>"+ //event description
+			"<td><a class='delete'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
+			"</tr>");
+  		});
  
-				if(Host == '')
-					$('.network').hide();
-				else
-					$('.network').show();
+		if(Host === '')
+			$('.network').hide();
+		else
+			$('.network').show();
 
-			$('.delete').click(function () {
-				Delete($(this).parent().parent().attr('id'));
-    		});
-			//if (event.IP )
-			var lastSearch = $("#tblEvent")[0].config.lastSearch;
-			$('#tblEvent').trigger('update'); //update table for tablesorter
-			$("#tblEvent").trigger("search", [lastSearch]);
+		$('.delete').click(function () {
+			Delete($(this).parent().parent().attr('id'));
+		});
+
+		//if (event.IP )
+		var lastSearch = $("#tblEvent")[0].config.lastSearch;
+		$('#tblEvent').trigger('update'); //update table for tablesorter
+		$("#tblEvent").trigger("search", [lastSearch]);
 			
-			$('#allEvents').click(function() {
-  				Delete('all');
-			});
+		$('#allEvents').click(function() {
+ 				Delete('all');
+		});
  	});
 }
 

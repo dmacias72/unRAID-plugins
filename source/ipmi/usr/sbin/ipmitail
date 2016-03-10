@@ -7,17 +7,21 @@ exec /usr/bin/tail -n 0 -F /var/log/syslog | \
 while read LINE;
 do
 
-# do not notify on ipmiseld start
-#[[ "$LINE" == *"Reading sensors"* ]] && continue
-
-#[[ "$LINE" == *"Waiting for events"* ]] && continue
-
 # do not notify on remote communication failure
 #[[ "$LINE" == *"Get SEL Info command failed"* ]] && continue
 
 # only notify when ipmiseld: is in the system log
 [[ "$LINE" != *$DAEMON* ]] && continue
+
+# edit syslog message
 MESSAGE=$(echo "$LINE" | sed -e 's/.* IPMI Event: //')
+
+# check for event state and set notification 
+STATE=$(echo "$MESSAGE" | sed 's/.* \*\(.*\)\* .*/\1/g')
+[[ "${STATE,,}" = "nominal" ]] && CONDITION="normal"
+[[ "${STATE,,}" = "warning" ]] && CONDITION="warning"
+[[ "${STATE,,}" = "critical" ]] && CONDITION="alert"
+
 sleep 1 |
-exec /usr/local/emhttp/webGui/scripts/notify -s "Notice [$HOSTNAME]" -d "$MESSAGE" -i "warning" && continue 2
+exec /usr/local/emhttp/webGui/scripts/notify -s "Notice [$HOSTNAME]" -d "$MESSAGE" -i "$CONDITION" && continue 2
 done
