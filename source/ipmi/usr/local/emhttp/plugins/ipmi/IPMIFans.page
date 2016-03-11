@@ -21,19 +21,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[0]): ?>
 
-<?=$ipmi_fans[0];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?> temperature sensor:
 :  <select name="FAN_<?=$ipmi_fans[0];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[0]], true);?>
 	</select>
 
-<?=$ipmi_fans[0];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[0];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[0]]);?>
 	</select>
 
-<?=$ipmi_fans[0];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[0];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[0]]);?>
@@ -45,19 +45,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[1]): ?>
 
-<?=$ipmi_fans[1];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[1];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[1]], true);?>
 	</select>
 
-<?=$ipmi_fans[1];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[1];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[1]]);?>
 	</select>
 
-<?=$ipmi_fans[1];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[1];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[1]]);?>
@@ -69,19 +69,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[2]): ?>
 
-<?=$ipmi_fans[2];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[2];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[2]], true);?>
 	</select>
 
-<?=$ipmi_fans[2];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[2];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[2]]);?>
 	</select>
 
-<?=$ipmi_fans[2];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[2];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[2]]);?>
@@ -93,19 +93,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[3]): ?>
 
-<?=$ipmi_fans[3];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[3];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[3]], true);?>
 	</select>
 
-<?=$ipmi_fans[3];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[3];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[3]]);?>
 	</select>
 
-<?=$ipmi_fans[3];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[3];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[3]]);?>
@@ -117,19 +117,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[4]): ?>
 
-<?=$ipmi_fans[4];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[4];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[4]], true);?>
 	</select>
 
-<?=$ipmi_fans[4];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[4];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[4]]);?>
 	</select>
 
-<?=$ipmi_fans[4];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[4];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[4]]);?>
@@ -141,19 +141,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[5]): ?>
 
-<?=$ipmi_fans[5];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[5];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[5]], true);?>
 	</select>
 
-<?=$ipmi_fans[5];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[5];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[5]]);?>
 	</select>
 
-<?=$ipmi_fans[5];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[5];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[5]]);?>
@@ -165,19 +165,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[6]): ?>
 
-<?=$ipmi_fans[6];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[6];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[6]], true);?>
 	</select>
 
-<?=$ipmi_fans[6];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?> Low temperature threshold:
 : <select name="<FAN_LOW_<?=$ipmi_fans[6];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[6]]);?>
 	</select>
 
-<?=$ipmi_fans[6];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?>> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[6];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[6]]);?>
@@ -189,19 +189,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[7]): ?>
 
-<?=$ipmi_fans[7];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[7];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[7]], true);?>
 	</select>
 
-<?=$ipmi_fans[7];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[7];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[7]]);?>
 	</select>
 
-<?=$ipmi_fans[7];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?> High temperature threshold:
 : <select name="<FAN_HIGH_<?=$ipmi_fans[7];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[7]]);?>
@@ -213,19 +213,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[8]): ?>
 
-<?=$ipmi_fans[8];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[8]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[8];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[8]], true);?>
 	</select>
 
-<?=$ipmi_fans[8];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[8]"]['Name'];?> Low temperature threshold:
 : <select name="FAN_LOW_<?=$ipmi_fans[8];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[8]]);?>
 	</select>
 
-<?=$ipmi_fans[8];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[8]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[8];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[8]]);?>
@@ -237,19 +237,19 @@ Motherboard Manufacturer:
 
 <?php if ($ipmi_fans[9]): ?>
 
-<?=$ipmi_fans[9];?> temperature sensor:
+<?=$ipmi_sensors["$ipmi_fans[9]"]['Name'];?> temperature sensor:
 : <select name="FAN_<?=$ipmi_fans[9];?>">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors,  'Temperature', $ipmi_cfg['FAN_'.$ipmi_fans[9]], true);?>
 	</select>
 
-<?=$ipmi_fans[9];?> Low temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[9]"]['Name'];?> Low temperature threshold:
 : <select name="<FAN_LOW_<?=$ipmi_fans[9];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LOW', $ipmi_cfg['FAN_LOW_'.$ipmi_fans[9]]);?>
 	</select>
 
-<?=$ipmi_fans[9];?> High temperature threshold:
+<?=$ipmi_sensors["$ipmi_fans[9]"]['Name'];?> High temperature threshold:
 : <select name="FAN_HIGH_<?=$ipmi_fans[9];?>">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HIGH', $ipmi_cfg['FAN_HIGH_'.$ipmi_fans[9]]);?>
