@@ -302,7 +302,7 @@ function parseDataXML(){
 				"<td class='tdShare'>"+Download+"</td>"+ //Download
 				"<td class='tdShare'>"+Upload+"</td>"+ //Upload
 				"<td class='tdShare'>"+Share+"</td>"+ //Share
-				"<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a>"+ //delete icon
+				"<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a></td>"+ //delete icon
 				"</tr>");
 
 			});
