@@ -38,10 +38,18 @@ $(function(){
 			filter_hideEmpty : true,
 			filter_liveSearch : true,
 			filter_saveFilters : true,
-			filter_reset : '.sreset',
+			filter_reset : '.reset-sensors',
 			filter_functions: {
 				'.filter-ip' : true,
 				'.filter-type' : true,
+				'.filter-reading' : {
+					'nominal'		: function(e, n, f, i, $r, c, data) {
+						return (data.$row.find('td.reading font').prop('color') == 'green'); },
+					'warning'		: function(e, n, f, i, $r, c, data) {
+						return (data.$row.find('td.reading font').prop('color') == 'orange'); },
+					'critical'		: function(e, n, f, i, $r, c, data) {
+						return (data.$row.find('td.reading font').prop('color') == 'red'); }
+				}
 			}
 		}
 	});
@@ -54,7 +62,7 @@ $(function(){
 			filter_hideEmpty : true,
 			filter_liveSearch : true,
 			filter_saveFilters : true,
-			filter_reset : '.ereset',
+			filter_reset : '.reset-events',
 			filter_functions: {
 				'.filter-ip' : true,
 				'.filter-type' : true,
