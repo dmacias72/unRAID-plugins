@@ -76,7 +76,7 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
 </div>
 
 <div>
- <table class="tablesorter hover-highlight" id="tblTests">
+ <table class="tablesorter hover-highlight tbltests" id="tblTests">
 		<thead>
 			<tr>
 				<th class="filter-date" data-placeholder="by date"> Date </th>

@@ -73,3 +73,14 @@ select .tablesorter input.tablesorter-filter,
 	min-width: 100px;
 	max-width: 150px;
 }
+/*table.tablesorter.tbltests th:nth-child(3){width:5%;text-align:left;}
+table.tablesorter.tbltests td:nth-child(3){width:5%;text-align:left;}
+table.tablesorter.tbltests th:nth-child(4){width:5%;text-align:left;}
+table.tablesorter.tbltests td:nth-child(4){width:5%;text-align:left;}
+table.tablesorter.tbltests th:nth-child(5){width:5%;text-align:left;}
+table.tablesorter.tbltests td:nth-child(5){width:5%;text-align:left;}
+table.tablesorter.tbltests th:nth-child(6){width:5%;text-align:left;}
+table.tablesorter.tbltests td:nth-child(6){width:5%;text-align:left;}
+table.tablesorter.tbltests th:nth-child(7){width:5%;text-align:left;}
+table.tablesorter.tbltests td:nth-child(7){width:5%;text-align:left;}
+*/
