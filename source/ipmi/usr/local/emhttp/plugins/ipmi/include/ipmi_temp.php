@@ -1,5 +1,5 @@
 <?
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php';
 
 function format_ipmi_temp($reading, $unit, $dot) {
   return ($reading>0 ? ($unit=='F' ? round(9/5*$reading+32) : str_replace('.',$dot,$reading)) : '##')."&thinsp;$unit";

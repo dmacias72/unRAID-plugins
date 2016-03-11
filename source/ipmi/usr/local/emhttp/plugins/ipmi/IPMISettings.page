@@ -1,7 +1,7 @@
 Menu="IPMI:1"
 Title="Settings"
 ---
-<?php require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php'; ?>
+<?php require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php'; ?>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
 
@@ -22,6 +22,7 @@ Enable Event Notifications:
   <?=mk_option($ipmipoll, "60", "1 min");?>
   <?=mk_option($ipmipoll, "180", "3 min");?>
   <?=mk_option($ipmipoll, "300", "5 min");?>
+  <?=mk_option($ipmipoll, "1800", "30 min");?>
   </select>
 
 &nbsp;
@@ -106,11 +107,11 @@ function resetDATA(form) {
 function checkIPMISELD(form) {
 	if (form.IPMISELD.selectedIndex < 1 ){
 		$(".ipmi-seld").hide();
-		form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seldstop";
+		form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_stop";
 	}else {
    	$(".ipmi-seld").show();
    	$(".ipmi-seld").prop("disabled", (form.IPMISELD.value == "enable"));
-   	form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seldstart";
+   	form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_start";
    }
 
 	if ("<?=$ipmiseld_running;?>" == true)
