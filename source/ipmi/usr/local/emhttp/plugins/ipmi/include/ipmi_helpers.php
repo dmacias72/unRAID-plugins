@@ -1,45 +1,6 @@
 <?php
-/* ipmi tool variables*/
-$ipmi_cfg_file = "/boot/config/plugins/ipmi/ipmi.cfg";
-if (is_file($ipmi_cfg_file))
-	$ipmi_cfg	= parse_ini_file($ipmi_cfg_file);
-$ipmiseld		= isset($ipmi_cfg['IPMISELD']) ? $ipmi_cfg['IPMISELD']	: "disable";
-$ipmipoll		= isset($ipmi_cfg['IPMIPOLL']) ? $ipmi_cfg['IPMIPOLL']	: "60";
-$ipmifan			= isset($ipmi_cfg['IPMIFAN'])	 ? $ipmi_cfg['IPMIFAN'] 	: "disable";
-$ipmi_network	= isset($ipmi_cfg['NETWORK'])	 ? $ipmi_cfg['NETWORK']		: "disable";
-$ipmi_local		= isset($ipmi_cfg['LOCAL'])	 ? $ipmi_cfg['LOCAL']		: "disable";
-
-//check running status
-$ipmiseld_running = trim(shell_exec( "[ -f /proc/`cat /var/run/ipmiseld.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
-$ipmifan_running = trim(shell_exec( "[ -f /proc/`cat /var/run/ipmifan.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
-$ipmi_running = "<span class='green'>Running</span>";
-$ipmi_stopped = "<span class='orange'>Stopped</span>";
-$ipmiseld_status = ($ipmiseld_running) ? $ipmi_running : $ipmi_stopped;
-$ipmifan_status = ($ipmifan_running) ? $ipmi_running : $ipmi_stopped;
-
-// use save ip address or use local ipmi address
-$ipmi_ipaddr = isset($ipmi_cfg['IPADDR']) ? $ipmi_cfg['IPADDR'] : '';
-//$ipmi_ipaddr = preg_match('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $ipmi_cfg['IPADDR']) ? 
-
-$ipmi_disp_temp1 = isset($ipmi_cfg['DISP_TEMP1']) ? $ipmi_cfg['DISP_TEMP1'] : ""; // cpu temp display name
-$ipmi_disp_temp2  = isset($ipmi_cfg['DISP_TEMP2'])  ? $ipmi_cfg['DISP_TEMP2']  : ""; // mb temp display name
-$ipmi_disp_fan1 = isset($ipmi_cfg['DISP_FAN1']) ? $ipmi_cfg['DISP_FAN1'] : ""; // fan speed display name
-$ipmi_disp_fan2 = isset($ipmi_cfg['DISP_FAN2']) ? $ipmi_cfg['DISP_FAN2'] : ""; // fan speed display name
-$ipmi_user     = isset($ipmi_cfg['USER'])     ? $ipmi_cfg['USER']     : ""; // user for network access
-$ipmi_password = isset($ipmi_cfg['PASSWORD']) ? $ipmi_cfg['PASSWORD'] : ""; // password for network access
-
-// options for network access or not
-$ipmi_options = ($ipmi_network == 'enable') ? "--always-prefix -h $ipmi_ipaddr -u $ipmi_user -p ".
-	base64_decode($ipmi_password)." --session-timeout=10000 --retransmission-timeout=1000" : '';
-
-// Get sensor info and check connection 
-$ipmi_sensors = ipmi_sensors($ipmi_options);
-$ipmi_fans = ipmi_get_fans($ipmi_sensors);
-if($ipmi_network == 'enable'){
-	$ipmi_conn = ($ipmi_sensors) ? "Connection successful" : "Connection failed";
-}
-
-$ipmi_board = "ipmi-fru | grep 'Board Manufacturer' | awk -F ':' '{print $2}'";
+/* get ipmi config and network options */
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 
 /* get an array of all sensors and their values */
 function ipmi_sensors($options=null) {
@@ -56,14 +17,16 @@ function ipmi_sensors($options=null) {
 	foreach($output as $line){
 
 		$sensor_raw = explode(",", $line);
-		// add sensor keys as keys to ipmi sensor output
 		$size_raw = sizeof($sensor_raw);
+
+		// add sensor keys as keys to ipmi sensor output
 		$sensor = ($size_raw < 13) ? []: array_combine($keys, array_slice($sensor_raw,0,13,true));
 		  /*array_combine(array_slice($keys,0,$size_raw,true), $sensor_raw)*/
 
 		if (empty($options)){
 			$sensors[$sensor['ID']] = $sensor;
 		}else{
+
 			//split id into host and id
 			$id = explode(':',$sensor['ID']);
 			$sensor['IP'] = trim($id[0]);
@@ -72,7 +35,7 @@ function ipmi_sensors($options=null) {
 				$sensor['IP'] = '127.0.0.1';
 
 			// add sensor to array of sensors
-			$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
+			$sensors[ip2long($sensor['IP']).'_'.$sensor['ID']] = $sensor;
 	}
 }
 	return $sensors;
@@ -92,14 +55,16 @@ function ipmi_events($options=null){
 
 	foreach($output as $line){
 
-		// add event keys as keys to ipmi event output
 		$event_raw = explode(",", $line);
 		$size_raw = sizeof($event_raw);
+
+		// add event keys as keys to ipmi event output
 		$event = ($size_raw < 7) ? []: array_combine($keys, array_slice($event_raw,0,7,true));
 
 		if (empty($options)){
 			$events[$event['ID']] = $event;
 		}else{
+
 		//split id into host and id
 		$id = explode(':',$event['ID']);
 		$event['IP'] = trim($id[0]);
@@ -108,7 +73,7 @@ function ipmi_events($options=null){
 			$event['IP'] = '127.0.0.1';
 
 		// add event to array of events
-		$events[ip2long($event['IP']).'-'.$event['ID']] = $event;
+		$events[ip2long($event['IP']).'_'.$event['ID']] = $event;
 	}
 }
 	return $events;
@@ -117,10 +82,12 @@ function ipmi_events($options=null){
 /* get select options for a given sensor type */
 function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
 	if ($hdd)
+		// add hard drive temp as option
 		$sensors[] = ['IP' => '', 'ID' => 'HDD', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
+
 	$options = "";
 	foreach($sensors as $id => $sensor){
-		if ($sensor["Type"] == $type && $sensor["State"] != "N/A"){ //ns
+		if ($sensor["Type"] == $type && $sensor["State"] != "N/A"){
 			$name = $sensor['Name'];
 			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
 			$options .= "<option value='$id'";
