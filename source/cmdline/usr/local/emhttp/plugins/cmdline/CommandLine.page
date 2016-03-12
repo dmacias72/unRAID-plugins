@@ -1,0 +1,23 @@
+Menu="UNRAID-OS"
+Title="Command Line"
+Type="xmenu"
+---
+<?php require_once '/usr/local/emhttp/plugins/cmdline/include/cmdline_config.php'; ?>
+<link type="text/css" rel="stylesheet" href="/plugins/cmdline/css/cmdline.css">
+
+<div>
+	<iframe id="shell" src="http://<?=$shellinabox_host?>:<?=$shellinabox_port;?>">
+	</iframe>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	$('.tabs')
+		.append("<span class='status'><label id='settings'><i class='fa fa-gear'></i> Settings </label></span>")
+		.append("<span class='status'>Status: <?=$shellinabox_status;?> </span>");
+
+	$('#settings').click(function() {
+		location = '/Settings/CommandLineSettings';
+	});
+});
+</script>

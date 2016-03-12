@@ -1,0 +1,16 @@
+#shell {
+  height: 600px;
+  width: 100%;
+  resize: both;
+  overflow: auto;
+  border: 0px;
+}
+#PORT {
+	width:135px;
+}
+#RUNAS {
+	width:222px;
+}
+#settings {
+	cursor: pointer;
+}

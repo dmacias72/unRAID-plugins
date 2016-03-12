@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                  |-----handy-ruler------------------------------------------------------|
+cmdline: Command Line unRAID 6.1+ Plugin
+cmdline:
+cmdline: Command line plugin implements Shell In A Box. A web server that can export
+cmdline: arbitrary command line tools to a web based terminal emulator. A Command Line
+cmdline: tool is created under the Tools menu. Backup and restore user home
+cmdline: directory on system shutdown and start. Also includes screenfetch for
+cmdline: command line screenshots
+cmdline: 
+cmdline: dmacias72/unRAID
+cmdline: https://github.com/dmacias72/unRAID-plugins
+cmdline:
