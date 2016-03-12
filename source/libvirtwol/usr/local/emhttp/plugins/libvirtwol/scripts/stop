@@ -8,4 +8,6 @@ if [ -r $PIDFILE ]; then
 	kill -TERM $(<"$PIDFILE") > /dev/null 2>&1
 	sleep 1
 	rm -f $LOCKFILE && rm -f $PIDFILE
+else
+echo "$prog is stopped"
 fi
