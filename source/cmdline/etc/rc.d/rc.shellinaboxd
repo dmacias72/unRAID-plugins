@@ -6,10 +6,10 @@ SHELLINABOXD="/usr/sbin/$PROG"
 LOCKFILE="/var/lock/$PROG"
 PIDFILE="/var/run/$PROG.pid"
 PROFILE="/root/.bash_profile"
-STYLES="/usr/local/emhttp/plugins/cmdline/css"
+CSS="/usr/local/emhttp/plugins/cmdline/css"
 PLGPATH="/boot/config/plugins/cmdline"
 CONFIG="$PLGPATH/cmdline.cfg"
-USER_CSS="Color:+$STYLES/color.css,Monochrome:-$STYLES/monochrome.css;White:+$STYLES/white-on-black.css,Black:-$STYLES/black-on-white.css,Blue:-$STYLES/blue-on-black.css,Green:-$STYLES/green-on-black.css,Pink:-$STYLES/pink-on-black.css,Purple:-$STYLES/purple-on-black.css,Red:-$STYLES/red-on-black.css,Yellow:-$STYLES/yellow-on-black.css"
+USER_CSS="Color:+$CSS/color.css,Monochrome:-$CSS/monochrome.css;White:+$CSS/white-on-black.css,Black:-$CSS/black-on-white.css,Blue:-$CSS/blue-on-black.css,Green:-$CSS/green-on-black.css,Pink:-$CSS/pink-on-black.css,Purple:-$CSS/purple-on-black.css,Red:-$CSS/red-on-black.css,Yellow:-$CSS/yellow-on-black.css"
 
 # read our configuration
 [ -e "$CONFIG" ] && source $CONFIG
