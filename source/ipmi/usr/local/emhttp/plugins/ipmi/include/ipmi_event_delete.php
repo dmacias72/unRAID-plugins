@@ -3,8 +3,8 @@ require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 $cmd = '/usr/sbin/ipmi-sel ';
 $event = $_GET["event"];
 
-if($event == 'all') {
-	$options = "--clear";
+if($event == 'clear' || $event == 'post-clear') {
+	$options = "--$event";
 	if($ipmi_network == 'enable')
 		$options .= " -h '$ipmi_ipaddr'";
 }else{
@@ -19,5 +19,15 @@ if($event == 'all') {
 if($ipmi_network == 'enable')
 	$options .= " -p ".base64_decode($ipmi_password)." --session-timeout=10000 --retransmission-timeout=1000 ";
 
-shell_exec($cmd.$options);
+if($event == 'post-clear'){
+	$logpath = "/boot/config/plugins/ipmi/logs";
+	if(!is_dir($logpath))
+		mkdir($logpath);
+	$gzfile = "$logpath/ipmi_event_log-".date("Y-m-d-His").".gz";
+	$fp = gzopen($gzfile, 'w9'); // w == write, 9 == highest compression
+	gzwrite($fp, shell_exec($cmd.$options));
+	gzclose($fp);
+}else{
+	shell_exec($cmd.$options);
+}
 ?>
