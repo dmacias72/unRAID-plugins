@@ -12,12 +12,12 @@ if ($ipmi_disp_temp1 || $ipmi_disp_temp2 || $ipmi_disp_fan1 || $ipmi_disp_fan2){
 	if ($ipmi_readings[$ipmi_disp_temp1])
 		$ipmi_temps[] = "<img src='/plugins/ipmi/icons/cpu.png' title='".$ipmi_readings[$ipmi_disp_temp1]['Name']
 			." (".$ipmi_readings[$ipmi_disp_temp1]['ID'].")' class='icon'>"
-			.floatval(format_ipmi_temp($ipmi_readings[$ipmi_disp_temp1]['Reading'], $_GET['unit'], $_GET['dot']));
+			.format_ipmi_temp(floatval($ipmi_readings[$ipmi_disp_temp1]['Reading']), $_GET['unit'], $_GET['dot']);
 
 	if ($ipmi_readings[$ipmi_disp_temp2])
 		$ipmi_temps[] = "<img src='/plugins/ipmi/icons/mb.png' title='".$ipmi_readings[$ipmi_disp_temp2]['Name']
 			." (".$ipmi_readings[$ipmi_disp_temp2]['ID'].")' class='icon'>"
-			.floatval(format_ipmi_temp($ipmi_readings[$ipmi_disp_temp2]['Reading'], $_GET['unit'], $_GET['dot']));
+			.format_ipmi_temp(floatval($ipmi_readings[$ipmi_disp_temp2]['Reading']), $_GET['unit'], $_GET['dot']);
 
 	if ($ipmi_readings[$ipmi_disp_fan1])
 		$ipmi_temps[] = "<img src='/plugins/ipmi/icons/fan.png' title='".$ipmi_readings[$ipmi_disp_fan1]['Name']
