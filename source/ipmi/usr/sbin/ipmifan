@@ -57,6 +57,8 @@ $quit = (array_key_exists("q", $args) || array_key_exists("quit", $args));
 $background = (array_key_exists("b", $args) || array_key_exists("background", $args));
 $argv = (array_key_exists("v", $args) || array_key_exists("verbose", $args));
 
+// ipmi-raw 00 3a 01 00 00 00 00 00 00 00 00
+// ipmi-raw 00 3a 01 AA BB CC DD EE FF GG HH
 // ipmitool raw 0x3a 0x01 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF 0xGG 0xHH
 // ipmitool raw 0x3a 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
 // 0x00 = smartfan mode
