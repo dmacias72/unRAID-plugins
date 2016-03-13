@@ -25,6 +25,9 @@ Enable Event Notifications:
   <?=mk_option($ipmipoll, "1800", "30 min");?>
   </select>
 
+Test Event Notifications:
+: <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
+
 &nbsp;
 
 Enable Network Connection(s):
@@ -83,6 +86,12 @@ $(function(){
 	$('.tabs')
 		.append("<span class='status'>Fan Control: <?=$ipmifan_status;?> </span>")
 		.append("<span class='status'>Event Notification: <?=$ipmiseld_status;?> </span>");
+
+	$('#btnTest').click(function () {
+		EventTest();
+	});
+
+
 	checkIPMISELD(document.ipmi_settings);
 	//checkIPMIFAN(document.ipmifan_settings);
 	checkNETWORK(document.ipmi_settings);
@@ -151,4 +160,18 @@ function verifyDATA(form) {
 	form.PASSWORD.value = btoa(form.PASSWORD.value);
 }
 
+
+function EventTest() {
+	$.getJSON('/plugins/ipmi/include/ipmi_event_test.php',
+		function(Message) {
+		swal({
+			title: 'Sample Event Sent:', 
+			text: Message, 
+			type: 'success',
+			showCancelButton: false,
+			closeOnConfirm: true,
+		}, function() {
+		});
+	});
+}
 </script>
