@@ -13,7 +13,7 @@ Icon="sensorspage.png"
 			<tr>
 				<th class="sorter-false filter-false"> Status </th>
 				<th class="network sorter-ipv4Address filter-ip" data-placeholder="by ip address"> IP Address </th>
-				<th class="filter-false"> ID </th>
+				<th class="advanced filter-false"> ID </th>
 				<th class="filter-false"> Sensor </th>
 				<th class="advanced filter-false"> Lower <br> Non-Recover </th>
 				<th class="advanced filter-false"> Lower <br> Critical </th>
