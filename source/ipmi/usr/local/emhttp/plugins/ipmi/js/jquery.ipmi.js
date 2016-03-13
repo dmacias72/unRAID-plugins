@@ -1,23 +1,30 @@
 $(function(){
 	$('.tabs')
 		.append("<span class='status'><label id='settings'><i class='fa fa-gear'></i>Settings</label></span>")
-		.append("<span id='advswitch' class='status'><input type='checkbox' id='advancedview'></span>");
+		.append("<span id='adv-switch' class='status'><input type='checkbox' id='advancedview'></span>")
+		.append("<span id='backup-switch' class='status'><input type='checkbox' id='event-backup'></span>");
 
 	$('#settings').click(function() {
 		location = '/Settings/IPMI';
 	});
 
 	$("#tab2").click(function () {
-		$('#advswitch').hide();
+		$('#adv-switch').hide();
+		$('#backup-switch').show();
 	});
 	$("#tab1").click(function () {
-		$('#advswitch').show();
+		$('#adv-switch').show();
+		$('#backup-switch').hide();
 	});
-	if ($("#tab2")[0].checked)
-		$('#advswitch').hide();
-	else
-		$('#advswitch').show();
 
+	if ($("#tab2")[0].checked){
+		$('#adv-switch').hide();
+		$('#backup-switch').show();
+	}else{
+		$('#adv-switch').show();
+		$('#backup-switch').hide();
+	}
+	
 	//advanced view switch set cookie and toggle advanced columns
 	$('#advancedview').switchButton({
 		labels_placement: 'left',
@@ -30,8 +37,19 @@ $(function(){
 		$.cookie('ipmi_sensor_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
 	});
 
+	//event backup switch set cookie and toggle backup setting
+	$('#event-backup').switchButton({
+		labels_placement: 'left',
+		on_label: 'Backup On',
+  		off_label: 'Backup Off',
+  		checked: ($.cookie('ipmi_event_backup') == 'post-clear')
+	})
+	.change(function () {
+		$.cookie('ipmi_event_backup', $('#event-backup')[0].checked ? 'post-clear' : 'clear', { expires: 3650 });
+	});
+
 	$('#tblSensor').tablesorter({
-		sortList: [[1,0]],
+		sortList: [[2,0]],
 		widgets: ['saveSort', 'filter', 'stickyHeaders'],
 		widgetOptions: {
 			stickyHeaders_filteredToTop: true,
@@ -55,7 +73,7 @@ $(function(){
 	});
 
 	$('#tblEvent').tablesorter({
-		sortList: [[1,0]],
+		sortList: [[2,1]],
 		widgets: ['saveSort', 'filter', 'stickyHeaders'],
 		widgetOptions: {
 			stickyHeaders_filteredToTop: true,
@@ -94,7 +112,7 @@ $(function(){
 	$('#tblEvent tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
 
 	// add advanced class to select tablesorter filter row cells
-	var tdAdv = [5, 6, 7, 10, 11, 12];
+	var tdAdv = [3,5, 6, 7, 10, 11, 12];
 	$.each(tdAdv , function (index, value) {
 		$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
 	});
@@ -160,7 +178,7 @@ function sensorArray(Refresh){
 					.append("<tr id='"+i+"'>"+
 					"<td title='"+sensor.State+"'><img src='/plugins/ipmi/images/green-on.png'/></td>"+ //state
 					"<td class='network'>"+Host+"</td>"+ // sensor host ip address
-					"<td>"+sensor.ID+"</td>"+ // sensor id
+					"<td class='advanced'>"+sensor.ID+"</td>"+ // sensor id
 					"<td>"+sensor.Name+"</td>"+ //sensor name
    				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+
 					"<td class='advanced'>"+ sensor.LowerC +"</td>"+
@@ -230,17 +248,18 @@ function eventArray(){
 		$("#tblEvent").trigger("search", [lastSearch]);
 			
 		$('#allEvents').click(function() {
- 				Delete('all');
+ 				Delete($.cookie('ipmi_event_backup'));
 		});
  	});
 }
 
 function Delete(ID) {
 	var EventDelete = '/plugins/ipmi/include/ipmi_event_delete.php';
-	if (ID == 'all'){
+	if (ID == 'clear'|| ID == 'post-clear'){
+		var Message = (ID == 'clear') ? 'permanently' : 'backup and'; 
 		swal({
 			title: 'Are you sure?', 
-			text: 'Are your sure you want to remove all events!?', 
+			text: 'You want to '+Message+' remove all events!?', 
 			type: 'warning',
 			showCancelButton: true,
 			closeOnConfirm: true,
