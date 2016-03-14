@@ -12,7 +12,7 @@ Title="Event Log"
 				<th class="filter-name" data-placeholder="Search..."> Sensor Name </th>
 				<th class="filter-type" data-placeholder="by type"> Sensor Type </th>
 				<th class="filter-desc" data-placeholder="Search..."> Description </th>
-				<th class="filter-false sorter-false"><a id='allEvents' title='delete all'><i class="fa fa-trash"> remove all </i></a></th>
+				<th class="filter-false sorter-false"><a id='allEvents' title='clear all'><i class="fa fa-trash"> Clear All </i></a></th>
 			</tr>
 		</thead>
 		<tbody>

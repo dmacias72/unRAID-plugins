@@ -1,6 +1,6 @@
 $(function(){
 	$('.tabs')
-		.append("<span class='status'><label id='settings'><i class='fa fa-gear'></i>Settings</label></span>")
+		.append("<span class='status'><label id='settings' title='go to settings page'><i class='fa fa-gear'></i>Settings</label></span>")
 		.append("<span id='adv-switch' class='status'><input type='checkbox' id='advancedview'></span>")
 		.append("<span id='backup-switch' class='status'><input type='checkbox' id='event-backup'></span>");
 
@@ -40,8 +40,8 @@ $(function(){
 	//event backup switch set cookie and toggle backup setting
 	$('#event-backup').switchButton({
 		labels_placement: 'left',
-		on_label: 'Backup On',
-  		off_label: 'Backup Off',
+		on_label: 'Save on Clear',
+  		off_label: 'Save on Clear',
   		checked: ($.cookie('ipmi_event_backup') == 'post-clear')
 	})
 	.change(function () {
@@ -256,7 +256,7 @@ function eventArray(){
 function Delete(ID) {
 	var EventDelete = '/plugins/ipmi/include/ipmi_event_delete.php';
 	if (ID == 'clear'|| ID == 'post-clear'){
-		var Message = (ID == 'clear') ? 'permanently' : 'backup and'; 
+		var Message = (ID == 'clear') ? 'permanently' : 'backup then'; 
 		swal({
 			title: 'Are you sure?', 
 			text: 'You want to '+Message+' remove all events!?', 
