@@ -20,7 +20,7 @@ Port (<?=$shellinabox_port_status;?>):
 
 Run as User:
 : <select id="USERS" class="shellinabox-run" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$shellinabox_runas;?>');">
-  <?=mk_option($aesir_runas, "nobody", "nobody");?>
+  <?=mk_option($shellinabox_runas, "nobody", "nobody");?>
   <?php foreach($shellinabox_users as $shellinabox_user){echo mk_option($shellinabox_runas, trim($shellinabox_user), trim($shellinabox_user));};?>
   <option value='other' <?=($shellinabox_runas != "root" && $shellinabox_runas != "nobody" && !in_array($shellinabox_runas, $shellinabox_users))?"selected=yes":"";?>>other</option>
   <?=mk_option($shellinabox_runas, "root", "root");?>
@@ -45,7 +45,7 @@ Enable Command Line Screenshot:
   <?=mk_option($cmdline_screen, "enable", "Yes");?>
   </select>
 
-Enable Home Directory Backup:
+Enable Root Home Directory Backup:
 : <select id="BACKUP" name="BACKUP" size="1" title="shows screenshot when you log in">
   <?=mk_option($cmdline_backup, "disable", "No");?>
   <?=mk_option($cmdline_backup, "enable", "Yes");?>
