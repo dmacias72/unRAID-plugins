@@ -8,8 +8,8 @@ $status_running = "<span class='green'>Running</span>";
 $status_stopped = "<span class='orange'>Stopped</span>";
 $libvirtwol_status = ($libvirtwol_running) ? $status_running : $status_stopped;
 ?>
-
-<div id="title"><span class="left"><img src="/plugins/libvirtwol/icons/wakeonlan.png" class="icon">Libvirt wake on lan</span><span class="status" style="margin-right:-10px;"> Status: <?=$libvirtwol_status;?></span></div>
+<div class="advanced">
+<div id="title"><span class="left advanced"><img src="/plugins/libvirtwol/icons/wakeonlan.png" class="icon">Libvirt wake on lan</span><span class="status advanced" style="margin-right:-10px; margin-top:-18px"> Status: <?=$libvirtwol_status;?></span></div>
 <form name="libvirtwol_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="/boot/config/domain.cfg" />
 <input type="hidden" id="command" name="#command" value="" />
@@ -27,7 +27,7 @@ $libvirtwol_status = ($libvirtwol_running) ? $status_running : $status_stopped;
 	<dd><input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
-
+</div>
 <script type="text/javascript">
 $(function(){
 	checkRUNNING(document.libvirtwol_settings);

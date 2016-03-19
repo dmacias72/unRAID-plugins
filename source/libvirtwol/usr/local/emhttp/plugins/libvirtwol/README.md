@@ -1,4 +1,4 @@
-**VM Wake On Lan**
+**Virtual Machine Wake On Lan**
 
-Wake On Lan for Libvirt. Allows you to recieve a wake on lan packet to wake or start up kvm virtual machines. 
+Wake On Lan for Virtual Machines. Allows you to recieve a wake on lan packet to wake hibernated or start up kvm virtual machines. 
 
