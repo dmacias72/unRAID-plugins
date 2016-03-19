@@ -170,7 +170,7 @@ if (is_file($lockfile)){
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
-$plugin       = "ipmitool-plugin";
+$plugin       = "ipmi";
 $cfg_file  = "/boot/config/plugins/$plugin/$plugin.cfg";
 
 function scan_dir($dir, $type = ""){
