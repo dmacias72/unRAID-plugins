@@ -36,21 +36,25 @@ function ipmi_sensors($options=null) {
 
 			// add sensor to array of sensors
 			$sensors[ip2long($sensor['IP']).'_'.$sensor['ID']] = $sensor;
+		}
 	}
-}
 	return $sensors;
 }
 
 /* get array of events and their values */
-function ipmi_events($options=null){
-	$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $options 2>/dev/null";
-	exec($cmd, $output, $return); 
-
+function ipmi_events($options=null, $archive=null){
+	if($archive) {
+		$filename = "/boot/config/plugins/ipmi/archived_events.log";
+		$output = file($filename, FILE_IGNORE_NEW_LINES);
+	} else {
+		$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $options 2>/dev/null";
+		exec($cmd, $output, $return); 
+	}
 	//if ($return)
 		//return []; // return empty array if error
 
 	// key names for ipmi event output
-	$keys = ['ID','DATE','Time','Name','Type','State','Event'];
+	$keys = ['ID','Date','Time','Name','Type','State','Event'];
 	$events = [];
 
 	foreach($output as $line){
@@ -61,45 +65,35 @@ function ipmi_events($options=null){
 		// add event keys as keys to ipmi event output
 		$event = ($size_raw < 7) ? []: array_combine($keys, array_slice($event_raw,0,7,true));
 
+		// put time in sortable format and add unix timestamp
+		$date = Datetime::createFromFormat('M-j-Y H:i:s', $event['Date']." ".$event['Time']);
+		$event['Date'] = $date->format('Y-m-d H:i:s');
+		$event['Time'] = $date->format('U');
+
 		if (empty($options)){
-			$events[$event['ID']] = $event;
+
+			if($archive)
+				$events[$event['Time']] = $event;
+			else
+				$events[$event['ID']] = $event;
+
 		}else{
 
-		//split id into host and id
-		$id = explode(':',$event['ID']);
-		$event['IP'] = trim($id[0]);
-		$event['ID'] = trim($id[1]);
-		if ($event['IP'] == 'localhost')
-			$event['IP'] = '127.0.0.1';
+			//split id into host and id
+			$id = explode(':',$event['ID']);
+			$event['IP'] = trim($id[0]);
+			if($archive)
+				$event['ID'] = $event['Time'];
+			else
+				$event['ID'] = trim($id[1]);
+			if ($event['IP'] == 'localhost')
+				$event['IP'] = '127.0.0.1';
 
-		// add event to array of events
-		$events[ip2long($event['IP']).'_'.$event['ID']] = $event;
-	}
-}
-	return $events;
-}
-
-/* get select options for a given sensor type */
-function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
-	if ($hdd)
-		// add hard drive temp as option
-		$sensors[] = ['IP' => '', 'ID' => 'HDD', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
-
-	$options = "";
-	foreach($sensors as $id => $sensor){
-		if ($sensor["Type"] == $type && $sensor["State"] != "N/A"){
-			$name = $sensor['Name'];
-			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
-			$options .= "<option value='$id'";
-
-			// set saved option as selected
-			if ($selected == $id)
-				$options .= " selected";
-
-		$options .= ">$name$ip</option>";
+			// add event to array of events
+			$events[ip2long($event['IP']).'_'.$event['ID']] = $event;
 		}
 	}
-	return $options;
+	return $events;
 }
 
 // get options for high or low temp thresholds
