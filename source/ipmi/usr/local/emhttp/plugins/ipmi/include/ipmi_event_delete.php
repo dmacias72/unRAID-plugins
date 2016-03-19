@@ -1,9 +1,9 @@
 <?php
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
-$cmd = '/usr/sbin/ipmi-sel ';
+$cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data ';
 $event = $_GET["event"];
 
-if($event == 'clear' || $event == 'post-clear') {
+/*if($event == 'clear' || $event == 'post-clear') {
 	$options = "--$event";
 	if($ipmi_network == 'enable')
 		$options .= " -h '$ipmi_ipaddr'";
@@ -18,15 +18,16 @@ if($event == 'clear' || $event == 'post-clear') {
 }
 if($ipmi_network == 'enable')
 	$options .= " -p ".base64_decode($ipmi_password)." --session-timeout=10000 --retransmission-timeout=1000 ";
-
+*/
 if($event == 'post-clear'){
-	$logpath = "/boot/config/plugins/ipmi/logs";
+	$logpath = "/boot/config/plugins/ipmi/";
 	if(!is_dir($logpath))
 		mkdir($logpath);
-	$gzfile = "$logpath/ipmi_event_log-".date("Y-m-d-His").".gz";
-	$fp = gzopen($gzfile, 'w9'); // w == write, 9 == highest compression
-	gzwrite($fp, shell_exec($cmd.$options));
-	gzclose($fp);
+//	$gzfile = "$logpath/ipmi_event_log-".date("Y-m-d-His").".gz";
+//	$fp = gzopen($gzfile, 'w9'); // w == write, 9 == highest compression
+//	gzwrite($fp, shell_exec($cmd.$options));
+//	gzclose($fp);
+	file_put_contents("$logpath/archived_events.log", shell_exec($cmd.$options),FILE_APPEND);
 }else{
 	shell_exec($cmd.$options);
 }
