@@ -1,0 +1,40 @@
+Menu="IPMITools:3"
+Title="Archived Events"
+---
+<div>
+	<table class="tablesorter hover-highlight events" id="tblArchive">			
+		<thead>
+			<tr>
+				<th class="sorter-false filter-false"> Status </th>
+				<th class="network sorter-ipv4Address filter-ip-arch" data-placeholder="by IP Address"> IP Address </th>
+				<th class="filter-false-arch"> Event ID </th>
+				<th class="filter-time-arch" data-placeholder="by timestamp"> Timestamp </th>
+				<th class="filter-name-arch" data-placeholder="Search..."> Sensor Name </th>
+				<th class="filter-type-arch" data-placeholder="by type"> Sensor Type </th>
+				<th class="filter-desc-arch" data-placeholder="Search..."> Description </th>
+				<th class="filter-false sorter-false"><a id='allArchive' title='clear all'><i class="fa fa-trash"> Clear All </i></a></th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<div id="pager-arch" class="pager">
+  <form>
+    <a class="first"><i class="fa fa-step-backward"></i></a>
+    <a class="prev"><i class="fa fa-backward"></i></a>
+    <span class="pagedisplay"></span>
+    <a class="next"><i class="fa fa-forward"></i></a>
+    <a class="last"><i class="fa fa-step-forward"></i></a>
+    <select class="pagesize">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+      <option value="all">All</option>
+    </select>
+    &nbsp;
+    <a  title="reset filters" class="reset-archive"><i class="fa fa-undo"></i></a>
+  </form>
+</div>
+<script type="text/javascript" src="/plugins/tablesorter/js/parsers/parser-network.min.js"></script>
