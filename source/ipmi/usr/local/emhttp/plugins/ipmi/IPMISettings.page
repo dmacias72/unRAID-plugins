@@ -91,7 +91,6 @@ $(function(){
 		EventTest();
 	});
 
-
 	checkIPMISELD(document.ipmi_settings);
 	//checkIPMIFAN(document.ipmifan_settings);
 	checkNETWORK(document.ipmi_settings);
@@ -147,10 +146,11 @@ function checkNETWORK(form) {
 }
 
 function checkLOCAL(form) {
-	if (form.LOCAL.selectedIndex < 1 )
+	if (form.LOCAL.selectedIndex < 1 ){
 		$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
-	else 
+	}else{ 
 		$('.ipmi-ipaddr').mask('localhost,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+	}
 }
 
 function verifyDATA(form) {
