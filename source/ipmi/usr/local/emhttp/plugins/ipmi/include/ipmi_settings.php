@@ -21,11 +21,13 @@ $ipmi_disp_temp2  = isset($ipmi_cfg['DISP_TEMP2'])  ? $ipmi_cfg['DISP_TEMP2']  :
 $ipmi_disp_fan1 = isset($ipmi_cfg['DISP_FAN1']) ? $ipmi_cfg['DISP_FAN1'] : "";
 $ipmi_disp_fan2 = isset($ipmi_cfg['DISP_FAN2']) ? $ipmi_cfg['DISP_FAN2'] : "";
 
-/* Get sensor info and check connection */ 
-$ipmi_sensors = ipmi_sensors($ipmi_options);
-$ipmi_fans = ipmi_get_fans($ipmi_sensors);
+/* Get sensor info and check connection */
+if($ipmi_mod || $ipmi_network == 'enable') {
+	$ipmi_sensors = ipmi_sensors($ipmi_options);
+	$ipmi_fans = ipmi_get_fans($ipmi_sensors);
+	$ipmi_board = trim(shell_exec("ipmi-fru $ipmi_options | grep 'Board Manufacturer' | awk -F ':' '{print $2}'")); // motherboard
+}
 if($ipmi_network == 'enable'){
 	$ipmi_conn = ($ipmi_sensors) ? "Connection successful" : "Connection failed";
 }
-$ipmi_board = trim(shell_exec("ipmi-fru $ipmi_options | grep 'Board Manufacturer' | awk -F ':' '{print $2}'")); // motherboard
 ?>
