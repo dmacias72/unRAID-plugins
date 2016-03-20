@@ -170,10 +170,13 @@ $(function(){
 
 	sensorArray(false);
 	eventArray();
-
+	archiveArray();
 	sensorRefresh();
 
 });
+
+var Host;
+var State = {'Critical':'red', 'Warning':'yellow', 'Nominal':'green', 'N/A':'blue'};
 
 //sensor refresh
 function sensorRefresh() {
@@ -183,8 +186,6 @@ function sensorRefresh() {
 
 //load ipmi sensor table
 function sensorArray(Refresh){
-	var Host;
-	var State = {Critical:'red', Warning:'yellow', Nominal:'green'};
   	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
   		$.each(sensors, function (i, sensor) {
   			if (sensor.State != 'N/A') {
@@ -221,7 +222,7 @@ function sensorArray(Refresh){
   					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
   						Color = 'red';
   				}
-//alert(State['Warning']);
+
   				if(Refresh) {
 					$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+"</font>");
 				} else {
@@ -265,8 +266,6 @@ function sensorArray(Refresh){
 
 //load ipmi event table
 function eventArray(){
-	var Host;
-	var State = {Critical:'red', Warning:'yellow', Nominal:'green'};
 	$('#tblEvent tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
   	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
   		$('#tblEvent tbody').empty();
@@ -306,19 +305,16 @@ function eventArray(){
 
 //load ipmi archive table
 function archiveArray(){
-	var Host;
 	$('#tblArchive tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
   	$.getJSON('/plugins/ipmi/include/ipmi_archive.php', function(archives) {
   		$('#tblArchive tbody').empty();
 		$.each(archives, function (i, archive) {
-   		var State = (archive.State == 'Asserted') ? 'red' : 'green';
    		Host = (typeof archive.IP == 'undefined') ? '' : archive.IP;
  			$('#tblArchive tbody')
  			.append("<tr id='"+i+"'>"+
-			"<td title='"+ archive.State +"'><img src='/plugins/ipmi/images/"+ State +"-on.png'/></td>"+ //state
+			"<td title='"+ archive.State +"'><img src='/plugins/dynamix/images/"+ State[archive.State] +"-on.png'/></td>"+ //state
 			"<td class='network'>"+ Host +"</td>"+ //archive host ip address
-			"<td>"+ archive.ID +"</td>"+ //archive id
-			"<td>"+ archive.DATE +" "+archive.Time+"</td>"+ //time stamp
+			"<td>"+ archive.Date+"</td>"+ //time stamp
 			"<td>"+ archive.Name +"</td>"+ //sensor name
 			"<td>"+ archive.Type +"</td>"+ //archive type
 			"<td>"+ archive.Event +"</td>"+ //archive description

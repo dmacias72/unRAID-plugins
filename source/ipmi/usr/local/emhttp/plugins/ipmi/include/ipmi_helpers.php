@@ -96,6 +96,29 @@ function ipmi_events($options=null, $archive=null){
 	return $events;
 }
 
+/* get select options for a given sensor type */
+function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
+	if ($hdd)
+		// add hard drive temp as option
+		$sensors[] = ['IP' => '', 'ID' => 'HDD', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
+
+	$options = "";
+	foreach($sensors as $id => $sensor){
+		if ($sensor["Type"] == $type && $sensor["State"] != "N/A"){
+			$name = $sensor['Name'];
+			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
+			$options .= "<option value='$id'";
+
+			// set saved option as selected
+			if ($selected == $id)
+				$options .= " selected";
+
+		$options .= ">$name$ip</option>";
+		}
+	}
+	return $options;
+}
+ 
 // get options for high or low temp thresholds
 function temp_get_options($range, $selected=null){
 	$temps = [20,25,30,35,40,45,50,55,60,65,70,75,80];

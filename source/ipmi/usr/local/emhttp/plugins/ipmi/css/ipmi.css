@@ -58,3 +58,12 @@ table.tablesorter.events th:nth-child(4){width:16%;}
 table.tablesorter.events td:nth-child(4){width:16%;}
 table.tablesorter.events th:nth-child(7){width:22%;}
 table.tablesorter.events td:nth-child(7){width:22%;}
+
+table.tablesorter.archive th:first-child{width:12%;}
+table.tablesorter.archive td:first-child{width:12%;}
+table.tablesorter.archive th:nth-child(2){width:12%;}
+table.tablesorter.archive td:nth-child(2){width:12%;}
+table.tablesorter.archive th:nth-child(3){width:16%;}
+table.tablesorter.archive td:nth-child(3){width:16%;}
+table.tablesorter.archive th:nth-child(6){width:22%;}
+table.tablesorter.archive td:nth-child(6){width:22%;}

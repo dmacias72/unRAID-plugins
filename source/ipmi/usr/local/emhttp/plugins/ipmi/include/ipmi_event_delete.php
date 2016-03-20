@@ -21,8 +21,8 @@ if($ipmi_network == 'enable')
 */
 if($event == 'post-clear'){
 	$logpath = "/boot/config/plugins/ipmi/";
-	if(!is_dir($logpath))
-		mkdir($logpath);
+//	if(!is_dir($logpath))
+//		mkdir($logpath);
 //	$gzfile = "$logpath/ipmi_event_log-".date("Y-m-d-His").".gz";
 //	$fp = gzopen($gzfile, 'w9'); // w == write, 9 == highest compression
 //	gzwrite($fp, shell_exec($cmd.$options));
