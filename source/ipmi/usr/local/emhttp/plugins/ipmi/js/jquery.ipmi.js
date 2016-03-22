@@ -51,14 +51,14 @@ $(function(){
 		labels_placement: 'left',
 		on_label: 'Archive On',
   		off_label: 'Archive Off',
-  		checked: ($.cookie('ipmi_event_archive') == 'post-clear')
+  		checked: ($.cookie('ipmi_event_archive') == 1)
 	})
 	.change(function () {
-		$.cookie('ipmi_event_archive', $('#event-arch')[0].checked ? 'post-clear' : 'clear', { expires: 3650 });
+		$.cookie('ipmi_event_archive', $('#event-arch')[0].checked ? 1 : 0, { expires: 3650 });
 		$("#tab3").parent().toggle();
 	});
 
-	if($.cookie('ipmi_event_archive') == 'post-clear')
+	if($.cookie('ipmi_event_archive') == 1)
 		$("#tab3").parent().show();
 	else
 		$("#tab3").parent().hide();
@@ -298,7 +298,7 @@ function eventArray(){
 		$("#tblEvent").trigger("search", [lastSearch]);
 			
 		$('#allEvents').click(function() {
- 				Delete($.cookie('ipmi_event_backup'));
+ 				Delete(0);
 		});
  	});
 }
@@ -318,7 +318,7 @@ function archiveArray(){
 			"<td>"+ archive.Name +"</td>"+ //sensor name
 			"<td>"+ archive.Type +"</td>"+ //archive type
 			"<td>"+ archive.Event +"</td>"+ //archive description
-			"<td><a class='delete-archive'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
+			"<td></td>"+//<a class='delete-archive'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
 			"</tr>");
   		});
  
@@ -328,7 +328,7 @@ function archiveArray(){
 			$('.network').show();
 
 		$('.delete-archive').click(function () {
-			Delete($(this).parent().parent().attr('id'));
+			ArchiveDelete($(this).parent().parent().attr('id'));
 		});
 
 		var lastSearch = $("#tblArchive")[0].config.lastSearch;
@@ -336,31 +336,33 @@ function archiveArray(){
 		$("#tblArchive").trigger("search", [lastSearch]);
 			
 		$('#allArchive').click(function() {
- 				Delete($.cookie('ipmi_event_archive'));
+ 				ArchiveDelete(0);
 		});
  	});
 }
 
 function Delete(ID) {
 	var EventDelete = '/plugins/ipmi/include/ipmi_event_delete.php';
-	if (ID == 'clear'|| ID == 'post-clear'){
-		var Message = (ID == 'clear') ? 'permanently' : 'archive then'; 
+	var Archive = $.cookie('ipmi_event_archive');
+	if (ID == 0) {
 		swal({
 			title: 'Are you sure?', 
-			text: 'You want to '+Message+' remove all events!?', 
+			text: 'You want to remove all events!?', 
 			type: 'warning',
 			showCancelButton: true,
 			closeOnConfirm: true,
 		}, function() {
-		$.get(EventDelete, {event: ID}, function() {
+		$.get(EventDelete, {archive: Archive, event: ID}, function(data) {
+			alert(data);
 			$('#tblEvent tbody').empty(); // empty table
 			}
 		);
     });
 	} else {
 		var trID = $('#'+ID);
-		$.get(EventDelete, {event: ID},
-			function() {
+		$.get(EventDelete, {archive: Archive, event: ID},
+			function(data) {
+				alert(data);
 				//remove table row
 				trID
 				.children('td')
@@ -369,7 +371,46 @@ function Delete(ID) {
 				.children()
 				.slideUp(function() {
 					trID.remove();
-					$('#tblEvents').trigger('update');
+					$('#tblEvent').trigger('update');
+				});
+		});
+	}
+	if(Archive == 1){
+		$('#tblArchive').trigger('update');
+		archiveArray();
+	}
+}
+
+function ArchiveDelete(ID) {
+	var EventDelete = '/plugins/ipmi/include/ipmi_archive_delete.php';
+	if (ID == 0) {
+		swal({
+			title: 'Are you sure?', 
+			text: 'You want to remove all archived events!?', 
+			type: 'warning',
+			showCancelButton: true,
+			closeOnConfirm: true,
+		}, function() {
+		$.get(EventDelete, {event: ID}, function(data) {
+			alert(data);
+			$('#tblArchive tbody').empty(); // empty table
+			}
+		);
+    });
+	} else {
+		var trID = $('#'+ID);
+		$.get(EventDelete, {event: ID},
+			function(data) {
+				alert(data);
+				//remove table row
+				trID
+				.children('td')
+				.animate({ padding: 0 })
+				.wrapInner('<div />')
+				.children()
+				.slideUp(function() {
+					trID.remove();
+					$('#tblArchive').trigger('update');
 				});
 		});
 	}
