@@ -6,7 +6,7 @@ Type="xmenu"
 <link type="text/css" rel="stylesheet" href="/plugins/cmdline/css/cmdline.css">
 
 <div>
-	<iframe id="shell" src="http://<?=$shellinabox_host?>:<?=$shellinabox_port;?>">
+	<iframe id="shell" src="<?=$shellinabox_http?>://<?=$shellinabox_host?>:<?=$shellinabox_port;?>">
 	</iframe>
 </div>
 
