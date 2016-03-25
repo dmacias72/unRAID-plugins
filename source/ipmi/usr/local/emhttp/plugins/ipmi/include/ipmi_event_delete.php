@@ -1,10 +1,11 @@
 <?php
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 $cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data ';
-$logpath = "/boot/config/plugins/ipmi/";
+$logfile = "/boot/config/plugins/ipmi/archived_events.log";
 $event = $_GET["event"];
 $archive = $_GET["archive"];
 
+/* network options */
 if($ipmi_network == 'enable') {
 	if($event){
 		$id = explode("_", $event);
@@ -16,14 +17,14 @@ if($ipmi_network == 'enable') {
 	$options .= " -u $ipmi_user -p ".base64_decode($ipmi_password)." --always-prefix --session-timeout=5000 --retransmission-timeout=1000 ";
 }
 
-/*archive function*/
+/* archive */
 if($archive) {
 	if($event)
 		$append = "--display=".$event.$options;
 	else
 		$append = $options;
 
-	file_put_contents("$logpath/archived_events.log", shell_exec($cmd.$append),FILE_APPEND);
+	file_put_contents($logfile, shell_exec($cmd.$append),FILE_APPEND);
 }
 
 if($event)
@@ -31,6 +32,5 @@ if($event)
 else
 	$options = "--clear ".$options;
 
-//shell_exec($cmd.$options);
-echo json_encode($cmd.$options." APPEND:".$cmd.$append." $event $archive");
+shell_exec($cmd.$options);
 ?>
