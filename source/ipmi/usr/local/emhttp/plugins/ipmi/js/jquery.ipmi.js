@@ -352,17 +352,18 @@ function Delete(ID) {
 			showCancelButton: true,
 			closeOnConfirm: true,
 		}, function() {
-		$.get(EventDelete, {archive: Archive, event: ID}, function(data) {
-			alert(data);
+		$.get(EventDelete, {archive: Archive, event: ID}, function() {
 			$('#tblEvent tbody').empty(); // empty table
+			if(Archive == 1){
+				ArchiveArray();
+				}
 			}
 		);
     });
 	} else {
 		var trID = $('#'+ID);
 		$.get(EventDelete, {archive: Archive, event: ID},
-			function(data) {
-				alert(data);
+			function() {
 				//remove table row
 				trID
 				.children('td')
@@ -372,12 +373,13 @@ function Delete(ID) {
 				.slideUp(function() {
 					trID.remove();
 					$('#tblEvent').trigger('update');
+
+						if(Archive == 1){
+							ArchiveArray();
+							}
+
 				});
 		});
-	}
-	if(Archive == 1){
-		$('#tblArchive').trigger('update');
-		archiveArray();
 	}
 }
 
@@ -391,8 +393,7 @@ function ArchiveDelete(ID) {
 			showCancelButton: true,
 			closeOnConfirm: true,
 		}, function() {
-		$.get(EventDelete, {event: ID}, function(data) {
-			alert(data);
+		$.get(EventDelete, {event: ID}, function() {
 			$('#tblArchive tbody').empty(); // empty table
 			}
 		);
@@ -400,8 +401,7 @@ function ArchiveDelete(ID) {
 	} else {
 		var trID = $('#'+ID);
 		$.get(EventDelete, {event: ID},
-			function(data) {
-				alert(data);
+			function() {
 				//remove table row
 				trID
 				.children('td')
