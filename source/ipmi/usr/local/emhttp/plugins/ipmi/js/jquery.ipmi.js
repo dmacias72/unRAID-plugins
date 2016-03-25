@@ -355,10 +355,9 @@ function Delete(ID) {
 		$.get(EventDelete, {archive: Archive, event: ID}, function() {
 			$('#tblEvent tbody').empty(); // empty table
 			if(Archive == 1){
-				ArchiveArray();
-				}
+				archiveArray();
 			}
-		);
+		});
     });
 	} else {
 		var trID = $('#'+ID);
@@ -373,12 +372,10 @@ function Delete(ID) {
 				.slideUp(function() {
 					trID.remove();
 					$('#tblEvent').trigger('update');
-
-						if(Archive == 1){
-							ArchiveArray();
-							}
-
 				});
+			if(Archive == 1){
+				archiveArray();
+			}
 		});
 	}
 }

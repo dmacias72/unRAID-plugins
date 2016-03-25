@@ -73,7 +73,7 @@ function ipmi_events($options=null, $archive=null){
 		if (empty($options)){
 
 			if($archive)
-				$events[$event['Time']] = $event;
+				$events[$event['Time']."-".$event['ID']] = $event;
 			else
 				$events[$event['ID']] = $event;
 
