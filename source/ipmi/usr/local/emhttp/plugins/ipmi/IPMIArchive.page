@@ -18,7 +18,7 @@ Title="Archived Events"
 		</tbody>
 	</table>
 </div>
-<div id="pager-arch" class="pager">
+<div id="pager-arch">
   <form>
     <a class="first"><i class="fa fa-step-backward"></i></a>
     <a class="prev"><i class="fa fa-backward"></i></a>

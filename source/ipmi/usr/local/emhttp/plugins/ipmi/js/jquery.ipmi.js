@@ -117,7 +117,7 @@ $(function(){
 		}
 	})
 	.tablesorterPager({
-		container: $('.pager'),
+		container: $('#pager'),
 		fixedHeight: false,
 		size: 20
 	});
@@ -152,7 +152,7 @@ $(function(){
 		}
 	})
 	.tablesorterPager({
-		container: $('.pager-arch'),
+		container: $('#pager-arch'),
 		fixedHeight: false,
 		size: 20
 	});
