@@ -66,7 +66,7 @@ function ipmi_events($options=null, $archive=null){
 		$event = ($size_raw < 7) ? []: array_combine($keys, array_slice($event_raw,0,7,true));
 
 		// put time in sortable format and add unix timestamp
-		$date = Datetime::createFromFormat('M-j-Y H:i:s', $event['Date']." ".$event['Time']);
+		$date = new DateTime($event['Date']." ".$event['Time']);
 		$event['Date'] = $date->format('Y-m-d H:i:s');
 		$event['Time'] = $date->format('U');
 
