@@ -102,9 +102,8 @@ function ipmi_events($options=null, $archive=null){
 
 /* get select options for a given sensor type */
 function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
-	if ($hdd)
-		// add hard drive temp as option
-		$sensors[] = ['IP' => '', 'ID' => 'HDD', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
+	if ($hdd)	// add hard drive temp as option
+		$sensors['99'] = ['IP' => '', 'ID' => '99', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
 
 	$options = "";
 	foreach($sensors as $id => $sensor){
@@ -126,7 +125,7 @@ function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
 // get options for high or low temp thresholds
 function temp_get_options($range, $selected=null){
 	$temps = [20,25,30,35,40,45,50,55,60,65,70,75,80];
-	if ($range == 'HIGH')
+	if ($range == 'HI')
 	  rsort($temps);
  $options = "";
  foreach($temps as $temp){
@@ -140,7 +139,7 @@ function temp_get_options($range, $selected=null){
 
  	}
  	return $options;
-	}
+}
 
 /* get reading for a given sensor by name */
 function ipmi_get_readings($options=null) {
@@ -173,8 +172,8 @@ function ipmi_get_readings($options=null) {
 
 			// add sensor to array of sensors
 			$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
+		}
 	}
-}
 	return $sensors; // sensor readings
 }
 
@@ -184,5 +183,13 @@ function ipmi_get_fans($sensors){
 			$fans[] = $key; 
 	}
 	return $fans;
+}
+
+function ipmi_get_temps($sensors){
+	foreach($sensors as $key => $sensor){
+		if ($sensor['Type'] == 'Temperature' && $sensor['State'] != 'N/A')
+			$temps[] = $key; 
+	}
+	return $temps;
 }
 ?>
