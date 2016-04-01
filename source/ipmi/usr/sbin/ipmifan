@@ -15,14 +15,15 @@ openlog($prog, LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $usage = <<<EOF
 
-Process settings files in ipmitool-plugin config. Control fans based on the config value and [options].
+Process settings in ipmi plugin config. Control fans based on config values and [options].
 
 Usage: $prog [options] = start daemon
 
   -c, --cron       create a cron job
-  -d, --debug      turn on debugging
+  -d, --daemon      turn on debugging
   -q, --quit       terminate $prog if running
   -v, --verbose    print all messages
+      --debug      turn on debugging
       --help       display this help and exit
       --version    output version information and exit
 
@@ -33,6 +34,7 @@ $shortopts = "bc:dqv";
 $longopts = [
 	"cron:",
 	"debug",
+	"daemon",
 	"help",
 	"quiet",
 	"quit",
@@ -51,25 +53,30 @@ if (array_key_exists("version", $args)) {
 	exit(1);
 }
 
-$cron = (array_key_exists("c", $args) || array_key_exists("cron", $args));
-$DEBUG = (array_key_exists("d", $args) || array_key_exists("debug", $args));
-$quit = (array_key_exists("q", $args) || array_key_exists("quit", $args));
-$background = (array_key_exists("b", $args) || array_key_exists("background", $args));
-$argv = (array_key_exists("v", $args) || array_key_exists("verbose", $args));
+$cron			= (array_key_exists("c", $args) || array_key_exists("cron", $args));
+$DEBUG		= (array_key_exists("debug", $args));
+$quit			= (array_key_exists("q", $args) || array_key_exists("quit", $args));
+$argv			= (array_key_exists("v", $args) || array_key_exists("verbose", $args));
 
-// ipmi-raw 00 3a 01 00 00 00 00 00 00 00 00
-// ipmi-raw 00 3a 01 AA BB CC DD EE FF GG HH
-// ipmitool raw 0x3a 0x01 0xAA 0xBB 0xCC 0xDD 0xEE 0xFF 0xGG 0xHH
-// ipmitool raw 0x3a 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-// 0x00 = smartfan mode
-// 0x01 - 0x64  = 1% - 100%
-$asrock = [
-  'CPU_FAN1'  => 'AA',
-  'CPU_FAN2'  => 'BB',
-  'REAR_FAN1' => 'CC',
-  'REAR_FAN2' => 'DD',
-  'FRNT_FAN1' => 'EE',
-  'FRNT_FAN2' => 'FF'
+#############################################
+# ipmi-raw 00 3a 01 00 00 00 00 00 00 00 00 #
+# ipmi-raw 00 3a 01 AA BB CC DD EE FF GG HH #
+# 0x00 = smartfan mode                      #
+# 0x01 - 0x64  = 1% - 100%                  #
+#############################################
+$boards = [
+	'ASRock' => [
+		'Command' => 'ipmi-raw 00 3a 01 ',
+		'Fans' => [
+			'CPU_FAN1'  => '00', // AA
+	  'CPU_FAN2'  => '00', // BB
+	  'REAR_FAN1' => '00', // CC
+	  'REAR_FAN2' => '00', // DD
+	  'FRNT_FAN1' => '00', // EE
+	  'FRNT_FAN2' => '00', // FF
+	  'FRNT_FAN3' => '00', // GG
+	  'FRNT_FAN4' => '00'] // HH
+	]
 ];
 
 function debug($m){
@@ -81,27 +88,8 @@ function debug($m){
   }
 }
 
-/*$background_args = "";
-if(isset($argv)){
-  for ($i=0; $i <= count($argv); $i++) { 
-    switch ($argv[$i]) {
-      case '--background':
-        $background = TRUE;
-      break;
-      case '-c':
-        $cron = $argv[$i+1];
-        $background_args .= " ${argv[$i]} ${argv[$i+1]}";
-      break;
-      case '-d':
-        $DEBUG = TRUE;
-        $background_args .= " ${argv[$i]}";
-      break;
-    }
-  }
-}*/
-
 # Deal with cron
-if ($cron) && is_numeric($cron) && !$quit){
+if (($cron) && is_numeric($cron) && !$quit){
   exec("crontab -l 2>/dev/null", $crontab);
   $crontab = array_unique($crontab);
   if (!$quit){
@@ -160,19 +148,19 @@ if (is_file($lockfile)){
   }
 }
 
-/*if(!$background){
-  exec("php $service --background $background_args 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
+/*if(!$daemon){
+  exec("php $service --daemon $args 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
   exit(0);
 } else {
   syslog(LOG_INFO, "process started. To terminate it, type: $prog -q");
-}
-*/
+}*/
+
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
-$plugin       = "ipmi";
-$cfg_file  = "/boot/config/plugins/$plugin/$plugin.cfg";
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 
+/* scan directory for type */
 function scan_dir($dir, $type = ""){
   $out = array();
   foreach (array_slice(scandir($dir), 2) as $entry){
@@ -182,6 +170,7 @@ function scan_dir($dir, $type = ""){
   return $out;
 }
 
+/* get highest temp of hard drives */
 function get_highest_temp($hdds){
   $highest_temp="0";
   foreach ($hdds as $hdd) {
@@ -194,6 +183,7 @@ function get_highest_temp($hdds){
   return $highest_temp;
 }
 
+/* get all hard drives except flash drive */
 function get_all_hdds(){
   $hdds = array();
   $flash = preg_replace("/\d$/", "", realpath("/dev/disk/by-label/UNRAID"));
@@ -205,73 +195,88 @@ function get_all_hdds(){
   return $hdds;
 }
 
-$hdds = get_all_hdds();
-while(TRUE){ while(TRUE){
+/* get reading for a given sensor by name */
+function ipmi_get_sensors($options=null) {
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --ignore-not-available-sensors --no-header-output --interpret-oem-data $options 2>/dev/null";
+	exec($cmd, $output, $return);
+
+	if ($return)
+		return []; // return empty array if error
+	$hdds =  get_all_hdds();
+	$hdd_temp = get_highest_temp($hdds);
+
+	// key names for ipmi sensors output
+	$keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
+	$output[] = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
+
+	foreach($output as $line){
+
+		// add sensor keys as keys to ipmi sensor output
+		$sensor_raw = explode(",", $line);
+		$size_raw = sizeof($sensor_raw);
+		$sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
+		
+		if (($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan') && $sensor['State'] != 'N/A') {
+			if (empty($options)){
+				$sensors[$sensor['ID']] = $sensor;
+			}else{
+				//split id into host and id
+				$id = explode(':',$sensor['ID']);
+				$sensor['IP'] = trim($id[0]);
+				$sensor['ID'] = trim($id[1]);
+				if ($sensor['IP'] == 'localhost')
+					$sensor['IP'] = '127.0.0.1';
+
+				// add sensor to array of sensors
+				$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
+			}
+		}
+	}
+	return $sensors; // sensor readings
+}
+
+if($fan_cfg){
+
+//while(TRUE){ while(TRUE){
 ####  DO YOUR STUFF HERE  ####
 
 # Load config file or die
-if(is_file($cfg_file)){
-  $params = parse_ini_file($cfg_file);
-  extract($params, EXTR_OVERWRITE);
-} else {
-  unlink($lockfile);
-  exit(1);
-}
 
-/*# Wait probes to become ready
-if (!is_file($PWM_CONTROLLER) || ! is_file($PWM_FAN)){
+  //extract($fan_cfg, EXTR_OVERWRITE);
+
+  /* Get sensor info and check connection */
+	if($ipmi_mod || $ipmi_network == 'enable')
+		$ipmi_sensors = ipmi_get_sensors($ipmi_options);
+	$board	= $fan_cfg['IPMIBOARD'];
+	$cmd 		= $boards["$board"]['Command'];
+	$hex		= $boards["$board"]['Fans'];
+
+# Wait probes to become ready
+/*if (!is_file($PWM_CONTROLLER) || ! is_file($PWM_FAN)){
   sleep(15);
   continue;
 }*/
 
-# Set PWM_HIGH and PWM_OFF
-$PWM_HIGH = 64;
-$PWM_OFF = $PWM_LOW-5;
+	for ($i = 0; $i < 7; $i++) {
+		if(isset($fan_cfg["FAN$i"])) {
+			$ipmi_fan	= (isset($fan_cfg["FAN$i"]))		? $fan_cfg["FAN$i"] : 0 ;
+			$ipmi_temp	= (isset($fan_cfg["FANTEMP$i"])) ? $fan_cfg["FANTEMP$i"] : 99;
+			$temp_lo		= (isset($fan_cfg["TEMPLO$i"]))	? $fan_cfg["TEMPLO$i"] : 30;
+			$temp_hi		= (isset($fan_cfg["TEMPHI$i"]))	? $fan_cfg["TEMPHI$i"] : 50;
 
-# Disable fan mininum RPM
-$FAN_RPM_MIN = file(split("_", $PWM_FAN)[0]."_min", FILE_IGNORE_NEW_LINES)[0];
-$D_FAN_RPM_MIN = ($FAN_RPM_MIN > 0) ? $FAN_RPM_MIN : FALSE;
+			$temp			= $ipmi_sensors["$ipmi_temp"]['Reading'];
+			$fan_name	= $ipmi_sensors["$ipmi_fan"]['Name'];
 
-# Enable speed change on fan
-/*$PWM_MODE=file("${PWM_CONTROLLER}_enable", FILE_IGNORE_NEW_LINES)[0];
-if($PWM_MODE != 1){
-  $DEFAULT_PWM_MODE = $PWM_MODE;
-  file_put_contents("${PWM_CONTROLLER}_enable", 1);
-}*/
-
-# Calculate size of increments.
-$TEMP_INCREMENTS     = $TEMP_HIGH-$TEMP_LOW; 
-$PWM_INCREMENTS      = round(($PWM_HIGH-$PWM_LOW)/$TEMP_INCREMENTS);
-# Get current fan rpm and pwm
-$CURRENT_PWM         = preg_replace("/\s*/", "", file_get_contents($PWM_CONTROLLER));
-$CURRENT_RPM         = preg_replace("/\s*/", "", file_get_contents($PWM_FAN));
-# Get current fan PWM percentage
-$CURRENT_PERCENT_PWM = round(($CURRENT_PWM*100)/$PWM_HIGH);
-$CURRENT_OUTPUT      = "${CURRENT_PWM} (${CURRENT_PERCENT_PWM}% @ ${CURRENT_RPM}rpm)";
-
-# Calculate a new scenario
-# Get highest drive temperature
-$HIGHEST_TEMP       = get_highest_temp($hdds);
-if ($HIGHEST_TEMP <= $TEMP_LOW){
-  $NEW_PWM          = $PWM_OFF;
-  $NEW_PERCENT_PWM  = 0;
-} else if ($HIGHEST_TEMP >= $TEMP_HIGH){
-  $NEW_PWM          = $PWM_HIGH;
-  $NEW_PERCENT_PWM  = 100;
-} else {
-  $NEW_PWM          = (($HIGHEST_TEMP-$TEMP_LOW)*$PWM_INCREMENTS)+$PWM_LOW;
-  $NEW_PERCENT_PWM  = round(($NEW_PWM*100)/$PWM_HIGH);
-}
-
-# Change the fan speed as needed
-if ($CURRENT_PWM != $NEW_PWM){
-  file_put_contents($PWM_CONTROLLER, $NEW_PWM);
-  sleep(5);
-  $NEW_RPM         = preg_replace("/\s*/", "", file_get_contents($PWM_FAN));
-  $NEW_PERCENT_PWM = round(($NEW_PWM*100)/$PWM_HIGH);
-  $NEW_OUTPUT      = "${NEW_PWM} (${NEW_PERCENT_PWM}% @ ${NEW_RPM}rpm)";
-  syslog(LOG_INFO, "highest disk temp is ${HIGHEST_TEMP}ºC, adjusting fan PWM from: $CURRENT_OUTPUT to: $NEW_OUTPUT");
-}
+			if ($temp <= $temp_lo)
+				$pwm = "01";
+			else if ($temp >= $temp_hi)
+				$pwm = "64";
+			else
+				$pwm = str_pad(round((($temp-$temp_lo)/($temp_hi-$temp_lo))*64), 2, '0', STR_PAD_LEFT);
+			$hex["$fan_name"] = $pwm;
+		}
+	}
+//syslog(LOG_INFO, "highest disk temp is ${HIGHEST_TEMP}ºC, adjusting fan PWM from: $CURRENT_OUTPUT to: $NEW_OUTPUT");
 
 # PRINT VARIABLES DEBUG 
 $defined_vars = get_defined_vars();
@@ -289,6 +294,11 @@ for ($i=0; $i < $INTERVAL*6 ; $i++) {
 debug("Sleep ".(time()-$time1)." seconds.");
 
 ######  END OF SECTION  ######
-};
-};
+//};
+//};
+} else {
+  unlink($lockfile);
+  exit(1);
+}
+
 ?>
