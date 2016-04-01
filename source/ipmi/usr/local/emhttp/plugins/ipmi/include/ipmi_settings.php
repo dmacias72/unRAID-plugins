@@ -4,7 +4,6 @@ require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 /* ipmi settings variables*/
 $ipmiseld		= isset($ipmi_cfg['IPMISELD']) ? $ipmi_cfg['IPMISELD']	: "disable";
 $ipmipoll		= isset($ipmi_cfg['IPMIPOLL']) ? $ipmi_cfg['IPMIPOLL']	: "60";
-$ipmifan			= isset($ipmi_cfg['IPMIFAN'])	 ? $ipmi_cfg['IPMIFAN'] 	: "disable";
 $ipmi_local		= isset($ipmi_cfg['LOCAL'])	 ? $ipmi_cfg['LOCAL']		: "disable";
 
 //check running status
