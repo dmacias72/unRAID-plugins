@@ -15,8 +15,8 @@ Enable Event Notifications:
   <?=mk_option($ipmiseld, "enable", "Yes");?>
   </select>
 
-<label class="ipmi-seld">Event Polling Time:</label>
-: <select id="IPMIPOLL" class="ipmi-seld ipmiseld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
+Event Polling Time:
+: <select id="IPMIPOLL" class="ipmiseld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
   <?=mk_option($ipmipoll, "15", "15 sec");?>
   <?=mk_option($ipmipoll, "30", "30 sec");?>
   <?=mk_option($ipmipoll, "60", "1 min");?>
