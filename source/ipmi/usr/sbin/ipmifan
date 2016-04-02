@@ -9,19 +9,14 @@ $DEBUG        = FALSE;
 # DO NOT TOUCH
 set_time_limit(0);
 $prog = pathinfo(__FILE__, PATHINFO_FILENAME);
-$lockfile     = "/var/run/$prog.pid";
-$service = __FILE__;
 openlog($prog, LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $usage = <<<EOF
 
-Process settings in ipmi plugin config. Control fans based on config values and [options].
+Process settings in ipmi plugin fan config. Control fans based on config values and [options].
 
-Usage: $prog [options] = start daemon
+Usage: $prog [options]
 
-  -c, --cron       create a cron job
-  -d, --daemon      turn on debugging
-  -q, --quit       terminate $prog if running
   -v, --verbose    print all messages
       --debug      turn on debugging
       --help       display this help and exit
@@ -30,14 +25,10 @@ Usage: $prog [options] = start daemon
 
 EOF;
 
-$shortopts = "bc:dqv";
+$shortopts = "v";
 $longopts = [
-	"cron:",
 	"debug",
-	"daemon",
 	"help",
-	"quiet",
-	"quit",
 	"verbose",
 	"version"
 ];
@@ -53,9 +44,6 @@ if (array_key_exists("version", $args)) {
 	exit(1);
 }
 
-$cron   = (array_key_exists("c", $args) || array_key_exists("cron", $args));
-$daemon = (array_key_exists("d", $args) || array_key_exists("daemon", $args));
-$quit   = (array_key_exists("q", $args) || array_key_exists("quit", $args));
 $argv   = (array_key_exists("v", $args) || array_key_exists("verbose", $args));
 $DEBUG  = (array_key_exists("debug", $args));
 
@@ -89,73 +77,6 @@ function debug($m){
   }
 }
 
-# Deal with cron
-if (($cron) && is_numeric($cron) && !$quit){
-  exec("crontab -l 2>/dev/null", $crontab);
-  $crontab = array_unique($crontab);
-  if (!$quit){
-    $entry = sprintf("*/%s * * * *  ${service}${background_args} 1> /dev/null 2>&1", $cron);
-    if (! preg_grep("#${service}#", $crontab)){
-      $crontab[] = $entry;
-      debug("\nCRONTAB\n".implode("\n", $crontab)."\n");
-      file_put_contents("/tmp/$prog.cron", implode(PHP_EOL, $crontab));
-      shell_exec("crontab /tmp/$prog.cron");
-      unlink("/tmp/$prog.cron");
-    }
-  }
-  unset($crontab);
-} else if ($quit){
-  exec("crontab -l 2>/dev/null", $crontab);
-  $crontab = array_unique($crontab);
-  if (preg_grep("#${service}#", $crontab)){
-    $crontab = preg_grep("#${service}#", $crontab, PREG_GREP_INVERT);
-      debug("\nCRONTAB\n".implode("\n", $crontab)."\n");
-    file_put_contents("/tmp/$prog.cron", implode(PHP_EOL, $crontab));
-    shell_exec("crontab /tmp/$prog.cron");
-    unlink("/tmp/$prog.cron");
-  };
-  unset($crontab);
-}
-
-if (is_file($lockfile)){
-  $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
-  $pid = preg_replace("/\s+/", "", shell_exec("ps -p ${lock_pid}| grep ${lock_pid}"));
-  if (!$pid){
-    if (!$quit){
-      file_put_contents($lockfile, getmypid());
-    } else {
-      echo "$lock_pid is not currently running";
-      unlink($lockfile);
-      exit(0);
-    }
-  } else {
-    if ($quit){
-      syslog(LOG_INFO, "killing daemon with PID [$lock_pid]");
-      exec("kill $lock_pid");
-      unlink($lockfile);
-      if (function_exists('at_exit')) at_exit();
-      exit(0);
-    } else {
-      echo "$prog is already running [$lock_pid]".PHP_EOL;
-      exit(0);
-    }
-  }
-} else {
-  if($quit){
-    echo "$prog not currently running".PHP_EOL;
-    exit(0);
-  } else {
-    file_put_contents($lockfile, getmypid());
-  }
-}
-
-/*if($daemon){
-  exec("/usr/bin/php $service --daemon 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
-  exit(0);
-} else {
-  syslog(LOG_INFO, "process started. To terminate it, type: $prog -q");
-}
-*/
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
@@ -281,10 +202,13 @@ if(!empty($fan_cfg)){
 	foreach($fans as $fan){
 		$hex .= " $fan";
 	}
-	$cmd = "ipmi-raw $raw$hex ";
-	shell_exec($cmd.$options);
-	syslog(LOG_INFO, "setting fans to $hex");
 
+	if($oldhex != $hex){
+		$cmd = "ipmi-raw $raw$hex ";
+		shell_exec($cmd.$options);
+		syslog(LOG_INFO, "setting fans to $hex");
+		$oldhex = $hex;
+	}
 # PRINT VARIABLES DEBUG 
 $defined_vars = get_defined_vars();
 foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i) {unset($defined_vars[$i]);}
@@ -292,8 +216,7 @@ debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
 unset($defined_vars);
 
 $time1 = time();
-//$MD5 = shell_exec("md5sum $fan_cfg_file|awk '{print $1}'");
-$MD5 = md5_file($fan_cfg_file);
+//$MD5 = md5_file($fan_cfg_file);
 for ($i=0; $i < $fanpoll*6 ; $i++) { 
   sleep(10);
   //if (md5_file($fan_cfg_file) != $MD5){syslog(LOG_INFO, "config file updated, reloading."); $i=10000;}
@@ -304,7 +227,6 @@ debug("Sleep ".(time()-$time1)." seconds.");
 };
 };
 } else {
-  unlink($lockfile);
   exit(1);
 }
 

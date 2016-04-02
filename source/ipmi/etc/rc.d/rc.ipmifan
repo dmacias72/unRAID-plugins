@@ -1,0 +1,82 @@
+#!/bin/sh
+# start/stop/restart ipmifan daemon:
+PROG="ipmifan"
+DAEMON="/usr/sbin/$PROG"
+LOCKFILE="/var/lock/$PROG"
+PIDFILE="/var/run/$PROG.pid"
+CONFIG="/boot/config/plugins/ipmi/fan.cfg"
+OPTIONS=""
+
+# read our configuration
+[ -e "$CONFIG" ] && source "$CONFIG"
+
+# Start ipmifan:
+ipmifan_start() {
+	# no-op if already running
+	if [ ! -r "$PIDFILE" ]; then
+		if [ "$IPMIFAN" == "enable" ]; then
+			echo "starting $PROG..."
+  			sleep 1
+
+			nohup $DAEMON >/dev/null 2>&1 | echo $! > $PIDFILE &
+			touch $LOCKFILE
+  			TIMER=0
+			while [ ! -e $PIDFILE ]; do
+				sleep 1
+  				let TIMER=$TIMER+1
+  				if [ $TIMER -gt 5 ]; then
+ 		 			echo -n "$PIDFILE not created"
+  			   	break
+				fi
+			done
+		else
+			echo "$PROG is not enabled   "
+		fi
+	else
+		echo "$PROG is running   "
+	fi
+}
+
+# Stop ipmifan:
+ipmifan_stop() {
+	# no-op if not running
+	if [ -r $PIDFILE ]; then
+		#stop ipmifan
+		echo "stopping $PROG..."
+
+		TIMER=0
+		while `killall $PROG 2>/dev/null`; do
+			sleep 1
+			TIMER=$((TIMER+1))
+			if [ $TIMER -ge 30 ]; then
+				killall -9 $PROG
+				sleep 1
+				break
+			fi
+		done
+		rm -f $LOCKFILE && rm -f $PIDFILE
+	else
+		echo "$PROG is stopped   "
+	fi
+}
+
+# Restart ipmifan:
+ipmifan_restart() {
+	ipmifan_stop
+	sleep 1
+	ipmifan_start
+}
+
+case "$1" in
+'start')
+  ipmifan_start
+  ;;
+'stop')
+  ipmifan_stop
+  ;;
+'restart')
+  ipmifan_restart
+  ;;
+*)
+  echo "usage rc.ipmifan: start|stop|restart"
+esac
