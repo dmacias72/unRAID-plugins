@@ -8,13 +8,14 @@ if (is_file($fan_cfg_file))
 	$fan_cfg	= parse_ini_file($fan_cfg_file);
 
 /* fan control */
-$ipmifan						= isset($fan_cfg['IPMIFAN'])			? $fan_cfg['IPMIFAN']			: "disable";
+$ipmifan       = isset($fan_cfg['IPMIFAN'])   ? $fan_cfg['IPMIFAN']   : "disable";
+$fanpoll      = isset($fan_cfg['FANPOLL'])  ? $fan_cfg['FANPOLL']  : 1;
 
 /* ipmi network options */
-$ipmi_network		= isset($ipmi_cfg['NETWORK'])		? $ipmi_cfg['NETWORK']		: 'disable';
-$ipmi_ipaddr			= isset($ipmi_cfg['IPADDR'])			? $ipmi_cfg['IPADDR']			: '';
-$ipmi_user				= isset($ipmi_cfg['USER'])					? $ipmi_cfg['USER']				: '';
-$ipmi_password	= isset($ipmi_cfg['PASSWORD'])	? $ipmi_cfg['PASSWORD']	: '';
+$ipmi_network  = isset($ipmi_cfg['NETWORK'])  ? $ipmi_cfg['NETWORK']  : 'disable';
+$ipmi_ipaddr   = isset($ipmi_cfg['IPADDR'])   ? $ipmi_cfg['IPADDR']   : '';
+$ipmi_user     = isset($ipmi_cfg['USER'])     ? $ipmi_cfg['USER']     : '';
+$ipmi_password	= isset($ipmi_cfg['PASSWORD']) ? $ipmi_cfg['PASSWORD'] : '';
 
 /* check if local ipmi driver is loaded */
 $ipmi_mod = shell_exec("modprobe ipmi_si --first-time 2>&1 | grep -q 'Module already in kernel' && echo 1 || echo 0 2> /dev/null");
