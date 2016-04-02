@@ -1,4 +1,6 @@
 <?php
+//ipmi-sensors-config --filename=ipmi.config --checkout
+//ipmi-sensors-config --filename=ipmi.config --commit
 /* get ipmi config and network options */
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 
