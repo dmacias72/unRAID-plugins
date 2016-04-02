@@ -53,10 +53,11 @@ if (array_key_exists("version", $args)) {
 	exit(1);
 }
 
-$cron			= (array_key_exists("c", $args) || array_key_exists("cron", $args));
-$DEBUG		= (array_key_exists("debug", $args));
-$quit			= (array_key_exists("q", $args) || array_key_exists("quit", $args));
-$argv			= (array_key_exists("v", $args) || array_key_exists("verbose", $args));
+$cron   = (array_key_exists("c", $args) || array_key_exists("cron", $args));
+$daemon = (array_key_exists("d", $args) || array_key_exists("daemon", $args));
+$quit   = (array_key_exists("q", $args) || array_key_exists("quit", $args));
+$argv   = (array_key_exists("v", $args) || array_key_exists("verbose", $args));
+$DEBUG  = (array_key_exists("debug", $args));
 
 #############################################
 # ipmi-raw 00 3a 01 00 00 00 00 00 00 00 00 #
@@ -66,8 +67,8 @@ $argv			= (array_key_exists("v", $args) || array_key_exists("verbose", $args));
 #############################################
 $boards = [
 	'ASRock' => [
-		'Command' => 'ipmi-raw 00 3a 01 ',
-		'Fans' => [
+		'raw' => '00 3a 01',
+		'fans' => [
 			'CPU_FAN1'  => '00', // AA
 	  'CPU_FAN2'  => '00', // BB
 	  'REAR_FAN1' => '00', // CC
@@ -148,13 +149,13 @@ if (is_file($lockfile)){
   }
 }
 
-/*if(!$daemon){
-  exec("php $service --daemon $args 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
+/*if($daemon){
+  exec("/usr/bin/php $service --daemon 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
   exit(0);
 } else {
   syslog(LOG_INFO, "process started. To terminate it, type: $prog -q");
-}*/
-
+}
+*/
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
@@ -202,12 +203,14 @@ function ipmi_get_sensors($options=null) {
 
 	if ($return)
 		return []; // return empty array if error
+	
+	/* get highest hard drive temp and add sensor */
 	$hdds =  get_all_hdds();
 	$hdd_temp = get_highest_temp($hdds);
+	$output[] = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
 
 	// key names for ipmi sensors output
 	$keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
-	$output[] = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
 
 	foreach($output as $line){
 
@@ -235,27 +238,25 @@ function ipmi_get_sensors($options=null) {
 	return $sensors; // sensor readings
 }
 
-if($fan_cfg){
+if(!empty($fan_cfg)){
+	$board	= $fan_cfg['IPMIBOARD'];
+	$raw		= $boards["$board"]['raw'];
+	$fans		= $boards["$board"]['fans'];
 
-//while(TRUE){ while(TRUE){
-####  DO YOUR STUFF HERE  ####
+	while(TRUE){ while(TRUE){
+	####  DO YOUR STUFF HERE  ####
 
-# Load config file or die
+	//extract($fan_cfg, EXTR_OVERWRITE);
 
-  //extract($fan_cfg, EXTR_OVERWRITE);
-
-  /* Get sensor info and check connection */
+	/* Get sensor info and check connection */
 	if($ipmi_mod || $ipmi_network == 'enable')
 		$ipmi_sensors = ipmi_get_sensors($ipmi_options);
-	$board	= $fan_cfg['IPMIBOARD'];
-	$cmd 		= $boards["$board"]['Command'];
-	$hex		= $boards["$board"]['Fans'];
 
-# Wait probes to become ready
-/*if (!is_file($PWM_CONTROLLER) || ! is_file($PWM_FAN)){
-  sleep(15);
-  continue;
-}*/
+	# Wait probes to become ready
+	/*if (!is_file($PWM_CONTROLLER) || ! is_file($PWM_FAN)){
+		sleep(15);
+		continue;
+	}*/
 
 	for ($i = 0; $i < 7; $i++) {
 		if(isset($fan_cfg["FAN$i"])) {
@@ -273,10 +274,16 @@ if($fan_cfg){
 				$pwm = "64";
 			else
 				$pwm = str_pad(round((($temp-$temp_lo)/($temp_hi-$temp_lo))*64), 2, '0', STR_PAD_LEFT);
-			$hex["$fan_name"] = $pwm;
+			$fans["$fan_name"] = $pwm;
 		}
 	}
-//syslog(LOG_INFO, "highest disk temp is ${HIGHEST_TEMP}ºC, adjusting fan PWM from: $CURRENT_OUTPUT to: $NEW_OUTPUT");
+	$hex = "";
+	foreach($fans as $fan){
+		$hex .= " $fan";
+	}
+	$cmd = "ipmi-raw $raw$hex ";
+	shell_exec($cmd.$options);
+	syslog(LOG_INFO, "setting fans to $hex");
 
 # PRINT VARIABLES DEBUG 
 $defined_vars = get_defined_vars();
@@ -285,17 +292,17 @@ debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
 unset($defined_vars);
 
 $time1 = time();
-$MD5 = shell_exec("md5sum $cfg_file|awk '{print $1}'");
-$MD5 = md5_file($cfg_file);
-for ($i=0; $i < $INTERVAL*6 ; $i++) { 
+//$MD5 = shell_exec("md5sum $fan_cfg_file|awk '{print $1}'");
+$MD5 = md5_file($fan_cfg_file);
+for ($i=0; $i < $fanpoll*6 ; $i++) { 
   sleep(10);
-  if (md5_file($cfg_file) != $MD5){syslog(LOG_INFO, "config file updated, reloading."); $i=10000;}
+  //if (md5_file($fan_cfg_file) != $MD5){syslog(LOG_INFO, "config file updated, reloading."); $i=10000;}
 }
 debug("Sleep ".(time()-$time1)." seconds.");
 
 ######  END OF SECTION  ######
-//};
-//};
+};
+};
 } else {
   unlink($lockfile);
   exit(1);
