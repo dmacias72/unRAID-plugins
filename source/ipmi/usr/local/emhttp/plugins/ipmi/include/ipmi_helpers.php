@@ -4,13 +4,52 @@
 /* get ipmi config and network options */
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 
+/* scan directory for type */
+function scan_dir($dir, $type = ""){
+  $out = array();
+  foreach (array_slice(scandir($dir), 2) as $entry){
+    $sep   = (preg_match("/\/$/", $dir)) ? "" : "/";
+    $out[] = $dir.$sep.$entry ;
+  }
+  return $out;
+}
+
+/* get highest temp of hard drives */
+function get_highest_temp($hdds){
+  $highest_temp="0";
+  foreach ($hdds as $hdd) {
+    if (shell_exec("hdparm -C ${hdd} 2>/dev/null| grep -c standby") == 0){
+      $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Celsius | awk '{print $10}'"));
+      $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
+    }
+  } 
+  return $highest_temp;
+}
+
+/* get all hard drives except flash drive */
+function get_all_hdds(){
+  $hdds = array();
+  $flash = preg_replace("/\d$/", "", realpath("/dev/disk/by-label/UNRAID"));
+  foreach (scan_dir("/dev/") as $dev) {
+    if(preg_match("/[sh]d[a-z]+$/", $dev) && $dev != $flash) {
+      $hdds[] = $dev;
+    }
+  }
+  return $hdds;
+}
+
 /* get an array of all sensors and their values */
 function ipmi_sensors($options=null) {
-	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --ignore-not-available-sensors --non-abbreviated-units --no-header-output --interpret-oem-data $options 2>/dev/null";
+	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --non-abbreviated-units --no-header-output --interpret-oem-data $options 2>/dev/null";
 	exec($cmd, $output, $return);
 
 	if ($return)
 		return []; // return empty array if error
+
+	/* get highest hard drive temp and add sensor */
+	$hdds =  get_all_hdds();
+	$hdd_temp = get_highest_temp($hdds);
+	$output[] = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,degrees C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
 
 	// key names for ipmi sensors output
 	$keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
@@ -109,7 +148,7 @@ function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
 
 	$options = "";
 	foreach($sensors as $id => $sensor){
-		if ($sensor["Type"] == $type && $sensor["State"] != "N/A"){
+		if ($sensor["Type"] == $type){
 			$name = $sensor['Name'];
 			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
 			$options .= "<option value='$id'";
@@ -145,11 +184,16 @@ function temp_get_options($range, $selected=null){
 
 /* get reading for a given sensor by name */
 function ipmi_get_readings($options=null) {
-	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --ignore-not-available-sensors --no-header-output --no-sensor-type-output --interpret-oem-data $options 2>/dev/null";
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --no-sensor-type-output --interpret-oem-data $options 2>/dev/null";
 	exec($cmd, $output, $return);
 
 	if ($return)
 		return []; // return empty array if error
+
+	/* get highest hard drive temp and add sensor */
+	$hdds =  get_all_hdds();
+	$hdd_temp = get_highest_temp($hdds);
+	$output[] = "99,HDD Temperature,$hdd_temp,C,Ok";
 
 	// key names for ipmi sensors output
 	$keys = ['ID', 'Name', 'Reading', 'Units', 'Event'];
@@ -181,7 +225,7 @@ function ipmi_get_readings($options=null) {
 
 function ipmi_get_fans($sensors){
 	foreach($sensors as $key => $sensor){
-		if ($sensor['Type'] == 'Fan' && $sensor['State'] != 'N/A')
+		if ($sensor['Type'] == 'Fan')
 			$fans[] = $key; 
 	}
 	return $fans;
@@ -189,7 +233,7 @@ function ipmi_get_fans($sensors){
 
 function ipmi_get_temps($sensors){
 	foreach($sensors as $key => $sensor){
-		if ($sensor['Type'] == 'Temperature' && $sensor['State'] != 'N/A')
+		if ($sensor['Type'] == 'Temperature')
 			$temps[] = $key; 
 	}
 	return $temps;
