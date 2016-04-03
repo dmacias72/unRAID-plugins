@@ -1,25 +1,18 @@
 Menu="IPMI:2"
 Title="Fan Control"
 ---
-<form markdown="1" name="ipmifan_settings" method="POST" action="/update.php" target="progressFrame">
+<form markdown="1" name="fancontrol_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 <input type="hidden" id="FANCMD" name="#command" value="" />
-<input type="hidden" id="include" name="#include" value="/plugins/ipmi/include/fan_config.php"/>
-
-Motherboard Manufacturer: 
-:  <select name="IPMIBOARD" size="1">
-	<?=mk_option($ipmi_board, "ASRock", "ASRock")?>
-	<?=mk_option($ipmi_board, "", "Other")?>
-	</select>
 
 Fan Control: 
-:  <select name="IPMIFAN" size="1" onChange="checkIPMIFAN(this.form);" title="Enable fan control based on selected temperature sensors">
-	<?=mk_option($ipmifan, "disable", "No")?>
-	<?=mk_option($ipmifan, "enable", "Yes")?>
-	</select><label><font class="red"><b>NOT FUNTIONAL YET</b></font></label>
+:  <select name="FANCONTROL" size="1" onChange="checkFANCONTROL(this.form);" title="Enable fan control based on selected temperature sensors">
+	<?=mk_option($fancontrol, "disable", "No")?>
+	<?=mk_option($fancontrol, "enable", "Yes")?>
+	</select>
 
-<label class="ipmi-fan">Temperature Polling Time:</label>
-: <select id="FANPOLL" class="ipmi-fan ipmifan-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
+<label>Temperature Polling Time:</label>
+: <select id="FANPOLL" class=" fancontrol-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
   <?=mk_option($ipmipoll, "1", "1 min");?>
   <?=mk_option($ipmipoll, "2", "2 min");?>
   <?=mk_option($ipmipoll, "3", "3 min");?>
@@ -30,26 +23,35 @@ Fan Control:
   <?=mk_option($ipmipoll, "30", "30 min");?>
   </select>
 
+Motherboard Manufacturer: 
+:  <select name="IPMIBOARD" size="1" class="fancontrol-run">
+	<?=mk_option($ipmi_board, "ASRock", "ASRock")?>
+	<?=mk_option($ipmi_board, "", "Other")?>
+	</select>
+
 &nbsp;
 
 <?php if ($ipmi_fans[0]): ?>
 
 <input type="hidden" name="FAN0" value="<?=$ipmi_fans[0];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP0">
+<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[0]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[0]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP0" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP0'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO0">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO0" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO0']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI0">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI0" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI0']);?>
 	</select>
@@ -62,20 +64,23 @@ Fan Control:
 
 <input type="hidden" name="FAN1" value="<?=$ipmi_fans[1];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP1">
+<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[1]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[1]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP1" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP1'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO1">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO1" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO1']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[1]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI1">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI1" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI1']);?>
 	</select>
@@ -88,20 +93,23 @@ Fan Control:
 
 <input type="hidden" name="FAN2" value="<?=$ipmi_fans[2];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP2">
+<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[2]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[2]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP2" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP2'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO2">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO2" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO2']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[2]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI2">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI2" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI2']);?>
 	</select>
@@ -114,20 +122,23 @@ Fan Control:
 
 <input type="hidden" name="FAN3" value="<?=$ipmi_fans[3];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP3">
+<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[3]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[3]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP3" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP3'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO3">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO3" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO3']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[3]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI3">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI3" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI3']);?>
 	</select>
@@ -140,20 +151,23 @@ Fan Control:
 
 <input type="hidden" name="FAN4" value="<?=$ipmi_fans[4];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP4">
+<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[4]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[4]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP4" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP4'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO4">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO4" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO4']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[4]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI4">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI4" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI4']);?>
 	</select>
@@ -166,20 +180,23 @@ Fan Control:
 
 <input type="hidden" name="FAN5" value="<?=$ipmi_fans[5];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP5">
+<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[5]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[5]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP5" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP5'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO5">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO5" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO5']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[5]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI5">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI5" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI5']);?>
 	</select>
@@ -192,20 +209,23 @@ Fan Control:
 
 <input type="hidden" name="FAN6" value="<?=$ipmi_fans[6];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP6">
+<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?>:
+: <?=$ipmi_sensors["$ipmi_fans[6]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[6]"]['Units'];?>
+
+<DL><DD>Temperature sensor:</DL>
+:  <select name="FANTEMP6" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP6'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO6">
+<DL><DD>Low temperature threshold (&deg;C):</DL>
+: <select name="TEMPLO6" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO6']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[6]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI6">
+<DL><DD>High temperature threshold (&deg;C):</DL>
+: <select name="TEMPHI6" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI6']);?>
 	</select>
@@ -218,20 +238,23 @@ Fan Control:
 
 <input type="hidden" name="FAN7" value="<?=$ipmi_fans[7];?>"/>
 
-<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?> temperature sensor:
-:  <select name="FANTEMP7">
+<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?>:
+:
+
+<DL><DD>Temperature sensor:
+:  <select name="FANTEMP7" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP7'], true);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?> Low temperature threshold (&deg;C):
-: <select name="TEMPLO7">
+<DL><DD>Low temperature threshold (&deg;C):
+: <select name="TEMPLO7" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('LO', $fan_cfg['TEMPLO7']);?>
 	</select>
 
-<?=$ipmi_sensors["$ipmi_fans[7]"]['Name'];?> High temperature threshold (&deg;C):
-: <select name="TEMPHI7">
+<DL><DD>High temperature threshold (&deg;C):
+: <select name="TEMPHI7" class="fancontrol-run">
 		<option value='0'>Auto</option>
 		<?=temp_get_options('HI', $fan_cfg['TEMPHI7GH']);?>
 	</select>
@@ -242,34 +265,37 @@ Fan Control:
 
 &nbsp;
 
-<input id="FAN_DEFAULT" class="ipmifan-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
+<input id="FAN_DEFAULT" class="fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
 : <input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
 
 <script type="text/javascript">
+$(function(){
+	checkFANCONTROL(document.fancontrol_settings);
+});
+
 function resetFANDATA(form) {
 		form.submit();
 }
 
-function checkIPMIFAN(form) {
-	if (form.IPMIFAN.selectedIndex < 1 ){
+function checkFANCONTROL(form) {
+	if (form.FANCONTROL.selectedIndex < 1 ){
 		form.FANCMD.value = "/usr/local/emhttp/plugins/ipmi/scripts/fancontrol_stop";
 	}else {
-   	$(".ipmi-fan").prop("disabled", (form.IPMIFAN.value == "enable"));
    	form.FANCMD.value = "/usr/local/emhttp/plugins/ipmi/scripts/fancontrol_start";
    }
 
-	if ("<?=$ipmifan_running;?>" == true)
+	if ("<?=$fancontrol_running;?>" == true)
 	{
-		$(".ipmifan-run").prop("disabled", true);
-		form.btnApply.disabled = "disabled";
+		$(".fancontrol-run").prop("disabled", true);
+		form.btnFanApply.disabled = "disabled";
    }else{
-   	$(".ipmifan-run").prop("disabled", false);
-		$("#btnApply").prop("disabled", false);
+   	$(".fancontrol-run").prop("disabled", false);
+		$("#btnFanApply").prop("disabled", false);
 	}
 }
 
 function verifyFANDATA(form) {
-	form.IPMIFAN.value = form.IPMIFAN.value.replace(/ /g,"_");
+	form.FANCONTROL.value = form.FANCONTROL.value.replace(/ /g,"_");
 }
 </script>
