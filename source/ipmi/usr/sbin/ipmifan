@@ -3,7 +3,6 @@
 ##############################
 ######  DEAMON SECTION  ######
 ##############################
-$cron         = FALSE;
 $DEBUG        = FALSE;
 
 # DO NOT TOUCH
@@ -57,14 +56,14 @@ $boards = [
 	'ASRock' => [
 		'raw' => '00 3a 01',
 		'fans' => [
-			'CPU_FAN1'  => '00', // AA
-	  'CPU_FAN2'  => '00', // BB
-	  'REAR_FAN1' => '00', // CC
-	  'REAR_FAN2' => '00', // DD
-	  'FRNT_FAN1' => '00', // EE
-	  'FRNT_FAN2' => '00', // FF
-	  'FRNT_FAN3' => '00', // GG
-	  'FRNT_FAN4' => '00'] // HH
+		'CPU_FAN1'  => '00', // AA
+		'CPU_FAN2'  => '00', // BB
+		'REAR_FAN1' => '00', // CC
+		'REAR_FAN2' => '00', // DD
+		'FRNT_FAN1' => '00', // EE
+		'FRNT_FAN2' => '00', // FF
+		'FRNT_FAN3' => '00', // GG
+		'FRNT_FAN4' => '00'] // HH
 	]
 ];
 
@@ -80,114 +79,32 @@ function debug($m){
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 
-/* scan directory for type */
-function scan_dir($dir, $type = ""){
-  $out = array();
-  foreach (array_slice(scandir($dir), 2) as $entry){
-    $sep   = (preg_match("/\/$/", $dir)) ? "" : "/";
-    $out[] = $dir.$sep.$entry ;
-  }
-  return $out;
-}
-
-/* get highest temp of hard drives */
-function get_highest_temp($hdds){
-  $highest_temp="0";
-  foreach ($hdds as $hdd) {
-    if (shell_exec("hdparm -C ${hdd} 2>/dev/null| grep -c standby") == 0){
-      $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Celsius | awk '{print $10}'"));
-      $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
-    }
-  } 
-  debug("Highest temp is ${highest_temp}ºC");
-  return $highest_temp;
-}
-
-/* get all hard drives except flash drive */
-function get_all_hdds(){
-  $hdds = array();
-  $flash = preg_replace("/\d$/", "", realpath("/dev/disk/by-label/UNRAID"));
-  foreach (scan_dir("/dev/") as $dev) {
-    if(preg_match("/[sh]d[a-z]+$/", $dev) && $dev != $flash) {
-      $hdds[] = $dev;
-    }
-  }
-  return $hdds;
-}
-
-/* get reading for a given sensor by name */
-function ipmi_get_sensors($options=null) {
-	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --ignore-not-available-sensors --no-header-output --interpret-oem-data $options 2>/dev/null";
-	exec($cmd, $output, $return);
-
-	if ($return)
-		return []; // return empty array if error
-	
-	/* get highest hard drive temp and add sensor */
-	$hdds =  get_all_hdds();
-	$hdd_temp = get_highest_temp($hdds);
-	$output[] = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
-
-	// key names for ipmi sensors output
-	$keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
-
-	foreach($output as $line){
-
-		// add sensor keys as keys to ipmi sensor output
-		$sensor_raw = explode(",", $line);
-		$size_raw = sizeof($sensor_raw);
-		$sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
-		
-		if (($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan') && $sensor['State'] != 'N/A') {
-			if (empty($options)){
-				$sensors[$sensor['ID']] = $sensor;
-			}else{
-				//split id into host and id
-				$id = explode(':',$sensor['ID']);
-				$sensor['IP'] = trim($id[0]);
-				$sensor['ID'] = trim($id[1]);
-				if ($sensor['IP'] == 'localhost')
-					$sensor['IP'] = '127.0.0.1';
-
-				// add sensor to array of sensors
-				$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
-			}
-		}
-	}
-	return $sensors; // sensor readings
-}
-
-if(!empty($fan_cfg)){
+if(!empty($fan_cfg) && $fancontrol == "enable"){
 	$board	= $fan_cfg['IPMIBOARD'];
 	$raw		= $boards["$board"]['raw'];
-	$fans		= $boards["$board"]['fans'];
 
 	while(TRUE){ while(TRUE){
 	####  DO YOUR STUFF HERE  ####
 
-	//extract($fan_cfg, EXTR_OVERWRITE);
+	$fans		= $boards["$board"]['fans'];
 
 	/* Get sensor info and check connection */
 	if($ipmi_mod || $ipmi_network == 'enable')
-		$ipmi_sensors = ipmi_get_sensors($ipmi_options);
-
-	# Wait probes to become ready
-	/*if (!is_file($PWM_CONTROLLER) || ! is_file($PWM_FAN)){
-		sleep(15);
-		continue;
-	}*/
+		$ipmi_sensors = ipmi_get_readings($ipmi_options);
 
 	for ($i = 0; $i < 7; $i++) {
-		if(isset($fan_cfg["FAN$i"])) {
-			$ipmi_fan	= (isset($fan_cfg["FAN$i"]))		? $fan_cfg["FAN$i"] : 0 ;
-			$ipmi_temp	= (isset($fan_cfg["FANTEMP$i"])) ? $fan_cfg["FANTEMP$i"] : 99;
+
+			$ipmi_fan	= (isset($fan_cfg["FAN$i"]))		? $fan_cfg["FAN$i"] : 0;
+			$fan_name	= $ipmi_sensors["$ipmi_fan"]['Name'];
+			$ipmi_temp	= (isset($fan_cfg["FANTEMP$i"])) ? $fan_cfg["FANTEMP$i"] : 0;
+
+		if($ipmi_temp != 0) {
 			$temp_lo		= (isset($fan_cfg["TEMPLO$i"]))	? $fan_cfg["TEMPLO$i"] : 30;
 			$temp_hi		= (isset($fan_cfg["TEMPHI$i"]))	? $fan_cfg["TEMPHI$i"] : 50;
 
 			$temp			= $ipmi_sensors["$ipmi_temp"]['Reading'];
-			$fan_name	= $ipmi_sensors["$ipmi_fan"]['Name'];
 
 			if ($temp <= $temp_lo)
 				$pwm = "01";
@@ -195,8 +112,11 @@ if(!empty($fan_cfg)){
 				$pwm = "64";
 			else
 				$pwm = str_pad(round((($temp-$temp_lo)/($temp_hi-$temp_lo))*64), 2, '0', STR_PAD_LEFT);
+				}else
+					$pwm = "00";
+
+				if(array_key_exists($fan_name, $fans))
 			$fans["$fan_name"] = $pwm;
-		}
 	}
 	$hex = "";
 	foreach($fans as $fan){
@@ -206,14 +126,14 @@ if(!empty($fan_cfg)){
 	if($oldhex != $hex){
 		$cmd = "ipmi-raw $raw$hex ";
 		shell_exec($cmd.$options);
-		syslog(LOG_INFO, "setting fans to $hex");
+		syslog(LOG_INFO, "adjusting fans to $hex");
 		$oldhex = $hex;
 	}
 # PRINT VARIABLES DEBUG 
 $defined_vars = get_defined_vars();
 foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i) {unset($defined_vars[$i]);}
 debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
-unset($defined_vars);
+//unset($defined_vars);
 
 $time1 = time();
 //$MD5 = md5_file($fan_cfg_file);

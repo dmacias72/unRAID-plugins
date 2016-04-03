@@ -84,7 +84,7 @@ Display Fan Speed #2:
 <script type="text/javascript">
 $(function(){
 	$('.tabs')
-		.append("<span class='status'>Fan Control: <?=$ipmifan_status;?> </span>")
+		.append("<span class='status'>Fan Control: <?=$fancontrol_status;?> </span>")
 		.append("<span class='status'>Event Notification: <?=$ipmiseld_status;?> </span>");
 
 	$('#btnTest').click(function () {
@@ -114,11 +114,8 @@ function resetDATA(form) {
 
 function checkIPMISELD(form) {
 	if (form.IPMISELD.selectedIndex < 1 ){
-		$(".ipmi-seld").hide();
 		form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_stop";
 	}else {
-   	$(".ipmi-seld").show();
-   	$(".ipmi-seld").prop("disabled", (form.IPMISELD.value == "enable"));
    	form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_start";
    }
 
