@@ -67,15 +67,6 @@ $boards = [
 	]
 ];
 
-function debug($m){
-  global $prog, $DEBUG;
-  if($DEBUG){
-    $STDERR = fopen('php://stderr', 'w+');
-    fwrite($STDERR, $m."\n");
-    fclose($STDERR);
-  }
-}
-
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
@@ -111,7 +102,7 @@ if(!empty($fan_cfg) && $fancontrol == "enable"){
 			else if ($temp >= $temp_hi)
 				$pwm = "64";
 			else
-				$pwm = str_pad(round((($temp-$temp_lo)/($temp_hi-$temp_lo))*64), 2, '0', STR_PAD_LEFT);
+				$pwm = str_pad(round((($temp-$temp_lo)/($temp_hi-$temp_lo))*16)*4, 2, '0', STR_PAD_LEFT);
 				}else
 					$pwm = "00";
 
@@ -123,17 +114,21 @@ if(!empty($fan_cfg) && $fancontrol == "enable"){
 		$hex .= " $fan";
 	}
 
-	if($oldhex != $hex){
+	if($current_hex != $hex){
 		$cmd = "ipmi-raw $raw$hex ";
 		shell_exec($cmd.$options);
-		syslog(LOG_INFO, "adjusting fans to $hex");
-		$oldhex = $hex;
+		syslog(LOG_INFO, "adjusting fans from $current_hex to $hex");
+		$current_hex = $hex;
 	}
 # PRINT VARIABLES DEBUG 
 $defined_vars = get_defined_vars();
-foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i) {unset($defined_vars[$i]);}
+unset($defined_vars['current_hex']);
+foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i) {
+	unset($defined_vars[$i]);
+}
+$defined_vars['current_hex'] = $current_hex;
 debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
-//unset($defined_vars);
+unset($defined_vars);
 
 $time1 = time();
 //$MD5 = md5_file($fan_cfg_file);
