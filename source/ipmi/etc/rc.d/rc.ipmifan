@@ -14,7 +14,7 @@ OPTIONS=""
 ipmifan_start() {
 	# no-op if already running
 	if [ ! -r "$PIDFILE" ]; then
-		if [ "$IPMIFAN" == "enable" ]; then
+		if [ "$FANCONTROL" == "enable" ]; then
 			echo "starting $PROG..."
   			sleep 1
 
