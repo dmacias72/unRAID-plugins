@@ -1,10 +1,11 @@
 $(function(){
 	$('.tabs')
-		.append("<span class='status'><label id='settings' title='go to settings page'><i class='fa fa-gear'></i>Settings</label></span>")
+		.append("<span class='status settings'><label id='settings' title='go to settings page'><i class='fa fa-gear'></i>Settings</label></span>")
 		.append("<span id='adv-switch' class='status'><input type='checkbox' id='advancedview'></span>")
 		.append("<span id='arch-switch' class='status'><input type='checkbox' id='event-arch'></span>");
 
-	$('#settings').click(function() {
+	$('.settings').click(function() {
+		$.cookie('one', 'tab1', { expires:null, path: '/'});
 		location = '/Settings/IPMI';
 	});
 
@@ -38,8 +39,8 @@ $(function(){
 	$('#advancedview').switchButton({
 		labels_placement: 'left',
 		on_label: 'Advanced View',
-  		off_label: 'Basic View',
-  		checked: ($.cookie('ipmi_sensor_mode') == 'advanced')
+		off_label: 'Basic View',
+		checked: ($.cookie('ipmi_sensor_mode') == 'advanced')
 	})
 	.change(function () {
 		$('.advanced').toggle('slow');
@@ -50,8 +51,8 @@ $(function(){
 	$('#event-arch').switchButton({
 		labels_placement: 'left',
 		on_label: 'Archive On',
-  		off_label: 'Archive Off',
-  		checked: ($.cookie('ipmi_event_archive') == 1)
+		off_label: 'Archive Off',
+		checked: ($.cookie('ipmi_event_archive') == 1)
 	})
 	.change(function () {
 		$.cookie('ipmi_event_archive', $('#event-arch')[0].checked ? 1 : 0, { expires: 3650 });
@@ -178,73 +179,80 @@ $(function(){
 var Host;
 var State = {'Critical':'red', 'Warning':'yellow', 'Nominal':'green', 'N/A':'blue'};
 
-//sensor refresh
+/* sensor refresh */
 function sensorRefresh() {
   sensorArray(true);
    setTimeout(sensorRefresh, 20000);
 };
 
-//load ipmi sensor table
+/* load ipmi sensor table */
 function sensorArray(Refresh){
+	if (!Refresh)
+		$('#tblSensor tbody').html("<tr id='waiting-sensor'><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving sensors information ...</em></td><tr>");
   	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
+  		$('#waiting-sensor').remove();
   		$.each(sensors, function (i, sensor) {
-  			if (sensor.State != 'N/A') {
-  				var Reading = parseFloat(sensor.Reading);
-  				var LowerNR = parseFloat(sensor.LowerNR);
-  				var LowerC = parseFloat(sensor.LowerC);
-  				var LowerNC = parseFloat(sensor.LowerNC);
-  				var UpperNC = parseFloat(sensor.UpperNC);
-  				var UpperC = parseFloat(sensor.UpperC);
-  				var UpperNR = parseFloat(sensor.UpperNR);
-  				var Color = 'green';
+ 			var LowerNR = parseFloat(sensor.LowerNR);
+			var LowerC = parseFloat(sensor.LowerC);
+			var LowerNC = parseFloat(sensor.LowerNC);
+			var UpperNC = parseFloat(sensor.UpperNC);
+			var UpperC = parseFloat(sensor.UpperC);
+			var UpperNR = parseFloat(sensor.UpperNR);
+			var Color = 'green';
 
-  				if (sensor.Type == 'Voltage'){
+			// only process sensor if reading is valid
+ 			if (sensor.Reading != 'N/A'){
+				var Reading = parseFloat(sensor.Reading);
+				if (sensor.Type == 'Voltage'){
 
-  					// if voltage is less than lower non-critical
-  					// or voltage is greater than upper non-critical show critical
-  					if (Reading < LowerNC && Reading > UpperNC)
-  						Color = 'orange';
+					// if voltage is less than lower non-critical
+					// or voltage is greater than upper non-critical show critical
+					if (Reading < LowerNC && Reading > UpperNC)
+						Color = 'orange';
 
-  					// if voltage is less than lower critical
-  					// or voltage is greater than upper critical show non-recoverable
-  					if (Reading < LowerC || Reading > UpperC)
-  						Color = 'red';
+					// if voltage is less than lower critical
+					// or voltage is greater than upper critical show non-recoverable
+					if (Reading < LowerC || Reading > UpperC)
+						Color = 'red';
 
-  				} else if (sensor.Type == 'Fan'){
- 
-  					// if Fan RPMs are less than lower non-critical
-  					if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
-  						Color = "red";
+				} else if (sensor.Type == 'Fan'){
 
-  				} else if(sensor.Type == 'Temperature'){
+					// if Fan RPMs are less than lower non-critical
+					if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
+						Color = "red";
 
-  					// if Temperature is greater than upper non-critical
-  					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
-  						Color = 'red';
-  				}
+				} else if(sensor.Type == 'Temperature'){
 
-  				if(Refresh) {
-					$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+"</font>");
-				} else {
-					Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
-					$('#tblSensor tbody')
-					.append("<tr id='"+i+"'>"+
-					"<td title='"+sensor.State+"'><img src='/plugins/dynamix/images/"+ State[sensor.State] +"-on.png'/></td>"+ //state
-					"<td class='network'>"+Host+"</td>"+ // sensor host ip address
-					"<td class='advanced'>"+sensor.ID+"</td>"+ // sensor id
-					"<td>"+sensor.Name+"</td>"+ //sensor name
-   				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+
-					"<td class='advanced'>"+ sensor.LowerC +"</td>"+
-					"<td class='advanced'>"+ sensor.LowerNC +"</td>"+
-					"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +"</font></td>"+ //sensor reading
-					"<td>"+sensor.Units+"</td>"+ //sensor units
-					"<td class='advanced'>"+ sensor.UpperNC +"</td>"+
-					"<td class='advanced'>"+ sensor.UpperC +"</td>"+
-					"<td class='advanced'>"+ sensor.UpperNR +"</td>"+
-					"</tr>");
+					// if Temperature is greater than upper non-critical
+					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
+						Color = 'red';
 				}
+			}else {
+				var Reading = sensor.Reading; // reading equals N/A
+				Color = 'blue';
 			}
-  		});
+
+			if(Refresh) {
+				$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+"</font>");
+			} else {
+				Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
+				$('#tblSensor tbody')
+				.append("<tr id='"+i+"'>"+
+				"<td title='"+sensor.State+"'><img src='/plugins/dynamix/images/"+ State[sensor.State] +"-on.png'/></td>"+ //state
+				"<td class='network'>"+Host+"</td>"+ // sensor host ip address
+				"<td class='advanced'>"+sensor.ID+"</td>"+ // sensor id
+				"<td>"+sensor.Name+"</td>"+ //sensor name
+				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+ // lower non recoverable
+				"<td class='advanced'>"+ sensor.LowerC +"</td>"+ // lower critical
+				"<td class='advanced'>"+ sensor.LowerNC +"</td>"+ // lower non critical
+				"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +"</font></td>"+ //sensor reading
+				"<td>"+sensor.Units+"</td>"+ //sensor units
+				"<td class='advanced'>"+ sensor.UpperNC +"</td>"+ // upper non critical
+				"<td class='advanced'>"+ sensor.UpperC +"</td>"+ // upper critical
+				"<td class='advanced'>"+ sensor.UpperNR +"</td>"+ // upper non recoverable
+				"</tr>");
+			}
+		});
 		if (!Refresh) {
 			if(Host === '')
 				$('.network').hide();
@@ -261,18 +269,18 @@ function sensorArray(Refresh){
 			$('#tblSensor').trigger('update');
 			$('#tblSensor').trigger('search', [lastSearch]);
 		}
- 	});
+	});
 };
 
-//load ipmi event table
+/* load ipmi event table */
 function eventArray(){
-	$('#tblEvent tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
-  	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
-  		$('#tblEvent tbody').empty();
+	$('#tblEvent tbody').html("<tr id='waiting-event'><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
+	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
+		$('#waiting-event').remove();
 		$.each(events, function (i, event) {
-   		Host = (typeof event.IP == 'undefined') ? '' : event.IP;
- 			$('#tblEvent tbody')
- 			.append("<tr id='"+i+"'>"+
+			Host = (typeof event.IP == 'undefined') ? '' : event.IP;
+			$('#tblEvent tbody')
+			.append("<tr id='"+i+"'>"+
 			"<td title='"+ event.State +"'><img src='/plugins/dynamix/images/"+ State[event.State] +"-on.png'/></td>"+ //state
 			"<td class='network'>"+ Host +"</td>"+ //event host ip address
 			"<td>"+ event.ID +"</td>"+ //event id
@@ -282,8 +290,8 @@ function eventArray(){
 			"<td>"+ event.Event +"</td>"+ //event description
 			"<td><a class='delete'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
 			"</tr>");
-  		});
- 
+		});
+
 		if(Host === '')
 			$('.network').hide();
 		else
@@ -298,20 +306,20 @@ function eventArray(){
 		$("#tblEvent").trigger("search", [lastSearch]);
 			
 		$('#allEvents').click(function() {
- 				Delete(0);
+			Delete(0);
 		});
- 	});
+	});
 }
 
-//load ipmi archive table
+/* load ipmi archive table */
 function archiveArray(){
 	$('#tblArchive tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
-  	$.getJSON('/plugins/ipmi/include/ipmi_archive.php', function(archives) {
-  		$('#tblArchive tbody').empty();
+	$.getJSON('/plugins/ipmi/include/ipmi_archive.php', function(archives) {
+		$('#tblArchive tbody').empty();
 		$.each(archives, function (i, archive) {
-   		Host = (typeof archive.IP == 'undefined') ? '' : archive.IP;
- 			$('#tblArchive tbody')
- 			.append("<tr id='"+i+"'>"+
+			Host = (typeof archive.IP == 'undefined') ? '' : archive.IP;
+			$('#tblArchive tbody')
+			.append("<tr id='"+i+"'>"+
 			"<td title='"+ archive.State +"'><img src='/plugins/dynamix/images/"+ State[archive.State] +"-on.png'/></td>"+ //state
 			"<td class='network'>"+ Host +"</td>"+ //archive host ip address
 			"<td>"+ archive.Date+"</td>"+ //time stamp
@@ -320,8 +328,8 @@ function archiveArray(){
 			"<td>"+ archive.Event +"</td>"+ //archive description
 			"<td></td>"+//<a class='delete-archive'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
 			"</tr>");
-  		});
- 
+		});
+
 		if(Host === '')
 			$('.network').hide();
 		else
@@ -336,11 +344,12 @@ function archiveArray(){
 		$("#tblArchive").trigger("search", [lastSearch]);
 			
 		$('#allArchive').click(function() {
- 				ArchiveDelete(0);
+			ArchiveDelete(0);
 		});
- 	});
+	});
 }
 
+/* delete event function */
 function Delete(ID) {
 	var EventDelete = '/plugins/ipmi/include/ipmi_event_delete.php';
 	var Archive = $.cookie('ipmi_event_archive');
@@ -352,13 +361,13 @@ function Delete(ID) {
 			showCancelButton: true,
 			closeOnConfirm: true,
 		}, function() {
-		$.get(EventDelete, {archive: Archive, event: ID}, function() {
-			$('#tblEvent tbody').empty(); // empty table
-			if(Archive == 1){
-				archiveArray();
-			}
+			$.get(EventDelete, {archive: Archive, event: ID}, function() {
+				$('#tblEvent tbody').empty(); // empty table
+				if(Archive == 1){
+					archiveArray();
+				}
+			});
 		});
-    });
 	} else {
 		var trID = $('#'+ID);
 		$.get(EventDelete, {archive: Archive, event: ID},
@@ -380,6 +389,7 @@ function Delete(ID) {
 	}
 }
 
+/* delete archive function */
 function ArchiveDelete(ID) {
 	var EventDelete = '/plugins/ipmi/include/ipmi_archive_delete.php';
 	if (ID == 0) {
@@ -390,11 +400,11 @@ function ArchiveDelete(ID) {
 			showCancelButton: true,
 			closeOnConfirm: true,
 		}, function() {
-		$.get(EventDelete, {event: ID}, function() {
-			$('#tblArchive tbody').empty(); // empty table
-			}
-		);
-    });
+			$.get(EventDelete, {event: ID}, function() {
+				$('#tblArchive tbody').empty(); // empty table
+				}
+			);
+		});
 	} else {
 		var trID = $('#'+ID);
 		$.get(EventDelete, {event: ID},
