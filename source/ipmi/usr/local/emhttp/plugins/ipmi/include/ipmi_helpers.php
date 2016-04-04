@@ -4,6 +4,16 @@
 /* get ipmi config and network options */
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 
+/* debug */
+function debug($m){
+  global $prog, $DEBUG;
+  if($DEBUG){
+    $STDERR = fopen('php://stderr', 'w+');
+    fwrite($STDERR, $m."\n");
+    fclose($STDERR);
+  }
+}
+
 /* scan directory for type */
 function scan_dir($dir, $type = ""){
   $out = array();
@@ -22,7 +32,8 @@ function get_highest_temp($hdds){
       $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Celsius | awk '{print $10}'"));
       $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
     }
-  } 
+  }
+  debug("Highest temp is ${highest_temp}ºC");
   return $highest_temp;
 }
 
