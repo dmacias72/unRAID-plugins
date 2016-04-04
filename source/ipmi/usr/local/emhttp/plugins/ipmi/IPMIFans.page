@@ -265,13 +265,18 @@ Motherboard Manufacturer:
 
 &nbsp;
 
-<input id="FAN_DEFAULT" class="fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
+<input id="FAN_DEFAULT" class="fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings">
 : <input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
 
 <script type="text/javascript">
 $(function(){
 	checkFANCONTROL(document.fancontrol_settings);
+});
+
+$('#readings').click(function() {
+	$.cookie('one', 'tab1', { expires:null, path: '/'});
+	location ='/Tools/IPMITools';
 });
 
 function resetFANDATA(form) {
