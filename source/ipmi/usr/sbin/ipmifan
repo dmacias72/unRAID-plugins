@@ -12,7 +12,8 @@ openlog($prog, LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $usage = <<<EOF
 
-Process settings in ipmi plugin fan config. Control fans based on config values and [options].
+Process settings in ipmi plugin fan config.
+Control fans based on config values and [options].
 
 Usage: $prog [options]
 
@@ -70,7 +71,53 @@ $boards = [
 ##############################
 #####  PROGRAM SECTION  ######
 ##############################
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_hdparm.php';
+
+/* get fan and temp sensors */
+function ipmi_get_fantemp($options=null) {
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $options 2>/dev/null";
+	exec($cmd, $output, $return);
+
+	if ($return)
+		return []; // return empty array if error
+
+	// get highest hard drive temp and add sensor
+	$hdds =  get_all_hdds();
+	$hdd_temp = get_highest_temp($hdds);
+	$output[] = "99,HDD Temperature,Temperature, $hdd_temp,C,Ok";
+
+	// key names for ipmi sensors output
+	$keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
+	$sensors = [];
+
+	foreach($output as $line){
+
+	/// add sensor keys as keys to ipmi sensor output
+		$sensor_raw = explode(",", $line);
+		$size_raw = sizeof($sensor_raw);
+		$sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
+
+if ($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan'){
+	
+			if (empty($options)){
+				$sensors[$sensor['ID']] = $sensor;
+			}else{
+				//split id into host and id
+				$id = explode(':',$sensor['ID']);
+				$sensor['IP'] = trim($id[0]);
+				$sensor['ID'] = trim($id[1]);
+				if ($sensor['IP'] == 'localhost')
+					$sensor['IP'] = '127.0.0.1';
+
+				// add sensor to array of sensors
+				$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
+			}
+		}
+	}
+	return $sensors; // sensor readings
+	unset($sensors);
+}
 
 if(!empty($fan_cfg) && $fancontrol == "enable"){
 	$board	= $fan_cfg['IPMIBOARD'];
@@ -83,7 +130,7 @@ if(!empty($fan_cfg) && $fancontrol == "enable"){
 
 	/* Get sensor info and check connection */
 	if($ipmi_mod || $ipmi_network == 'enable')
-		$ipmi_sensors = ipmi_get_readings($ipmi_options);
+		$ipmi_sensors = ipmi_get_fantemp($ipmi_options);
 
 	for ($i = 0; $i < 7; $i++) {
 

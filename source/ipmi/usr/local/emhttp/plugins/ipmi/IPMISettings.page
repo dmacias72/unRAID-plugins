@@ -3,7 +3,10 @@ Title="Settings"
 ---
 <?php require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php'; ?>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
+
+<div id="title" style="margin-top: -22px;">&nbsp;<span class='status' id='notify-status'>Event Notification: <?=$ipmiseld_status;?> </span></div>
 
 <form markdown="1" name="ipmi_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -81,11 +84,9 @@ Display Fan Speed #2:
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
 
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 <script type="text/javascript">
 $(function(){
-	$('.tabs')
-		.append("<span class='status'>Fan Control: <?=$fancontrol_status;?> </span>")
-		.append("<span class='status'>Event Notification: <?=$ipmiseld_status;?> </span>");
 
 	$('#btnTest').click(function () {
 		EventTest();

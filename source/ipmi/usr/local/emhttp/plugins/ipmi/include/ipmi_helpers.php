@@ -3,51 +3,7 @@
 //ipmi-sensors-config --filename=ipmi.config --commit
 /* get ipmi config and network options */
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
-
-/* debug */
-function debug($m){
-  global $prog, $DEBUG;
-  if($DEBUG){
-    $STDERR = fopen('php://stderr', 'w+');
-    fwrite($STDERR, $m."\n");
-    fclose($STDERR);
-  }
-}
-
-/* scan directory for type */
-function scan_dir($dir, $type = ""){
-  $out = array();
-  foreach (array_slice(scandir($dir), 2) as $entry){
-    $sep   = (preg_match("/\/$/", $dir)) ? "" : "/";
-    $out[] = $dir.$sep.$entry ;
-  }
-  return $out;
-}
-
-/* get highest temp of hard drives */
-function get_highest_temp($hdds){
-  $highest_temp="0";
-  foreach ($hdds as $hdd) {
-    if (shell_exec("hdparm -C ${hdd} 2>/dev/null| grep -c standby") == 0){
-      $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Celsius | awk '{print $10}'"));
-      $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
-    }
-  }
-  debug("Highest temp is ${highest_temp}ºC");
-  return $highest_temp;
-}
-
-/* get all hard drives except flash drive */
-function get_all_hdds(){
-  $hdds = array();
-  $flash = preg_replace("/\d$/", "", realpath("/dev/disk/by-label/UNRAID"));
-  foreach (scan_dir("/dev/") as $dev) {
-    if(preg_match("/[sh]d[a-z]+$/", $dev) && $dev != $flash) {
-      $hdds[] = $dev;
-    }
-  }
-  return $hdds;
-}
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_hdparm.php';
 
 /* get an array of all sensors and their values */
 function ipmi_sensors($options=null) {
@@ -201,7 +157,7 @@ function ipmi_get_readings($options=null) {
 	if ($return)
 		return []; // return empty array if error
 
-	/* get highest hard drive temp and add sensor */
+	// get highest hard drive temp and add sensor
 	$hdds =  get_all_hdds();
 	$hdd_temp = get_highest_temp($hdds);
 	$output[] = "99,HDD Temperature,$hdd_temp,C,Ok";
@@ -242,11 +198,48 @@ function ipmi_get_fans($sensors){
 	return $fans;
 }
 
-function ipmi_get_temps($sensors){
+function get_fan_options($sensors, $config){
+	$i = 0;
 	foreach($sensors as $key => $sensor){
-		if ($sensor['Type'] == 'Temperature')
-			$temps[] = $key; 
+		if ($sensor['Type'] == 'Fan'){
+			$fantemp = $sensors[$config["FANTEMP{$i}"]];
+			
+			// hidden fan id
+			echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
+
+			// fan name: reading = temp name: reading
+			echo '<dl><dt>'.$sensor['Name'].': '.floatval($sensor['Reading']).' '.$sensor['Units'].'</dt><dd>';
+			if ($fantemp['Name'])
+				echo $fantemp['Name'].': '.floatval($fantemp['Reading']).' '.$fantemp['Units'];
+			else
+				echo 'Auto';
+			echo '</dd></dl>';
+
+			// temperature sensor
+			echo'<dl class="fancontrol">'.
+	'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
+		'<select name="FANTEMP'.$i.'" class="fancontrol fancontrol-run">'.
+			'<option value="0">Auto</option>';
+			echo ipmi_get_options($sensors, 'Temperature', $config["FANTEMP{$i}"], true);
+		echo '</select></dd></dl>';
+
+		// low temperature threshold
+		echo '<dl class="fancontrol">'.
+	'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
+	'<dd><select name="TEMPLO'.$i.'" class="fancontrol fancontrol-run">'.
+			'<option value="0">Auto</option>';
+			echo temp_get_options('LO', $config["TEMPLO{$i}"]);
+		echo '</select></dd></dl>';
+		
+		// high temperature threshold
+		echo '<dl class="fancontrol">'.
+	'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
+	'<dd><select name="TEMPHI'.$i.'" class="fancontrol fancontrol-run">'.
+			'<option value="0">Auto</option>';
+		echo	temp_get_options('HI', $config["TEMPHI{$i}"]);
+		echo '</select></dd></dl>&nbsp;';
+			$i++;
+			}
 	}
-	return $temps;
-}
+}	
 ?>

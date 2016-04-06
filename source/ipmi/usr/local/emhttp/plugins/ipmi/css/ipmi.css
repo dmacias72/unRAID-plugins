@@ -11,7 +11,7 @@ table.tablesorter{
 	cursor: pointer;
 }
 
-.advanced, .network {
+.advanced, .network, .fancontrol{
 		display: none;
 }
 
