@@ -7,7 +7,7 @@ require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_hdparm.php';
 
 /* get an array of all sensors and their values */
 function ipmi_sensors($options=null) {
-	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --non-abbreviated-units --no-header-output --interpret-oem-data $options 2>/dev/null";
+	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $options 2>/dev/null"; // --non-abbreviated-units 
 	exec($cmd, $output, $return);
 
 	if ($return)
@@ -16,7 +16,7 @@ function ipmi_sensors($options=null) {
 	/* get highest hard drive temp and add sensor */
 	$hdds =  get_all_hdds();
 	$hdd_temp = get_highest_temp($hdds);
-	$output[] = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,degrees C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
+	$output[] = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
 
 	// key names for ipmi sensors output
 	$keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
@@ -208,9 +208,9 @@ function get_fan_options($sensors, $config){
 			echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
 
 			// fan name: reading = temp name: reading
-			echo '<dl><dt>'.$sensor['Name'].': '.floatval($sensor['Reading']).' '.$sensor['Units'].'</dt><dd>';
+			echo '<dl><dt>'.$sensor['Name'].' ('.floatval($sensor['Reading']).' '.$sensor['Units'].'):</dt><dd>';
 			if ($fantemp['Name'])
-				echo $fantemp['Name'].': '.floatval($fantemp['Reading']).' '.$fantemp['Units'];
+				echo $fantemp['Name'].' ('.floatval($fantemp['Reading']).' '.$fantemp['Units'].')';
 			else
 				echo 'Auto';
 			echo '</dd></dl>';

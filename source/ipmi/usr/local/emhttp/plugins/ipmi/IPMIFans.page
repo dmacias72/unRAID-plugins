@@ -128,7 +128,7 @@ function checkFANCONTROL(form) {
 
 	if ("<?=$fancontrol_running;?>" == true)
 	{
-		//$(".fancontrol-run").prop("disabled", true);
+		$(".fancontrol-run").prop("disabled", true);
 		form.btnFanApply.disabled = "disabled";
    }else{
    	$(".fancontrol-run").prop("disabled", false);

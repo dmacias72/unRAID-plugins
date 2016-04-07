@@ -75,7 +75,7 @@ $(function(){
 			filter_reset : '.reset-sensors',
 			filter_functions: {
 				'.filter-ip' : true,
-				'.filter-type' : true,
+				'.filter-bytype' : true,
 				'.filter-reading' : {
 					'nominal'		: function(e, n, f, i, $r, c, data) {
 						return (data.$row.find('td.reading font').prop('color') == 'green'); },
@@ -164,7 +164,7 @@ $(function(){
 	$('#tblArchive tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
 
 	// add advanced class to select tablesorter filter row cells
-	var tdAdv = [3,5, 6, 7, 10, 11, 12];
+	var tdAdv = [3, 5, 6, 7, 10, 11, 12];
 	$.each(tdAdv , function (index, value) {
 		$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
 	});
@@ -222,6 +222,7 @@ function sensorArray(Refresh){
 						Color = "red";
 
 				} else if(sensor.Type == 'Temperature'){
+					sensor.Units = '&deg;'+sensor.Units;
 
 					// if Temperature is greater than upper non-critical
 					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
@@ -233,7 +234,7 @@ function sensorArray(Refresh){
 			}
 
 			if(Refresh) {
-				$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+"</font>");
+				$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+" "+sensor.Units+"</font>");
 			} else {
 				Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
 				$('#tblSensor tbody')
@@ -245,8 +246,8 @@ function sensorArray(Refresh){
 				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+ // lower non recoverable
 				"<td class='advanced'>"+ sensor.LowerC +"</td>"+ // lower critical
 				"<td class='advanced'>"+ sensor.LowerNC +"</td>"+ // lower non critical
-				"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +"</font></td>"+ //sensor reading
-				"<td>"+sensor.Units+"</td>"+ //sensor units
+				"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +" "+ sensor.Units +"</font></td>"+ //sensor reading
+				"<td>"+sensor.Type+"</td>"+ //sensor units
 				"<td class='advanced'>"+ sensor.UpperNC +"</td>"+ // upper non critical
 				"<td class='advanced'>"+ sensor.UpperC +"</td>"+ // upper critical
 				"<td class='advanced'>"+ sensor.UpperNR +"</td>"+ // upper non recoverable

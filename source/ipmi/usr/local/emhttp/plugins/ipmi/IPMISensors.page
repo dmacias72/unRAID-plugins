@@ -19,7 +19,7 @@ Icon="sensorspage.png"
 				<th class="advanced filter-false"> Lower <br> Critical </th>
 				<th class="advanced filter-false"> Lower <br> Non-Critical </th>
 				<th class="filter-reading" data-placeholder="by status"> Reading </th>
-				<th class="filter-type" data-placeholder="by type"> Units </th>
+				<th class="filter-bytype" data-placeholder="by type"> Type </th>
 				<th class="advanced filter-false"> Upper <br> Non-Critical </th>
 				<th class="advanced filter-false"> Upper <br> Critical </th>
 				<th class="advanced filter-false"> Upper <br> Non-Recover </th>
