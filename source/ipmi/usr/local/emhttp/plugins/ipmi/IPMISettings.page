@@ -116,6 +116,7 @@ function resetDATA(form) {
 function checkIPMISELD(form) {
 	if (form.IPMISELD.selectedIndex < 1 ){
 		form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_stop";
+		$("#btnApply").prop("disabled", false);
 	}else {
    	form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_start";
    }
@@ -123,7 +124,7 @@ function checkIPMISELD(form) {
 	if ("<?=$ipmiseld_running;?>" == true)
 	{
 		$(".ipmiseld-run").prop("disabled", true);
-		form.btnApply.disabled = "disabled";
+		$("#btnApply").disabled = "disabled";
    }else{
    	$(".ipmiseld-run").prop("disabled", false);
 		$("#btnApply").prop("disabled", false);
