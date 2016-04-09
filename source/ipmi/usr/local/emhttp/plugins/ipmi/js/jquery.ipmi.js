@@ -75,7 +75,7 @@ $(function(){
 			filter_reset : '.reset-sensors',
 			filter_functions: {
 				'.filter-ip' : true,
-				'.filter-bytype' : true,
+				'.filter-type' : true,
 				'.filter-reading' : {
 					'nominal'		: function(e, n, f, i, $r, c, data) {
 						return (data.$row.find('td.reading font').prop('color') == 'green'); },
@@ -187,10 +187,7 @@ function sensorRefresh() {
 
 /* load ipmi sensor table */
 function sensorArray(Refresh){
-	if (!Refresh)
-		$('#tblSensor tbody').html("<tr id='waiting-sensor'><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving sensors information ...</em></td><tr>");
   	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
-  		$('#waiting-sensor').remove();
   		$.each(sensors, function (i, sensor) {
  			var LowerNR = parseFloat(sensor.LowerNR);
 			var LowerC = parseFloat(sensor.LowerC);
@@ -275,9 +272,7 @@ function sensorArray(Refresh){
 
 /* load ipmi event table */
 function eventArray(){
-	$('#tblEvent tbody').html("<tr id='waiting-event'><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
 	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
-		$('#waiting-event').remove();
 		$.each(events, function (i, event) {
 			Host = (typeof event.IP == 'undefined') ? '' : event.IP;
 			$('#tblEvent tbody')
