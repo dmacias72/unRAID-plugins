@@ -58,8 +58,8 @@ function ipmi_events($options=null, $archive=null){
 		$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $options 2>/dev/null";
 		exec($cmd, $output, $return); 
 	}
-	//if ($return)
-		//return []; // return empty array if error
+	if ($return)
+		return []; // return empty array if error
 
 	// key names for ipmi event output
 	$keys = ['ID','Date','Time','Name','Type','State','Event'];
@@ -108,47 +108,6 @@ function ipmi_events($options=null, $archive=null){
 	return $events;
 }
 
-/* get select options for a given sensor type */
-function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
-	if ($hdd)	// add hard drive temp as option
-		$sensors['99'] = ['IP' => '', 'ID' => '99', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
-
-	$options = "";
-	foreach($sensors as $id => $sensor){
-		if ($sensor["Type"] == $type){
-			$name = $sensor['Name'];
-			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
-			$options .= "<option value='$id'";
-
-			// set saved option as selected
-			if ($selected == $id)
-				$options .= " selected";
-
-		$options .= ">$name$ip</option>";
-		}
-	}
-	return $options;
-}
- 
-// get options for high or low temp thresholds
-function temp_get_options($range, $selected=null){
-	$temps = [20,25,30,35,40,45,50,55,60,65,70,75,80];
-	if ($range == 'HI')
-	  rsort($temps);
- $options = "";
- foreach($temps as $temp){
-			$options .= "<option value='$temp'";
-
-			// set saved option as selected
-			if ($selected == $temp)
-				$options .= " selected";
-
-		$options .= ">$temp</option>";
-
- 	}
- 	return $options;
-}
-
 /* get reading for a given sensor by name */
 function ipmi_get_readings($options=null) {
 	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --no-sensor-type-output --interpret-oem-data $options 2>/dev/null";
@@ -184,10 +143,50 @@ function ipmi_get_readings($options=null) {
 				$sensor['IP'] = '127.0.0.1';
 
 			// add sensor to array of sensors
-			$sensors[ip2long($sensor['IP']).'-'.$sensor['ID']] = $sensor;
+			$sensors[ip2long($sensor['IP']).'_'.$sensor['ID']] = $sensor;
 		}
 	}
 	return $sensors; // sensor readings
+}
+
+/* get select options for a given sensor type */
+function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
+	if ($hdd)	// add hard drive temp as option
+		$sensors['99'] = ['IP' => '', 'ID' => '99', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
+
+	$options = "";
+	foreach($sensors as $id => $sensor){
+		if ($sensor["Type"] == $type){
+			$name = $sensor['Name'];
+			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
+			$options .= "<option value='$id'";
+
+			// set saved option as selected
+			if ($selected == $id)
+				$options .= " selected";
+
+		$options .= ">$name$ip</option>";
+		}
+	}
+	return $options;
+}
+ 
+// get options for high or low temp thresholds
+function temp_get_options($range, $selected=null){
+	$temps = [20,80];
+	if ($range == 'HI')
+	  rsort($temps);
+ 	$options = "";
+ 	foreach(range($temps[0], $temps[1], 5) as $temp){
+		$options .= "<option value='$temp'";
+
+		// set saved option as selected
+		if ($selected == $temp)
+			$options .= " selected";
+
+		$options .= ">$temp</option>";
+ 	}
+ 	return $options;
 }
 
 function ipmi_get_fans($sensors){
@@ -215,31 +214,69 @@ function get_fan_options($sensors, $config){
 				echo 'Auto';
 			echo '</dd></dl>';
 
-			// temperature sensor
-			echo'<dl class="fancontrol">'.
-	'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
-		'<select name="FANTEMP'.$i.'" class="fancontrol fancontrol-run">'.
-			'<option value="0">Auto</option>';
-			echo ipmi_get_options($sensors, 'Temperature', $config["FANTEMP{$i}"], true);
-		echo '</select></dd></dl>';
+			// fan control lower limit
+			$fanlimit = 'FANLIMIT'.$i;
+			echo '<dl class="fancontrol">'.
+			'<dt><dl><dd>Fan speed lower limit:</dd></dl></dt><dd>'.
+			'<select name="'.$fanlimit.'" class="fancontrol fancontrol-run">';
+			echo get_limit_options($config[$fanlimit]);
+			echo '</select></dd></dl>';
 
-		// low temperature threshold
-		echo '<dl class="fancontrol">'.
-	'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
-	'<dd><select name="TEMPLO'.$i.'" class="fancontrol fancontrol-run">'.
+			// temperature sensor
+			$fantemp = 'FANTEMP'.$i;
+			echo '<dl class="fancontrol">'.
+			'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
+			'<select name="'.$fantemp.'" class="fancontrol fancontrol-run">'.
 			'<option value="0">Auto</option>';
-			echo temp_get_options('LO', $config["TEMPLO{$i}"]);
-		echo '</select></dd></dl>';
+			echo ipmi_get_options($sensors, 'Temperature', $config[$fantemp], true);
+			echo '</select></dd></dl>';
+
+			// low temperature threshold
+			$templo = 'TEMPLO'.$i;
+			echo '<dl class="fancontrol">'.
+			'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
+			'<dd><select name="'.$templo.'" class="fancontrol fancontrol-run">'.
+			'<option value="0">Auto</option>';
+			echo temp_get_options('LO', $config[$templo]);
+			echo '</select></dd></dl>';
 		
-		// high temperature threshold
-		echo '<dl class="fancontrol">'.
-	'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
-	'<dd><select name="TEMPHI'.$i.'" class="fancontrol fancontrol-run">'.
+			// high temperature threshold
+			$temphi = 'TEMPHI'.$i;
+			echo '<dl class="fancontrol">'.
+			'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
+			'<dd><select name="'.$temphi.'" class="fancontrol fancontrol-run">'.
 			'<option value="0">Auto</option>';
-		echo	temp_get_options('HI', $config["TEMPHI{$i}"]);
-		echo '</select></dd></dl>&nbsp;';
+			echo	temp_get_options('HI', $config[$temphi]);
+			echo '</select></dd></dl>&nbsp;';
 			$i++;
-			}
+		}
 	}
 }	
+
+function get_limit_options($limit){
+	$options = '';
+		for($i = 1; $i <= 64; $i++){
+			$options .= '<option value="'.$i.'"';
+			if($limit == $i)
+				$options .= ' selected';
+		
+			$options .= '>'.$i.'</option>';			
+		}
+	return $options;
+}
+
+function get_fanip_options($ips, $fanip){
+	$ips = 'None,'.$ips;
+	$ips = explode(',',$ips);
+		foreach($ips as $ip){
+			$options .= '<option value="'.$ip.'"';
+			if($fanip == $ip)
+				$options .= ' selected';
+		
+			$options .= '>'.$ip.'</option>';			
+		}
+	return $options;
+}
+
+echo $ipmi_options;
 ?>
