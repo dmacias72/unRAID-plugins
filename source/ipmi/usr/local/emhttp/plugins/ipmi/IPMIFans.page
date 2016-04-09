@@ -35,60 +35,30 @@ Markdown="false"
   	</dd>
 </dl>
 
+		<input type="hidden" name="IPMIBOARD" value="<?=$ipmi_board;?>">
+
+<?if ($ipmi_network == "enable"):?>
+
 <dl>
-	<dt>Motherboard Manufacturer:</dt> 
+	<dt>Fan Control IP Address:</dt> 
 	<dd>
-		<select name="IPMIBOARD" size="1" class="fancontrol-run">
-		<?=mk_option($ipmi_board, "ASRock", "ASRock")?>
-		<?=mk_option($ipmi_board, "", "Other")?>
-		</select>
+		<select id="FANIP" class=" fancontrol-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
+		<?=get_fanip_options($ipmi_ipaddr, $fanip);?>
+	</select>
 	</dd>
 </dl>
+
+<?endif;?>
 
 &nbsp;
 
-<?php get_fan_options($ipmi_sensors, $fan_cfg);?>
-
-
-<!-- <dl>
-<input type="hidden" name="FAN0" value="<?=$ipmi_fans[0];?>"/>
-
-<dt><?=$ipmi_sensors["$ipmi_fans[0]"]['Name'];?>: <?=$ipmi_sensors["$ipmi_fans[0]"]['Reading'];?> <?=$ipmi_sensors["$ipmi_fans[0]"]['Units'];?></dt>
-<dd><?=$ipmi_sensors[$fan_cfg['FANTEMP0']]['Name'];?>: <?=$ipmi_sensors[$fan_cfg['FANTEMP0']]['Reading'];?> <?=$ipmi_sensors[$fan_cfg['FANTEMP0']]['Units'];?></dd>
-</dl>
-
-<dl class="fancontrol">
-	<dt><dl><dd>Temperature sensor:</dd></dl></dt>
-	<dd>
-		<select name="FANTEMP0" class="fancontrol fancontrol-run">
-			<option value='0'>Auto</option>
-			<?=ipmi_get_options($ipmi_sensors, 'Temperature', $fan_cfg['FANTEMP0'], true);?>
-		</select>
-	</dd>
-</dl>
-<dl class="fancontrol">
-	<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>
-	<dd>
-		<select name="TEMPLO0" class="fancontrol fancontrol-run">
-			<option value='0'>Auto</option>
-			<?=temp_get_options('LO', $fan_cfg['TEMPLO0']);?>
-		</select>
-	</dd>
-</dl>
-<dl class="fancontrol">
-	<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>
-	<dd>
-		<select name="TEMPHI0" class="fancontrol fancontrol-run">
-			<option value='0'>Auto</option>
-			<?=temp_get_options('HI', $fan_cfg['TEMPHI0']);?>
-		</select>
-	</dd>
-</dl>
-&nbsp; -->
+<?if (($ipmi_network == "disable") || (($ipmi_network == 'enable') && ($fanip != 'None')) ):?>
+	<?get_fan_options($ipmi_sensors, $fan_cfg);?>
+<?endif;?>
 
 <dl>
-<dt><input id="FAN_DEFAULT" class="fancontrol fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
-<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
+	<dt><input id="FAN_DEFAULT" class="fancontrol fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
+	<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
 
@@ -111,6 +81,10 @@ $(function(){
 		location ='/Tools/IPMITools';
 	});
 
+	if ($.cookie('ipmi_fancontrol_mode') == 'advanced') {
+		$('.fancontrol').show();
+	}
+
 	checkFANCONTROL(document.fancontrol_settings);
 
 });
@@ -129,7 +103,7 @@ function checkFANCONTROL(form) {
 	if ("<?=$fancontrol_running;?>" == true)
 	{
 		$(".fancontrol-run").prop("disabled", true);
-		form.btnFanApply.disabled = "disabled";
+		$("#btnFanApply").disabled = "disabled";
    }else{
    	$(".fancontrol-run").prop("disabled", false);
 		$("#btnFanApply").prop("disabled", false);
