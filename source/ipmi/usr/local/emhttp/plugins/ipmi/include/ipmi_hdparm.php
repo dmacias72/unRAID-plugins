@@ -24,7 +24,7 @@ function get_highest_temp($hdds){
   $highest_temp="0";
   foreach ($hdds as $hdd) {
     if (shell_exec("hdparm -C ${hdd} 2>/dev/null| grep -c standby") == 0){
-      $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Celsius | awk '{print $10}'"));
+      $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Cel | awk '{print $10}'"));
       $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
     }
   }
