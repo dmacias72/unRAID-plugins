@@ -1,11 +1,12 @@
-Menu="IPMI:2"
+Menu="IPMI:3"
 Title="Fan Control"
 Markdown="false"
 ---
-<div id="title" style="margin-top: -22px;">&nbsp;<span class='status' id='fancontrol-status'>Fan Control: <?=$fancontrol_status;?></span>
-<span class="status" style="margin-top: -30px; margin-right: -121px;"><input type="checkbox" id="advancedview"></span></div>
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
-<form markdown="1" name="fancontrol_settings" method="POST" action="/update.php" target="progressFrame">
+<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span><span class='status' id='fancontrol-status'>Fan Control: <?=$fancontrol_status;?></span></div>
+
+<form name="fancontrol_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 <input type="hidden" id="FANCMD" name="#command" value="" />
 
@@ -43,7 +44,7 @@ Markdown="false"
 	<dt>Fan Control IP Address:</dt> 
 	<dd>
 		<select id="FANIP" class=" fancontrol-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
-		<?=get_fanip_options($ipmi_ipaddr, $fanip);?>
+		<?get_fanip_options($ipmi_ipaddr, $fanip);?>
 	</select>
 	</dd>
 </dl>
@@ -52,15 +53,31 @@ Markdown="false"
 
 &nbsp;
 
-<?if (($ipmi_network == "disable") || (($ipmi_network == 'enable') && ($fanip != 'None')) ):?>
-	<?get_fan_options($ipmi_sensors, $fan_cfg);?>
-<?endif;?>
-
 <dl>
 	<dt><input id="FAN_DEFAULT" class="fancontrol fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
 	<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
+
+<div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fan.png"> Fan Settings </span>
+<span class="status" style="margin-top: 30px;"><input type="checkbox" id="advancedview"></span></div>
+<form name="fancontrol_options" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="ipmi/fan.cfg" />
+
+<?if (($ipmi_network == "disable") || (($ipmi_network == 'enable') && ($fanip != 'None')) ):?>
+	<?get_fan_options($ipmi_sensors, $fan_cfg);?>
+<?endif;?>
+
+&nbsp;
+
+<dl>
+	<dt>&nbsp;</dt>
+	<dd><input type="submit" value="Apply" onClick="verifyFANOPT(this.form)"><input type="button" value="Done" onClick="done()"></dd>
+</dl>
+
+</form>
+
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script type="text/javascript">
 $(function(){

@@ -3,12 +3,11 @@ Title="Settings"
 ---
 <?php require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php'; ?>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
-<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
 
-<div id="title" style="margin-top: -22px;">&nbsp;<span class='status' id='notify-status'>Event Notification: <?=$ipmiseld_status;?> </span></div>
+<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span><span class='status' id='notify-status'>Event Notification: <?=$ipmiseld_status;?> </span></div>
 
-<form markdown="1" name="ipmi_settings" method="POST" action="/update.php" target="progressFrame">
+<form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
 <input type="hidden" id="COMMAND" name="#command" value="" />
 
@@ -16,7 +15,7 @@ Enable Event Notifications:
 : <select id="IPMISELD" name="IPMISELD" size="1" onChange="checkIPMISELD(this.form);" title="Enable event notifications and local system logging for ipmi events">
   <?=mk_option($ipmiseld, "disable", "No");?>
   <?=mk_option($ipmiseld, "enable", "Yes");?>
-  </select>
+  </select> &nbsp; <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
 
 Event Polling Time:
 : <select id="IPMIPOLL" class="ipmiseld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
@@ -27,11 +26,6 @@ Event Polling Time:
   <?=mk_option($ipmipoll, "300", "5 min");?>
   <?=mk_option($ipmipoll, "1800", "30 min");?>
   </select>
-
-Test Event Notifications:
-: <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
-
-&nbsp;
 
 Enable Network Connection(s):
 : <select id="NETWORK" class="ipmiseld-run" name="NETWORK" size="1" onChange="checkNETWORK(this.form);"  title="Enable connection to network based ipmi, not necessary for local onboard ipmi">
@@ -56,35 +50,10 @@ Enable Network Connection(s):
 
 &nbsp;
 
-Display Temperature #1:
-: <select name="DISP_TEMP1" class="display">
-		<option value='false'>None</option>
-		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $ipmi_disp_temp1);?>
-  </select>
-
-Display Temperature #2:
-: <select name="DISP_TEMP2" class="display">
-		<option value='false'>None</option>	
-		<?=ipmi_get_options($ipmi_sensors, 'Temperature', $ipmi_disp_temp2);?>
-	</select>
-
-Display Fan Speed #1:
-: <select name="DISP_FAN1" class="display">
-		<option value='false'>None</option>
-		<?=ipmi_get_options($ipmi_sensors, 'Fan', $ipmi_disp_fan1);?>
-	</select>
-
-Display Fan Speed #2:
-: <select name="DISP_FAN2" class="display">
-		<option value='false'>None</option>
-		<?=ipmi_get_options($ipmi_sensors, 'Fan', $ipmi_disp_fan2);?>
-	</select>
-
 <input id="DEFAULT" class="ipmiseld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
 
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 <script type="text/javascript">
 $(function(){
 
@@ -92,11 +61,11 @@ $(function(){
 		EventTest();
 	});
 
-	checkIPMISELD(document.ipmi_settings);
+	checkIPMISELD(document.seld_settings);
 	//checkIPMIFAN(document.ipmifan_settings);
-	checkNETWORK(document.ipmi_settings);
-	checkLOCAL(document.ipmi_settings);
-	decData(document.ipmi_settings);
+	checkNETWORK(document.seld_settings);
+	checkLOCAL(document.seld_settings);
+	decData(document.seld_settings);
 });
 
 function resetDATA(form) {
@@ -125,9 +94,11 @@ function checkIPMISELD(form) {
 	{
 		$(".ipmiseld-run").prop("disabled", true);
 		$("#btnApply").disabled = "disabled";
+		$("#btnTest").show();
    }else{
    	$(".ipmiseld-run").prop("disabled", false);
 		$("#btnApply").prop("disabled", false);
+		$("#btnTest").hide();
 	}
 }
 

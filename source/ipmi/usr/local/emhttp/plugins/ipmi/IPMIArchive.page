@@ -36,4 +36,3 @@ Title="Archived Events"
     <a  title="reset filters" class="reset-archive"><i class="fa fa-undo"></i></a>
   </form>
 </div>
-<script type="text/javascript" src="/plugins/tablesorter/js/parsers/parser-network.min.js"></script>
