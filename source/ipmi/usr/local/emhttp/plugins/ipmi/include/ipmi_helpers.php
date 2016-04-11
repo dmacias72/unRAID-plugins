@@ -201,34 +201,34 @@ function get_fan_options($sensors, $config){
 	$i = 0;
 	foreach($sensors as $key => $sensor){
 		if ($sensor['Type'] == 'Fan'){
-			$fantemp = $sensors[$config["FANTEMP{$i}"]];
+			$fan_temp = 'FANTEMP'.$i;
+			$fan_sensor = $sensors[$config[$fan_temp]];
 			
 			// hidden fan id
 			echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
 
 			// fan name: reading = temp name: reading
 			echo '<dl><dt>'.$sensor['Name'].' ('.floatval($sensor['Reading']).' '.$sensor['Units'].'):</dt><dd>';
-			if ($fantemp['Name'])
-				echo $fantemp['Name'].' ('.floatval($fantemp['Reading']).' '.$fantemp['Units'].')';
+			if ($fan_sensor['Name'])
+				echo $fan_sensor['Name'].' ('.floatval($fan_sensor['Reading']).' '.$fan_sensor['Units'].')';
 			else
 				echo 'Auto';
 			echo '</dd></dl>';
 
-			// fan control lower limit
-			$fanlimit = 'FANLIMIT'.$i;
+			// fan control minimum speed
+			$fan_min = 'FANMIN'.$i;
 			echo '<dl class="fancontrol">'.
-			'<dt><dl><dd>Fan speed lower limit:</dd></dl></dt><dd>'.
-			'<select name="'.$fanlimit.'" class="fancontrol fancontrol-run">';
-			echo get_limit_options($config[$fanlimit]);
+			'<dt><dl><dd>Fan speed minimum:</dd></dl></dt><dd>'.
+			'<select name="'.$fan_min.'" class="fancontrol fancontrol-run">';
+			echo get_min_options($config[$fan_min]);
 			echo '</select></dd></dl>';
 
 			// temperature sensor
-			$fantemp = 'FANTEMP'.$i;
 			echo '<dl class="fancontrol">'.
 			'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
-			'<select name="'.$fantemp.'" class="fancontrol fancontrol-run">'.
+			'<select name="'.$fan_temp.'" class="fancontrol fancontrol-run">'.
 			'<option value="0">Auto</option>';
-			echo ipmi_get_options($sensors, 'Temperature', $config[$fantemp], true);
+			echo ipmi_get_options($sensors, 'Temperature', $config[$fan_temp], true);
 			echo '</select></dd></dl>';
 
 			// low temperature threshold
@@ -253,7 +253,7 @@ function get_fan_options($sensors, $config){
 	}
 }	
 
-function get_limit_options($limit){
+function get_min_options($limit){
 	$options = '';
 		for($i = 1; $i <= 64; $i++){
 			$options .= '<option value="'.$i.'"';
@@ -275,8 +275,6 @@ function get_fanip_options($ips, $fanip){
 		
 			$options .= '>'.$ip.'</option>';			
 		}
-	return $options;
+	echo $options;
 }
-
-echo $ipmi_options;
 ?>
