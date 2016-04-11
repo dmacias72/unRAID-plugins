@@ -48,11 +48,63 @@ $argv   = (array_key_exists("v", $args) || array_key_exists("verbose", $args));
 $DEBUG  = (array_key_exists("debug", $args));
 
 #############################################
+# ASRock                                    #
 # ipmi-raw 00 3a 01 00 00 00 00 00 00 00 00 #
 # ipmi-raw 00 3a 01 AA BB CC DD EE FF GG HH #
 # 0x00 = smartfan mode                      #
 # 0x01 - 0x64  = 1% - 100%                  #
 #############################################
+/*Fan Speed CLI ATEN X9
+ipmitool raw 0x30 0x91 0x5A 0x3 0x0 0x0
+ipmitool raw 0x30 0x91 0x5A 0x3 0x1 0x0
+ipmitool raw 0x30 0x91 0x5A 0x3 0x2 0x0
+ipmitool raw 0x30 0x91 0x5A 0x3 0x3 0x0
+
+One is for Write and one is for Read.
+// for full speed
+ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0xff
+ipmitool raw 0x30 0x91 0x5A 0x3 0x11 0xff
+
+//for half speed
+ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0x7f
+ipmitool raw 0x30 0x91 0x5A 0x3 0x11 0x7f
+
+Set/Get Fan speed mode
+Input : NetFn 0x30
+Cmd 0x45
+Data1 Get/Set ->[0/1]
+Data2 Fan Speed Mode, standard/full/optimal -> [0/1/2] // for Set only
+
+Output: Completion Code 0x00
+
+Example: Set fans to full speed would be #ipmitool raw 0x30 0x45 1 1
+
+if ($max_temp > 39) {
+  # at least one hard drive is 40 deg C or higher
+  # set fan speed control to Full
+  `ipmitool raw 0x30 0x45 0x01 0x01`
+}
+elsif ($max_temp == 39 ){
+  # maximum drive temperature is 39 deg C
+  # set fan speed to 50% duty cycle
+  `ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x32`
+}
+ 
+else {
+  # all hard drive temperatures are 38 deg C or cooler
+  # set fan speed control to Optimal
+  `ipmitool raw 0x30 0x45 0x01 0x02`
+}
+
+0x30 0x70 0x66 Fan Control Manually (X10)
+#100% duty cycle
+ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x64
+     
+#50% duty cycle
+ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x32
+The last value is the duty cycle, with max = 64, and minimum = 0.
+You can set the duty cycle in 64 steps, between minimum and full speed.
+*/
 $boards = [
 	'ASRock' => [
 		'raw' => '00 3a 01',
@@ -98,22 +150,8 @@ function ipmi_get_fantemp($options=null) {
 		$size_raw = sizeof($sensor_raw);
 		$sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
 
-		if ($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan'){
-	
-			if (empty($options)){
-				$sensors[$sensor['ID']] = $sensor;
-			}else{
-				//split id into host and id
-				$id = explode(':',$sensor['ID']);
-				$sensor['IP'] = trim($id[0]);
-				$sensor['ID'] = trim($id[1]);
-				if ($sensor['IP'] == 'localhost')
-					$sensor['IP'] = '127.0.0.1';
-
-				// add sensor to array of sensors
-				$sensors[ip2long($sensor['IP']).'_'.$sensor['ID']] = $sensor;
-			}
-		}
+		if ($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan')	
+			$sensors[$sensor['ID']] = $sensor;
 	}
 	return $sensors; // sensor readings
 	unset($sensors);
@@ -130,20 +168,20 @@ if(!empty($fan_cfg) && $fancontrol == "enable"){
 
 	/* Get sensor info and check connection */
 	if($ipmi_mod || $ipmi_network == 'enable')
-		$ipmi_sensors = ipmi_get_fantemp($ipmi_options);
+		$ipmi_sensors = ipmi_get_fantemp($fan_options);
 
 	for ($i = 0; $i < 7; $i++) {
 
-		$ipmi_fan	= (isset($fan_cfg["FAN$i"]))		? $fan_cfg["FAN$i"] : 0;
+		$ipmi_fan	= (isset($fan_cfg["FAN$i"]))		? $fan_cfg["FAN$i"]     : 0;
 		$fan_name	= $ipmi_sensors["$ipmi_fan"]['Name'];
 		$ipmi_temp	= (isset($fan_cfg["FANTEMP$i"])) ? $fan_cfg["FANTEMP$i"] : 0;
-		$fan_limit	= (isset($fan_cfg["FANLIMIT$i"])) ? $fan_cfg["FANLIMIT$i"] : 1;
+		$fan_min    = (isset($fan_cfg["FANMIN$i"]))  ? $fan_cfg["FANMIN$i"]  : 1;
 		
 		if($ipmi_temp != 0) {
-			$temp_lo		= (isset($fan_cfg["TEMPLO$i"]))	? $fan_cfg["TEMPLO$i"] : 30;
-			$temp_hi		= (isset($fan_cfg["TEMPHI$i"]))	? $fan_cfg["TEMPHI$i"] : 50;
+			$temp_lo = (isset($fan_cfg["TEMPLO$i"]))  ? $fan_cfg["TEMPLO$i"]  : 30;
+			$temp_hi = (isset($fan_cfg["TEMPHI$i"]))  ? $fan_cfg["TEMPHI$i"]  : 40;
 
-			$temp			= $ipmi_sensors["$ipmi_temp"]['Reading'];
+			$temp    = $ipmi_sensors["$ipmi_temp"]['Reading'];
 
 			if ($temp <= $temp_lo)
 				$pwm = 1;
@@ -152,7 +190,7 @@ if(!empty($fan_cfg) && $fancontrol == "enable"){
 			else
 				$pwm = round((($temp-$temp_lo)/($temp_hi-$temp_lo))*16)*4;
 			//impose fan lower limit
-			$pwm = ($pwm <= $fan_limit) ? $fan_limit : $pwm;
+			$pwm = ($pwm <= $fan_min) ? $fan_min : $pwm;
 		}else
 			$pwm = 0;
 	
@@ -189,10 +227,15 @@ debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
 unset($defined_vars);
 
 $time1 = time();
-//$MD5 = md5_file($fan_cfg_file);
+$MD5 = md5_file($fan_cfg_file);
 for ($i=0; $i < $fanpoll*6 ; $i++) { 
-  sleep(10);
-  //if (md5_file($fan_cfg_file) != $MD5){syslog(LOG_INFO, "config file updated, reloading."); $i=10000;}
+	sleep(10);
+	if (is_file($fan_cfg_file)){
+ 		if (md5_file($fan_cfg_file) != $MD5){
+  			syslog(LOG_INFO, "config file updated, reloading.");
+			$fan_cfg = parse_ini_file($fan_cfg_file);
+		}
+  	}
 }
 debug("Sleep ".(time()-$time1)." seconds.");
 
