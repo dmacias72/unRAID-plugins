@@ -16,7 +16,7 @@ $ipmi_password	= isset($ipmi_cfg['PASSWORD'])  ? $ipmi_cfg['PASSWORD']  : '';
 /* fan control */
 $fancontrol    = isset($fan_cfg['FANCONTROL']) ? $fan_cfg['FANCONTROL'] : "disable";
 $fanpoll       = isset($fan_cfg['FANPOLL'])    ? $fan_cfg['FANPOLL']    : 1;
-$fanip = isset($fan_cfg['FANIP'])    ? $fan_cfg['FANIP']    : 'None';
+$fanip         = isset($fan_cfg['FANIP'])      ? $fan_cfg['FANIP']      : 'None';
 
 /* check if local ipmi driver is loaded */
 if($ipmi_network == "disable")
@@ -25,4 +25,7 @@ if($ipmi_network == "disable")
 /* options for network access */
 $ipmi_options = ($ipmi_network == 'enable') ? "--always-prefix -h $ipmi_ipaddr -u $ipmi_user -p ".
 	base64_decode($ipmi_password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
+$fan_options = ($ipmi_network == 'enable') ? "-h $fanip -u $ipmi_user -p ".
+	base64_decode($ipmi_password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
+
 ?>
