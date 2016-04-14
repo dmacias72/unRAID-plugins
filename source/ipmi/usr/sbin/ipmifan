@@ -9,7 +9,9 @@ $netopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
 $debug = FALSE;
 
 set_time_limit(0);
-$prog = pathinfo(__FILE__, PATHINFO_FILENAME);
+$prog         = pathinfo(__FILE__, PATHINFO_FILENAME);
+$lockfile     = "/var/run/${prog}.pid";
+$service      = __FILE__;
 openlog($prog, LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $usage = <<<EOF
@@ -22,7 +24,9 @@ Usage: $prog [options]
   -q, --quiet      suppress all messages
   -v, --verbose    print all messages
       --debug      turn on debugging
+      --daemon     run in the background
       --help       display this help and exit
+      --quit       stop daemon if running
       --version    output version information and exit
 
 
@@ -30,8 +34,10 @@ EOF;
 
 $shortopts = 'qv';
 $longopts = [
+	'daemon',
 	'debug',
 	'help',
+	'quit',
 	'quiet',
 	'verbose',
 	'version'
@@ -39,18 +45,56 @@ $longopts = [
 $args = getopt($shortopts, $longopts);
 
 if (array_key_exists('help', $args)) {
-	echo $usage;
-	exit(1);
+	echo $usage.PHP_EOL;
+	exit(0);
 }
 
 if (array_key_exists('version', $args)) {
-	echo 'IPMI Fan Control: 1.0\n';
-	exit(1);
+	echo 'IPMI Fan Control: 1.0'.PHP_EOL;
+	exit(0);
 }
 
 $argq   = (array_key_exists('q', $args) || array_key_exists('quiet', $args));
 $argv   = (array_key_exists('v', $args) || array_key_exists('verbose', $args));
 $debug  = (array_key_exists('debug', $args));
+$daemon = (array_key_exists('daemon', $args));
+$quit   = (array_key_exists('quit', $args));
+
+if (is_file($lockfile)){
+	$lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
+	$pid_running = preg_replace("/\s+/", "", shell_exec("ps -p $lock_pid | grep $lock_pid"));
+	if($pid_running){
+		if($quit){
+			syslog(LOG_INFO, "killing daemon with PID [$lock_pid]");
+			exec("kill $lock_pid");
+			unlink($lockfile);
+			if (function_exists('at_exit')) at_exit();
+				exit(0);
+		}else{
+			echo "$prog is already running [$lock_pid]".PHP_EOL;
+			exit(0);
+		}
+	}else{
+		if($quit){
+			echo "$lock_pid is not currently running";
+			unlink($lockfile);
+			exit(0);
+		}else
+			file_put_contents($lockfile, getmypid());
+	}
+}else{
+	if($quit){
+		echo "$prog not currently running".PHP_EOL;
+		exit(0);
+	}else
+		file_put_contents($lockfile, getmypid());
+}
+
+if($daemon){
+	exec("php $service 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
+	syslog(LOG_INFO, "process started. To terminate it, type: $prog -q");
+	exit(0);
+}
 
 #############################################
 # ASRock                                    #
@@ -85,7 +129,7 @@ $boards = [
 function logger($msg, $quiet = false) {
 	syslog(LOG_INFO, $msg);
 	if (!$quiet) {
-		echo '\n'.$msg.' \n';
+		echo PHP_EOL.$msg.PHP_EOL;
 	}
 }
 
@@ -94,7 +138,7 @@ function debug($m){
   global $prog, $debug;
   if($debug){
     $STDERR = fopen('php://stderr', 'w+');
-    fwrite($STDERR, $m.'\n');
+    fwrite($STDERR, $m.PHP_EOL);
     fclose($STDERR);
   }
 }
@@ -171,16 +215,16 @@ function ipmi_get_fantemp() {
 ##############################
 
 if(empty($fancfg)){
-		$msg = "Fan control settings file $fancfg_file is missing or empty";
-		logger($msg, $argq);
-  exit(1);
+	$msg = "Fan control settings file $fancfg_file is missing or empty";
+	logger($msg, $argq);
+	exit(1);
 }
 
 $board = $fancfg['IPMIBOARD'];
 if (!array_key_exists($board, $boards)){
 	$msg = 'Your motherboard is not supported yet';
 	logger($msg, $argq);
-  exit(1);
+	exit(1);
 }
 
 $raw  = $boards[$board]['raw'];
