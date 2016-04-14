@@ -5,53 +5,86 @@ Title="Settings"
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
 
-<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span><span class='status' id='notify-status'>Event Notification: <?=$ipmiseld_status;?> </span></div>
+<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span><span class='status' id='notify-status'>Event Notification: <?=$seld_status;?> </span></div>
 
 <form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
 <input type="hidden" id="COMMAND" name="#command" value="" />
 
 Enable Event Notifications:
-: <select id="IPMISELD" name="IPMISELD" size="1" onChange="checkIPMISELD(this.form);" title="Enable event notifications and local system logging for ipmi events">
-  <?=mk_option($ipmiseld, "disable", "No");?>
-  <?=mk_option($ipmiseld, "enable", "Yes");?>
+: <select id="IPMISELD" name="IPMISELD" size="1" onChange="checkSELD(this.form);" title="Enable event notifications and local system logging for ipmi events">
+  <?=mk_option($seld, "disable", "No");?>
+  <?=mk_option($seld, "enable", "Yes");?>
   </select> &nbsp; <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
 
 Event Polling Time:
-: <select id="IPMIPOLL" class="ipmiseld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
-  <?=mk_option($ipmipoll, "15", "15 sec");?>
-  <?=mk_option($ipmipoll, "30", "30 sec");?>
-  <?=mk_option($ipmipoll, "60", "1 min");?>
-  <?=mk_option($ipmipoll, "180", "3 min");?>
-  <?=mk_option($ipmipoll, "300", "5 min");?>
-  <?=mk_option($ipmipoll, "1800", "30 min");?>
+: <select id="IPMIPOLL" class="seld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
+  <?=mk_option($seldpoll, '15', '15 sec');?>
+  <?=mk_option($seldpoll, '30', '30 sec');?>
+  <?=mk_option($seldpoll, '60', '1 min');?>
+  <?=mk_option($seldpoll, '180', '3 min');?>
+  <?=mk_option($seldpoll, '300', '5 min');?>
+  <?=mk_option($seldpoll, '1800', '30 min');?>
   </select>
 
 Enable Network Connection(s):
-: <select id="NETWORK" class="ipmiseld-run" name="NETWORK" size="1" onChange="checkNETWORK(this.form);"  title="Enable connection to network based ipmi, not necessary for local onboard ipmi">
-  <?=mk_option($ipmi_network, "disable", "No");?>
-  <?=mk_option($ipmi_network, "enable", "Yes");?>
+: <select id="NETWORK" class="seld-run" name="NETWORK" size="1" onChange="checkNETWORK(this.form);"  title="Enable connection to network based ipmi, not necessary for local onboard ipmi">
+  <?=mk_option($netsvc, 'disable', 'No');?>
+  <?=mk_option($netsvc, 'enable', 'Yes');?>
   </select>
 
-<label class="ipmiseld-run ipmi-lan">Enable Localhost Connection:</label>
-: <select id="LOCAL" class="ipmiseld-run ipmi-lan" name="LOCAL" size="1" onChange="checkLOCAL(this.form);" title="Enable localhost connection along with network connections">
-  <?=mk_option($ipmi_local, "disable", "No");?>
-  <?=mk_option($ipmi_local, "enable", "Yes");?>
+<label class="seld-run ipmi-lan">Enable Localhost Connection:</label>
+: <select id="LOCAL" class="seld-run ipmi-lan" name="LOCAL" size="1" onChange="checkLOCAL(this.form);" title="Enable localhost connection along with network connections">
+  <?=mk_option($local, 'disable', 'No');?>
+  <?=mk_option($local, 'enable', 'Yes');?>
   </select>
 
-<label class="ipmiseld-run ipmi-lan">IPMI IP Address(es):</label>
-: <input id="IPADDR" type="text" class="ipmiseld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipmi_ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$ipmi_conn;?></label>
+<label class="seld-run ipmi-lan">IPMI IP Address(es):</label>
+: <input id="IPADDR" type="text" class="seld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$conn;?></label>
 
-<label class="ipmiseld-run ipmi-lan">IPMI User Name:</label>
-: <input id="USER" type="text" class="ipmiseld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$ipmi_user;?>" title="username for network access IPMI" placeholder="username for network access" >
+<label class="seld-run ipmi-lan">IPMI User Name:</label>
+: <input id="USER" type="text" class="seld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$user;?>" title="username for network access IPMI" placeholder="username for network access" >
 
-<label class="ipmiseld-run ipmi-lan">IPMI Password:</label>
-: <input id="PASSWORD" type="password" class="ipmiseld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$ipmi_password;?>" title="password for network access IPMI" placeholder="password for network access" >
+<label class="seld-run ipmi-lan">IPMI Password:</label>
+: <input id="PASSWORD" type="password" class="seld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$password;?>" title="password for network access IPMI" placeholder="password for network access" >
 
 &nbsp;
 
-<input id="DEFAULT" class="ipmiseld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
+<input id="DEFAULT" class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
+</form>
+
+<div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/mb.png"> Display Settings</span></div>
+
+<form markdown="1" name="footer_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
+
+Display Temperature #1:
+: <select name="DISP_TEMP1" class="display">
+		<option value='false'>None</option>
+		<?=ipmi_get_options('Temperature', $disp_temp1);?>
+  </select>
+
+Display Temperature #2:
+: <select name="DISP_TEMP2" class="display">
+		<option value='false'>None</option>	
+		<?=ipmi_get_options('Temperature', $disp_temp2);?>
+	</select>
+
+Display Fan Speed #1:
+: <select name="DISP_FAN1" class="display">
+		<option value='false'>None</option>
+		<?=ipmi_get_options('Fan', $disp_fan1);?>
+	</select>
+
+Display Fan Speed #2:
+: <select name="DISP_FAN2" class="display">
+		<option value='false'>None</option>
+		<?=ipmi_get_options('Fan', $disp_fan2);?>
+	</select>
+
+&nbsp;
+: <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
 <script type="text/javascript">
@@ -61,8 +94,7 @@ $(function(){
 		EventTest();
 	});
 
-	checkIPMISELD(document.seld_settings);
-	//checkIPMIFAN(document.ipmifan_settings);
+	checkSELD(document.seld_settings);
 	checkNETWORK(document.seld_settings);
 	checkLOCAL(document.seld_settings);
 	decData(document.seld_settings);
@@ -72,9 +104,9 @@ function resetDATA(form) {
 	form.IPMIPOLL.selectedIndex = 2;
 	form.NETWORK.selectedIndex = 0;
 	form.LOCAL.selectedIndex = 0;
-	form.IPADDR.value = "";
-	form.USER.value = "";
-	form.PASSWORD.value = "";
+	form.IPADDR.value = '';
+	form.USER.value = '';
+	form.PASSWORD.value = '';
 	form.DISP_TEMP1.selectedIndex = 0;
 	form.DISP_TEMP2.selectedIndex = 0;
 	form.DISP_FAN1.selectedIndex = 0;
@@ -82,23 +114,23 @@ function resetDATA(form) {
 	form.submit();
 }
 
-function checkIPMISELD(form) {
+function checkSELD(form) {
 	if (form.IPMISELD.selectedIndex < 1 ){
-		form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_stop";
-		$("#btnApply").prop("disabled", false);
+		form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_stop';
+		$('#btnApply').prop('disabled', false);
 	}else {
-   	form.COMMAND.value = "/usr/local/emhttp/plugins/ipmi/scripts/seld_start";
+   	form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_start';
    }
 
-	if ("<?=$ipmiseld_running;?>" == true)
+	if ("<?=$seld_run;?>" == true)
 	{
-		$(".ipmiseld-run").prop("disabled", true);
-		$("#btnApply").disabled = "disabled";
-		$("#btnTest").show();
+		$('.seld-run').prop('disabled', true);
+		$('#btnApply').disabled = 'disabled';
+		$('#btnTest').show();
    }else{
-   	$(".ipmiseld-run").prop("disabled", false);
-		$("#btnApply").prop("disabled", false);
-		$("#btnTest").hide();
+   	$('.seld-run').prop('disabled', false);
+		$('#btnApply').prop('disabled', false);
+		$('#btnTest').hide();
 	}
 }
 
@@ -108,10 +140,10 @@ function decData(form) {
 
 function checkNETWORK(form) {
 	if (form.NETWORK.selectedIndex < 1 )
-		$(".ipmi-lan").hide();
+		$('.ipmi-lan').hide();
 	else {
-   	$(".ipmi-lan").show();
-   	$(".ipmi-lan").prop("disabled", (form.IPMISELD.value == "enable"));
+   	$('.ipmi-lan').show();
+   	$('.ipmi-lan').prop('disabled', (form.IPMISELD.value == 'enable'));
    }
 }
 
@@ -124,9 +156,9 @@ function checkLOCAL(form) {
 }
 
 function verifyDATA(form) {
-	form.IPMISELD.value = form.IPMISELD.value.replace(/ /g,"_");
-	form.NETWORK.value = form.NETWORK.value.replace(/ /g,"_");
-	form.USER.value = form.USER.value.replace(/ /g,"_");
+	form.IPMISELD.value = form.IPMISELD.value.replace(/ /g,'_');
+	form.NETWORK.value = form.NETWORK.value.replace(/ /g,'_');
+	form.USER.value = form.USER.value.replace(/ /g,'_');
 	form.PASSWORD.value = btoa(form.PASSWORD.value);
 }
 

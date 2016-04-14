@@ -1,20 +1,20 @@
 <?php
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 $cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data ';
-$logfile = "/boot/config/plugins/ipmi/archived_events.log";
+$log = "/boot/config/plugins/ipmi/archived_events.log";
 $event = $_GET["event"];
 $archive = $_GET["archive"];
 
 /* network options */
-if($ipmi_network == 'enable') {
+if($netsvc == 'enable') {
 	if($event){
 		$id = explode("_", $event);
 		$event = $id[1];
 		$options = " -h ".long2ip($id[0]);
 	}else
-		$options = " -h '$ipmi_ipaddr'";
+		$options = " -h '$ipaddr'";
 
-	$options .= " -u $ipmi_user -p ".base64_decode($ipmi_password)." --always-prefix --session-timeout=5000 --retransmission-timeout=1000 ";
+	$options .= " -u $user -p ".base64_decode($password)." --always-prefix --session-timeout=5000 --retransmission-timeout=1000 ";
 }
 
 /* archive */
@@ -24,7 +24,7 @@ if($archive) {
 	else
 		$append = $options;
 
-	file_put_contents($logfile, shell_exec($cmd.$append),FILE_APPEND);
+	file_put_contents($log, shell_exec($cmd.$append),FILE_APPEND);
 }
 
 if($event)

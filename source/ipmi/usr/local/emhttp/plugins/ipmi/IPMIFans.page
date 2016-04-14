@@ -1,21 +1,21 @@
-Menu="IPMI:3"
+Menu="IPMI:2"
 Title="Fan Control"
 Markdown="false"
 ---
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
-<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span><span class='status' id='fancontrol-status'>Fan Control: <?=$fancontrol_status;?></span></div>
+<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span><span class='status' id='fanctrl-status'>Fan Control: <?=$fanctrl_status;?></span></div>
 
-<form name="fancontrol_settings" method="POST" action="/update.php" target="progressFrame">
+<form name="fanctrl_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 <input type="hidden" id="FANCMD" name="#command" value="" />
 
 <dl>
 	<dt>Fan Control:</dt>
 	<dd> 
-		<select name="FANCONTROL" size="1" onChange="checkFANCONTROL(this.form);" title="Enable fan control based on selected temperature sensors">
-		<?=mk_option($fancontrol, "disable", "No")?>
-		<?=mk_option($fancontrol, "enable", "Yes")?>
+		<select name="FANCONTROL" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
+		<?=mk_option($fanctrl, 'disable', 'No')?>
+		<?=mk_option($fanctrl, 'enable', 'Yes')?>
 		</select>
 	</dd>
 </dl>
@@ -23,28 +23,28 @@ Markdown="false"
 <dl>
 	<dt>Temperature Polling Time:</dt>
 	<dd>
-		<select id="FANPOLL" class=" fancontrol-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
-		<?=mk_option($ipmipoll, "1", "1 min");?>
-		<?=mk_option($ipmipoll, "2", "2 min");?>
-		<?=mk_option($ipmipoll, "3", "3 min");?>
-		<?=mk_option($ipmipoll, "4", "4 min");?>
-		<?=mk_option($ipmipoll, "5", "5 min");?>
-		<?=mk_option($ipmipoll, "10", "10 min");?>
-		<?=mk_option($ipmipoll, "15", "15 min");?>
-		<?=mk_option($ipmipoll, "30", "30 min");?>
+		<select id="FANPOLL" class=" fanctrl-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
+		<?=mk_option($fanpoll, '1', '1 min');?>
+		<?=mk_option($fanpoll, '2', '2 min');?>
+		<?=mk_option($fanpoll, '3', '3 min');?>
+		<?=mk_option($fanpoll, '4', '4 min');?>
+		<?=mk_option($fanpoll, '5', '5 min');?>
+		<?=mk_option($fanpoll, '10', '10 min');?>
+		<?=mk_option($fanpoll, '15', '15 min');?>
+		<?=mk_option($fanpoll, '30', '30 min');?>
   		</select>
   	</dd>
 </dl>
 
-		<input type="hidden" name="IPMIBOARD" value="<?=$ipmi_board;?>">
+		<input type="hidden" name="IPMIBOARD" value="<?=$board;?>">
 
-<?if ($ipmi_network == "enable"):?>
+<?if ($netsvc == 'enable'):?>
 
 <dl>
 	<dt>Fan Control IP Address:</dt> 
 	<dd>
-		<select id="FANIP" class=" fancontrol-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
-		<?get_fanip_options($ipmi_ipaddr, $fanip);?>
+		<select id="FANIP" class=" fanctrl-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
+		<?get_fanip_options();?>
 	</select>
 	</dd>
 </dl>
@@ -54,18 +54,18 @@ Markdown="false"
 &nbsp;
 
 <dl>
-	<dt><input id="FAN_DEFAULT" class="fancontrol fancontrol-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
+	<dt><input id="FAN_DEFAULT" class="fanctrl-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
 	<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
 
 <div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fan.png"> Fan Settings </span>
 <span class="status" style="margin-top: 30px;"><input type="checkbox" id="advancedview"></span></div>
-<form name="fancontrol_options" method="POST" action="/update.php" target="progressFrame">
+<form name="fanctrl_options" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 
-<?if (($ipmi_network == "disable") || (($ipmi_network == 'enable') && ($fanip != 'None')) ):?>
-	<?get_fan_options($ipmi_sensors, $fan_cfg);?>
+<?if (($netsvc == 'disable') || (($netsvc == 'enable') && ($fanip != 'None')) ):?>
+	<?get_fan_options();?>
 <?endif;?>
 
 &nbsp;
@@ -77,6 +77,24 @@ Markdown="false"
 
 </form>
 
+<div id="title" ><span class="left"><img class="icon" src="/plugins/ipmi/icons/fan.png"> Fan Control Log </span></div>
+<table class="tablesorter fanlog" style="margin-top: -22px;">
+	<thead>
+		<th>Logfile</th>
+		<th>Size</th>
+		<th>Delete</th>
+	</thead>
+	<tbody>
+<?php
+	$log = '/var/log/ipmifan';
+		echo "<tr><td><a id='open-fanlog' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$fanlog</a></td><td>"
+		.filesize($log)."</td><td><a id='delete-fanlog'><i class='fa fa-trash' title='delete'></i></a></td></tr>";	
+?>
+	</tbody>
+</table>
+
+
+
 <script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script type="text/javascript">
@@ -86,23 +104,25 @@ $(function(){
 		labels_placement: 'left',
 		on_label: 'Advanced View',
 		off_label: 'Basic View',
-		checked: ($.cookie('ipmi_fancontrol_mode') == 'advanced')
+		checked: ($.cookie('fanctrl_mode') == 'advanced')
 	})
 	.change(function () {
-		$('.fancontrol').toggle('slow');
-		$.cookie('ipmi_fancontrol_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
+		$('.fanctrl').toggle('slow');
+		$.cookie('fanctrl_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
 	});
+
+	$('#delete-fanlog').on('click', deleteFanLOG);
 
 	$('#readings').click(function() {
 		$.cookie('one', 'tab1', { expires:null, path: '/'});
 		location ='/Tools/IPMITools';
 	});
 
-	if ($.cookie('ipmi_fancontrol_mode') == 'advanced') {
-		$('.fancontrol').show();
+	if ($.cookie('fanctrl_mode') == 'advanced') {
+		$('.fanctrl').show();
 	}
 
-	checkFANCONTROL(document.fancontrol_settings);
+	checkFANCTRL(document.fanctrl_settings);
 
 });
 
@@ -110,24 +130,32 @@ function resetFANDATA(form) {
 		form.submit();
 }
 
-function checkFANCONTROL(form) {
+function checkFANCTRL(form) {
 	if (form.FANCONTROL.selectedIndex < 1 ){
-		form.FANCMD.value = "/usr/local/emhttp/plugins/ipmi/scripts/fancontrol_stop";
+		form.FANCMD.value = '/usr/local/emhttp/plugins/ipmi/scripts/fanctrl_stop';
 	}else {
-   	form.FANCMD.value = "/usr/local/emhttp/plugins/ipmi/scripts/fancontrol_start";
+   	form.FANCMD.value = '/usr/local/emhttp/plugins/ipmi/scripts/fanctrl_start';
    }
 
-	if ("<?=$fancontrol_running;?>" == true)
+	if ("<?=$fanctrl_run;?>" == true)
 	{
-		$(".fancontrol-run").prop("disabled", true);
-		$("#btnFanApply").disabled = "disabled";
+		$('.fanctrl-run').prop('disabled', true);
+		$('#btnFanApply').disabled = 'disabled';
    }else{
-   	$(".fancontrol-run").prop("disabled", false);
-		$("#btnFanApply").prop("disabled", false);
+   	$('.fanctrl-run').prop('disabled', false);
+		$('#btnFanApply').prop('disabled', false);
 	}
 }
 
 function verifyFANDATA(form) {
-	form.FANCONTROL.value = form.FANCONTROL.value.replace(/ /g,"_");
+	form.FANCONTROL.value = form.FANCONTROL.value.replace(/ /g,'_');
 }
+
+function deleteFanLOG(){
+	var par = $(this).parent().parent();
+	var id = par.children('td:nth-child(1)').text().trim();
+	par.remove();
+	    $.get('/webGui/include/DeleteLogFile.php', 'log='+id,function() {});
+};
+
 </script>

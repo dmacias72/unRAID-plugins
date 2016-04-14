@@ -1,13 +1,15 @@
 <?php
 //ipmi-sensors-config --filename=ipmi.config --checkout
 //ipmi-sensors-config --filename=ipmi.config --commit
+
 /* get ipmi config and network options */
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_hdparm.php';
 
 /* get an array of all sensors and their values */
-function ipmi_sensors($options=null) {
-	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $options 2>/dev/null"; // --non-abbreviated-units 
+function ipmi_sensors() {
+	global $netopts;
+	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts 2>/dev/null"; // --non-abbreviated-units 
 	exec($cmd, $output, $return);
 
 	if ($return)
@@ -31,7 +33,7 @@ function ipmi_sensors($options=null) {
 		$sensor = ($size_raw < 13) ? []: array_combine($keys, array_slice($sensor_raw,0,13,true));
 		  /*array_combine(array_slice($keys,0,$size_raw,true), $sensor_raw)*/
 
-		if (empty($options)){
+		if (empty($netopts)){
 			$sensors[$sensor['ID']] = $sensor;
 		}else{
 
@@ -50,12 +52,13 @@ function ipmi_sensors($options=null) {
 }
 
 /* get array of events and their values */
-function ipmi_events($options=null, $archive=null){
+function ipmi_events($archive=null){
+	global $netopts;
 	if($archive) {
 		$filename = "/boot/config/plugins/ipmi/archived_events.log";
 		$output = file($filename, FILE_IGNORE_NEW_LINES);
 	} else {
-		$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $options 2>/dev/null";
+		$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $netopts 2>/dev/null";
 		exec($cmd, $output, $return); 
 	}
 	if ($return)
@@ -82,7 +85,7 @@ function ipmi_events($options=null, $archive=null){
 			}
 		}
 
-		if (empty($options)){
+		if (empty($netopts)){
 
 			if($archive)
 				$events[$event['Time']."-".$event['ID']] = $event;
@@ -109,8 +112,9 @@ function ipmi_events($options=null, $archive=null){
 }
 
 /* get reading for a given sensor by name */
-function ipmi_get_readings($options=null) {
-	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --no-sensor-type-output --interpret-oem-data $options 2>/dev/null";
+function ipmi_get_readings() {
+	global $netopts;
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --no-sensor-type-output --interpret-oem-data $netopts 2>/dev/null";
 	exec($cmd, $output, $return);
 
 	if ($return)
@@ -132,7 +136,7 @@ function ipmi_get_readings($options=null) {
 		$size_raw = sizeof($sensor_raw);
 		$sensor = ($size_raw < 5) ? []: array_combine($keys, array_slice($sensor_raw,0,5,true));
 
-		if (empty($options)){
+		if (empty($netopts)){
 			$sensors[$sensor['ID']] = $sensor;
 		}else{
 			//split id into host and id
@@ -150,10 +154,8 @@ function ipmi_get_readings($options=null) {
 }
 
 /* get select options for a given sensor type */
-function ipmi_get_options($sensors, $type, $selected=null, $hdd=null){
-	if ($hdd)	// add hard drive temp as option
-		$sensors['99'] = ['IP' => '', 'ID' => '99', 'Name' => 'HDD Temperature', 'Type' => 'Temperature', 'State' => 'Nominal'];
-
+function ipmi_get_options($type, $selected=null){
+	global $sensors;
 	$options = "";
 	foreach($sensors as $id => $sensor){
 		if ($sensor["Type"] == $type){
@@ -189,20 +191,13 @@ function temp_get_options($range, $selected=null){
  	return $options;
 }
 
-function ipmi_get_fans($sensors){
-	foreach($sensors as $key => $sensor){
-		if ($sensor['Type'] == 'Fan')
-			$fans[] = $key; 
-	}
-	return $fans;
-}
-
-function get_fan_options($sensors, $config){
+function get_fan_options(){
+	global $sensors, $fancfg;
 	$i = 0;
 	foreach($sensors as $key => $sensor){
 		if ($sensor['Type'] == 'Fan'){
 			$fan_temp = 'FANTEMP'.$i;
-			$fan_sensor = $sensors[$config[$fan_temp]];
+			$fan_sensor = $sensors[$fancfg[$fan_temp]];
 			
 			// hidden fan id
 			echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
@@ -217,36 +212,36 @@ function get_fan_options($sensors, $config){
 
 			// fan control minimum speed
 			$fan_min = 'FANMIN'.$i;
-			echo '<dl class="fancontrol">'.
+			echo '<dl class="fanctrl">'.
 			'<dt><dl><dd>Fan speed minimum:</dd></dl></dt><dd>'.
-			'<select name="'.$fan_min.'" class="fancontrol fancontrol-run">';
-			echo get_min_options($config[$fan_min]);
+			'<select name="'.$fan_min.'" class="fanctrl">';
+			echo get_min_options($fancfg[$fan_min]);
 			echo '</select></dd></dl>';
 
 			// temperature sensor
-			echo '<dl class="fancontrol">'.
+			echo '<dl class="fanctrl">'.
 			'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
-			'<select name="'.$fan_temp.'" class="fancontrol fancontrol-run">'.
+			'<select name="'.$fan_temp.'" class="fanctrl">'.
 			'<option value="0">Auto</option>';
-			echo ipmi_get_options($sensors, 'Temperature', $config[$fan_temp], true);
+			echo ipmi_get_options($sensors, 'Temperature', $fancfg[$fan_temp], true);
 			echo '</select></dd></dl>';
 
 			// low temperature threshold
 			$templo = 'TEMPLO'.$i;
-			echo '<dl class="fancontrol">'.
+			echo '<dl class="fanctrl">'.
 			'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
-			'<dd><select name="'.$templo.'" class="fancontrol fancontrol-run">'.
+			'<dd><select name="'.$templo.'" class="fanctrl">'.
 			'<option value="0">Auto</option>';
-			echo temp_get_options('LO', $config[$templo]);
+			echo temp_get_options('LO', $fancfg[$templo]);
 			echo '</select></dd></dl>';
 		
 			// high temperature threshold
 			$temphi = 'TEMPHI'.$i;
-			echo '<dl class="fancontrol">'.
+			echo '<dl class="fanctrl">'.
 			'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
-			'<dd><select name="'.$temphi.'" class="fancontrol fancontrol-run">'.
+			'<dd><select name="'.$temphi.'" class="fanctrl">'.
 			'<option value="0">Auto</option>';
-			echo	temp_get_options('HI', $config[$temphi]);
+			echo	temp_get_options('HI', $fancfg[$temphi]);
 			echo '</select></dd></dl>&nbsp;';
 			$i++;
 		}
@@ -265,8 +260,9 @@ function get_min_options($limit){
 	return $options;
 }
 
-function get_fanip_options($ips, $fanip){
-	$ips = 'None,'.$ips;
+function get_fanip_options(){
+	global $ipaddr, $fanip;
+	$ips = 'None,'.$ipaddr;
 	$ips = explode(',',$ips);
 		foreach($ips as $ip){
 			$options .= '<option value="'.$ip.'"';

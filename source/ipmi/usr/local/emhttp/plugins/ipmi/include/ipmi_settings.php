@@ -2,31 +2,31 @@
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 
 /* ipmi settings variables*/
-$ipmiseld   = isset($ipmi_cfg['IPMISELD']) ? $ipmi_cfg['IPMISELD'] : "disable";
-$ipmipoll   = isset($ipmi_cfg['IPMIPOLL']) ? $ipmi_cfg['IPMIPOLL'] : "60";
-$ipmi_local = isset($ipmi_cfg['LOCAL'])    ? $ipmi_cfg['LOCAL']    : "disable";
+$seld     = isset($cfg['IPMISELD']) ? $cfg['IPMISELD'] : "disable";
+$seldpoll = isset($cfg['IPMIPOLL']) ? $cfg['IPMIPOLL'] : "60";
+$local    = isset($cfg['LOCAL'])    ? $cfg['LOCAL']    : "disable";
 
 //check running status
-$ipmiseld_running   = trim(shell_exec( "[ -f /proc/`cat /var/run/ipmiseld.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
-$fancontrol_running = trim(shell_exec( "[ -f /proc/`cat /var/run/ipmifan.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
-$ipmi_running = "<span class='green'>Running</span>";
-$ipmi_stopped = "<span class='orange'>Stopped</span>";
-$ipmiseld_status   = ($ipmiseld_running)   ? $ipmi_running : $ipmi_stopped;
-$fancontrol_status = ($fancontrol_running) ? $ipmi_running : $ipmi_stopped;
+$seld_run    = trim(shell_exec( "[ -f /proc/`cat /var/run/ipmiseld.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
+$fanctrl_run = trim(shell_exec( "[ -f /proc/`cat /var/run/ipmifan.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" ));
+$running = "<span class='green'>Running</span>";
+$stopped = "<span class='orange'>Stopped</span>";
+$seld_status    = ($seld_run) ? $running : $stopped;
+$fanctrl_status = ($fanctrl_run)  ? $running : $stopped;
 
 /* get display temps and fans */
-$ipmi_disp_temp1 = isset($ipmi_cfg['DISP_TEMP1']) ? $ipmi_cfg['DISP_TEMP1'] : "";
-$ipmi_disp_temp2 = isset($ipmi_cfg['DISP_TEMP2']) ? $ipmi_cfg['DISP_TEMP2'] : "";
-$ipmi_disp_fan1  = isset($ipmi_cfg['DISP_FAN1'])  ? $ipmi_cfg['DISP_FAN1']  : "";
-$ipmi_disp_fan2  = isset($ipmi_cfg['DISP_FAN2'])  ? $ipmi_cfg['DISP_FAN2']  : "";
+$disp_temp1 = isset($cfg['DISP_TEMP1']) ? $cfg['DISP_TEMP1'] : "";
+$disp_temp2 = isset($cfg['DISP_TEMP2']) ? $cfg['DISP_TEMP2'] : "";
+$disp_fan1  = isset($cfg['DISP_FAN1'])  ? $cfg['DISP_FAN1']  : "";
+$disp_fan2  = isset($cfg['DISP_FAN2'])  ? $cfg['DISP_FAN2']  : "";
 
 /* Get sensor info and check connection */
-if(($ipmi_mod) || ($ipmi_network == 'enable')) {
-	$ipmi_sensors = ipmi_sensors($ipmi_options);
-	$ipmi_fans    = ipmi_get_fans($ipmi_sensors);
-	$ipmi_board   = trim(shell_exec("ipmi-fru $ipmi_options | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
+if(($mod) || ($netsvc == 'enable')) {
+	$sensors = ipmi_sensors();
+	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
 }
-if($ipmi_network == 'enable'){
-	$ipmi_conn = ($ipmi_sensors) ? "Connection successful" : "Connection failed";
+if($netsvc == 'enable'){
+	$conn = ($sensors) ? "Connection successful" : "Connection failed";
 }
+
 ?>

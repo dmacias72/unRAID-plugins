@@ -12,7 +12,7 @@ table.tablesorter{
 }
 
 .advanced, .network,
-.fancontrol, #btnTest {
+.fanctrl, #btnTest {
 		display: none;
 }
 
@@ -44,6 +44,10 @@ select .tablesorter input.tablesorter-filter,
 .tablesorter .tablesorter-header,
 table.tablesorter tr>td {
 	text-align: center;
+}
+
+table.tablesorter.fanlog tr>td {
+	text-align: left;
 }
 
 table.tablesorter.sensors th:first-child{width:12%;}
