@@ -3,9 +3,11 @@
 ##############################
 ######  DEAMON SECTION  ######
 ##############################
-$DEBUG        = FALSE;
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+$netopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
+	base64_decode($password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
+$debug = FALSE;
 
-# DO NOT TOUCH
 set_time_limit(0);
 $prog = pathinfo(__FILE__, PATHINFO_FILENAME);
 openlog($prog, LOG_PID | LOG_PERROR, LOG_LOCAL0);
@@ -17,6 +19,7 @@ Control fans based on config values and [options].
 
 Usage: $prog [options]
 
+  -q, --quiet      suppress all messages
   -v, --verbose    print all messages
       --debug      turn on debugging
       --help       display this help and exit
@@ -25,27 +28,29 @@ Usage: $prog [options]
 
 EOF;
 
-$shortopts = "v";
+$shortopts = 'qv';
 $longopts = [
-	"debug",
-	"help",
-	"verbose",
-	"version"
+	'debug',
+	'help',
+	'quiet',
+	'verbose',
+	'version'
 ];
 $args = getopt($shortopts, $longopts);
 
-if (array_key_exists("help", $args)) {
+if (array_key_exists('help', $args)) {
 	echo $usage;
 	exit(1);
 }
 
-if (array_key_exists("version", $args)) {
-	echo "IPMI Fan Control: 1.0\n";
+if (array_key_exists('version', $args)) {
+	echo 'IPMI Fan Control: 1.0\n';
 	exit(1);
 }
 
-$argv   = (array_key_exists("v", $args) || array_key_exists("verbose", $args));
-$DEBUG  = (array_key_exists("debug", $args));
+$argq   = (array_key_exists('q', $args) || array_key_exists('quiet', $args));
+$argv   = (array_key_exists('v', $args) || array_key_exists('verbose', $args));
+$debug  = (array_key_exists('debug', $args));
 
 #############################################
 # ASRock                                    #
@@ -54,57 +59,7 @@ $DEBUG  = (array_key_exists("debug", $args));
 # 0x00 = smartfan mode                      #
 # 0x01 - 0x64  = 1% - 100%                  #
 #############################################
-/*Fan Speed CLI ATEN X9
-ipmitool raw 0x30 0x91 0x5A 0x3 0x0 0x0
-ipmitool raw 0x30 0x91 0x5A 0x3 0x1 0x0
-ipmitool raw 0x30 0x91 0x5A 0x3 0x2 0x0
-ipmitool raw 0x30 0x91 0x5A 0x3 0x3 0x0
 
-One is for Write and one is for Read.
-// for full speed
-ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0xff
-ipmitool raw 0x30 0x91 0x5A 0x3 0x11 0xff
-
-//for half speed
-ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0x7f
-ipmitool raw 0x30 0x91 0x5A 0x3 0x11 0x7f
-
-Set/Get Fan speed mode
-Input : NetFn 0x30
-Cmd 0x45
-Data1 Get/Set ->[0/1]
-Data2 Fan Speed Mode, standard/full/optimal -> [0/1/2] // for Set only
-
-Output: Completion Code 0x00
-
-Example: Set fans to full speed would be #ipmitool raw 0x30 0x45 1 1
-
-if ($max_temp > 39) {
-  # at least one hard drive is 40 deg C or higher
-  # set fan speed control to Full
-  `ipmitool raw 0x30 0x45 0x01 0x01`
-}
-elsif ($max_temp == 39 ){
-  # maximum drive temperature is 39 deg C
-  # set fan speed to 50% duty cycle
-  `ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x32`
-}
- 
-else {
-  # all hard drive temperatures are 38 deg C or cooler
-  # set fan speed control to Optimal
-  `ipmitool raw 0x30 0x45 0x01 0x02`
-}
-
-0x30 0x70 0x66 Fan Control Manually (X10)
-#100% duty cycle
-ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x64
-     
-#50% duty cycle
-ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x32
-The last value is the duty cycle, with max = 64, and minimum = 0.
-You can set the duty cycle in 64 steps, between minimum and full speed.
-*/
 $boards = [
 	'ASRock' => [
 		'raw' => '00 3a 01',
@@ -120,14 +75,68 @@ $boards = [
 	]
 ];
 
+
+
 ##############################
-#####  PROGRAM SECTION  ######
+###### FUNCTION SECTION ######
 ##############################
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_hdparm.php';
+
+/* logger*/
+function logger($msg, $quiet = false) {
+	syslog(LOG_INFO, $msg);
+	if (!$quiet) {
+		echo '\n'.$msg.' \n';
+	}
+}
+
+/* debug */
+function debug($m){
+  global $prog, $debug;
+  if($debug){
+    $STDERR = fopen('php://stderr', 'w+');
+    fwrite($STDERR, $m.'\n');
+    fclose($STDERR);
+  }
+}
+
+/* scan directory for type */
+function scan_dir($dir, $type = ""){
+  $out = array();
+  foreach (array_slice(scandir($dir), 2) as $entry){
+    $sep   = (preg_match("/\/$/", $dir)) ? "" : "/";
+    $out[] = $dir.$sep.$entry ;
+  }
+  return $out;
+}
+
+/* get highest temp of hard drives */
+function get_highest_temp($hdds){
+  $highest_temp="0";
+  foreach ($hdds as $hdd) {
+    if (shell_exec("hdparm -C ${hdd} 2>/dev/null| grep -c standby") == 0){
+      $temp = preg_replace("/\s+/", "", shell_exec("smartctl -A ${hdd} 2>/dev/null| grep -m 1 -i Temperature_Cel | awk '{print $10}'"));
+      $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
+    }
+  }
+  debug("Highest temp is ${highest_temp}ºC");
+  return $highest_temp;
+}
+
+/* get all hard drives except flash drive */
+function get_all_hdds(){
+  $hdds = array();
+  $flash = preg_replace("/\d$/", "", realpath("/dev/disk/by-label/UNRAID"));
+  foreach (scan_dir("/dev/") as $dev) {
+    if(preg_match("/[sh]d[a-z]+$/", $dev) && $dev != $flash) {
+      $hdds[] = $dev;
+    }
+  }
+  return $hdds;
+}
 
 /* get fan and temp sensors */
-function ipmi_get_fantemp($options=null) {
+function ipmi_get_fantemp() {
+	global $options;
 	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $options 2>/dev/null";
 	exec($cmd, $output, $return);
 
@@ -157,31 +166,47 @@ function ipmi_get_fantemp($options=null) {
 	unset($sensors);
 }
 
-if(!empty($fan_cfg) && $fancontrol == "enable"){
-	$board	= $fan_cfg['IPMIBOARD'];
-	$raw		= $boards["$board"]['raw'];
+##############################
+#####  PROGRAM SECTION  ######
+##############################
 
-	while(TRUE){ while(TRUE){
-	####  DO YOUR STUFF HERE  ####
+if(empty($fancfg)){
+		$msg = "Fan control settings file $fancfg_file is missing or empty";
+		logger($msg, $argq);
+  exit(1);
+}
 
-	$fans		= $boards["$board"]['fans'];
+$board = $fancfg['IPMIBOARD'];
+if (!array_key_exists($board, $boards)){
+	$msg = 'Your motherboard is not supported yet';
+	logger($msg, $argq);
+  exit(1);
+}
+
+$raw  = $boards[$board]['raw'];
+$fans = $boards[$board]['fans'];
+$MD5  = md5_file($fancfg_file);
+$log  = '/var/log/ipmifan';
+
+while(TRUE){ while(TRUE){
+####  DO YOUR STUFF HERE  ####
 
 	/* Get sensor info and check connection */
-	if($ipmi_mod || $ipmi_network == 'enable')
-		$ipmi_sensors = ipmi_get_fantemp($fan_options);
+	if(($mod) || ($netsvc == 'enable'))
+		$sensors = ipmi_get_fantemp();
 
 	for ($i = 0; $i < 7; $i++) {
 
-		$ipmi_fan	= (isset($fan_cfg["FAN$i"]))		? $fan_cfg["FAN$i"]     : 0;
-		$fan_name	= $ipmi_sensors["$ipmi_fan"]['Name'];
-		$ipmi_temp	= (isset($fan_cfg["FANTEMP$i"])) ? $fan_cfg["FANTEMP$i"] : 0;
-		$fan_min    = (isset($fan_cfg["FANMIN$i"]))  ? $fan_cfg["FANMIN$i"]  : 1;
+		$fan      = (isset($fancfg["FAN$i"]))     ? $fancfg["FAN$i"]     : 0;
+		$fan_name = $sensors[$fan]['Name'];
+		$fan_temp = (isset($fancfg["FANTEMP$i"])) ? $fancfg["FANTEMP$i"] : 0;
+		$fan_min  = (isset($fancfg["FANMIN$i"]))  ? $fancfg["FANMIN$i"]  : 1;
 		
-		if($ipmi_temp != 0) {
-			$temp_lo = (isset($fan_cfg["TEMPLO$i"]))  ? $fan_cfg["TEMPLO$i"]  : 30;
-			$temp_hi = (isset($fan_cfg["TEMPHI$i"]))  ? $fan_cfg["TEMPHI$i"]  : 40;
+		if($fan_temp != 0) {
+			$temp_lo = (isset($fancfg["TEMPLO$i"])) ? $fancfg["TEMPLO$i"]  : 30;
+			$temp_hi = (isset($fancfg["TEMPHI$i"])) ? $fancfg["TEMPHI$i"]  : 40;
 
-			$temp    = $ipmi_sensors["$ipmi_temp"]['Reading'];
+			$temp    = $sensors[$fan_temp]['Reading'];
 
 			if ($temp <= $temp_lo)
 				$pwm = 1;
@@ -189,61 +214,70 @@ if(!empty($fan_cfg) && $fancontrol == "enable"){
 				$pwm = 64;
 			else
 				$pwm = round((($temp-$temp_lo)/($temp_hi-$temp_lo))*16)*4;
+
 			//impose fan lower limit
 			$pwm = ($pwm <= $fan_min) ? $fan_min : $pwm;
 		}else
 			$pwm = 0;
-	
-	
+
 	//pad pwm to 2 places
 	$pwm = str_pad($pwm, 2, '0', STR_PAD_LEFT);
 
 	//check array for fan name
 	if(array_key_exists($fan_name, $fans))
-		$fans["$fan_name"] = $pwm;
+		$fans[$fan_name] = $pwm;
 	}
 
 	//get values for all fans
 	$hex = "";
-	foreach($fans as $fan){
-		$hex .= " $fan";
+	foreach($fans as $value){
+		$hex .= " $value";
 	}
 
 	//compare last value to new value
 	if($current_hex != $hex){
 		$cmd = "ipmi-raw $raw$hex ";
-		shell_exec($cmd.$options);
-		syslog(LOG_INFO, "adjusting fans from $current_hex to $hex");
+		shell_exec($cmd.$netopts);
+
+		//log changes
+		$timestamp = date('Y-m-d h:i:s');
+		$msg = "$timestamp adjusting fans to $hex\n";
+			file_put_contents($log,$msg,FILE_APPEND);
 		$current_hex = $hex;
 	}
-# PRINT VARIABLES DEBUG 
-$defined_vars = get_defined_vars();
-unset($defined_vars['current_hex']); //remove current from list
-foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i) {
-	unset($defined_vars[$i]);
-}
-$defined_vars['current_hex'] = $current_hex; //keep last value
-debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
-unset($defined_vars);
 
-$time1 = time();
-$MD5 = md5_file($fan_cfg_file);
-for ($i=0; $i < $fanpoll*6 ; $i++) { 
-	sleep(10);
-	if (is_file($fan_cfg_file)){
- 		if (md5_file($fan_cfg_file) != $MD5){
-  			syslog(LOG_INFO, "config file updated, reloading.");
-			$fan_cfg = parse_ini_file($fan_cfg_file);
-		}
-  	}
-}
-debug("Sleep ".(time()-$time1)." seconds.");
+	/* print variable */
+	$defined_vars = get_defined_vars();
+
+	//remove vars from array to save
+	unset($defined_vars['current_hex'],$defined_vars['MD5']);
+
+	foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i)
+		unset($defined_vars[$i]);
+
+	//add saved vars to array for debug print
+	$defined_vars['current_hex'] = $current_hex;
+	$defined_vars['MD5'] = $MD5;
+	debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
+	unset($defined_vars);
+
+	$time1 = time();
+
+	for ($i=0; $i < $fanpoll*6 ; $i++) { 
+		sleep(10);
+		$MD5_new = md5_file($fancfg_file);
+		if((is_file($fancfg_file)) && ($MD5_new != $MD5)){
+ 			$msg = 'fan control config file updated, reloading settings.';
+			$fancfg = parse_ini_file($fancfg_file);
+			logger($msg, $argq);
+			$MD5 = $MD5_new;
+			file_put_contents($log,$msg.'\n',FILE_APPEND);
+			break;
+  		}
+	}
+	debug("Sleep ".(time()-$time1)." seconds.");
 
 ######  END OF SECTION  ######
+	};
 };
-};
-} else {
-  exit(1);
-}
-
 ?>
