@@ -2,7 +2,7 @@
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php';
 
 function format_ipmi_temp($reading, $unit, $dot) {
-  return ($reading>0 ? ($unit=='F' ? round(9/5*$reading+32) : str_replace('.',$dot,$reading)) : '##')."&thinsp;$unit";
+  return ($reading>0 ? ($unit=='F' ? round(9/5*$reading+32) : str_replace('.',$dot,$reading)) : '##')."<small>&deg;$unit</small>";
 }
 
 if ($disp_temp1 || $disp_temp2 || $disp_fan1 || $disp_fan2){
@@ -22,12 +22,12 @@ if ($disp_temp1 || $disp_temp2 || $disp_fan1 || $disp_fan2){
 	if ($readings[$disp_fan1])
 		$temps[] = "<img src='/plugins/ipmi/icons/fan.png' title='".$readings[$disp_fan1]['Name']
 			." (".$readings[$disp_fan1]['ID'].")' class='icon'>"
-			.floatval($readings[$disp_fan1]['Reading'])."&thinsp;rpm";
+			.floatval($readings[$disp_fan1]['Reading'])."<small>&thinsp;rpm</small>";
 
 	if ($readings[$disp_fan2])
 		$temps[] = "<img src='/plugins/ipmi/icons/fan.png' title='".$readings[$disp_fan2]['Name']
 			." (".$readings[$disp_fan2]['ID'].")' class='icon'>"
-			.floatval($readings[$disp_fan2]['Reading'])."&thinsp;rpm";
+			.floatval($readings[$disp_fan2]['Reading'])."<small>&thinsp;rpm</small>";
 }
 if ($temps)
 	echo "<span id='temps' style='margin-right:16px'>".implode('&nbsp;', $temps)."</span>";
