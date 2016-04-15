@@ -1,2 +1,2 @@
 #!/bin/sh
-/etc/rc.d/rc.ipmifan stop
+/usr/sbin/ipmifan --quit
