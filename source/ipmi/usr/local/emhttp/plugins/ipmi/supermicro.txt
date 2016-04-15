@@ -1,51 +1,51 @@
 /*Fan Speed CLI ATEN X9
-ipmitool raw 0x30 0x91 0x5A 0x3 0x0 0x0
-ipmitool raw 0x30 0x91 0x5A 0x3 0x1 0x0
-ipmitool raw 0x30 0x91 0x5A 0x3 0x2 0x0
-ipmitool raw 0x30 0x91 0x5A 0x3 0x3 0x0
+ipmi-raw 00 30 91 5A 03 00 00
+ipmi-raw 00 30 91 5A 03 01 00
+ipmi-raw 00 30 91 5A 03 02 00
+ipmi-raw 00 30 91 5A 03 03 00
 
 One is for Write and one is for Read.
 // for full speed
-ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0xff
-ipmitool raw 0x30 0x91 0x5A 0x3 0x11 0xff
+ipmi-raw 00 30 91 5A 03 10 ff
+ipmi-raw 00 30 91 5A 03 11 ff
 
 //for half speed
-ipmitool raw 0x30 0x91 0x5A 0x3 0x10 0x7f
-ipmitool raw 0x30 0x91 0x5A 0x3 0x11 0x7f
+ipmi-raw 00 30 91 5A 03 10 7f
+ipmi-raw 00 30 91 5A 03 11 7f
 
 Set/Get Fan speed mode
-Input : NetFn 0x30
-Cmd 0x45
+Input : NetFn 30
+Cmd 45
 Data1 Get/Set ->[0/1]
 Data2 Fan Speed Mode, standard/full/optimal -> [0/1/2] // for Set only
 
-Output: Completion Code 0x00
+Output: Completion Code 00
 
-Example: Set fans to full speed would be #ipmitool raw 0x30 0x45 1 1
+Example: Set fans to full speed would be #ipmi-raw 00 30 45 01 01
 
 if ($max_temp > 39) {
   # at least one hard drive is 40 deg C or higher
   # set fan speed control to Full
-  `ipmitool raw 0x30 0x45 0x01 0x01`
+  `ipmi-raw 00 30 45 01 01`
 }
 elsif ($max_temp == 39 ){
   # maximum drive temperature is 39 deg C
   # set fan speed to 50% duty cycle
-  `ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x32`
+  `ipmi-raw 00 30 70 66 01 00 32`
 }
  
 else {
   # all hard drive temperatures are 38 deg C or cooler
   # set fan speed control to Optimal
-  `ipmitool raw 0x30 0x45 0x01 0x02`
+  `ipmi-raw 00 30 45 01 02`
 }
 
-0x30 0x70 0x66 Fan Control Manually (X10)
+30 70 66 Fan Control Manually (X10)
 #100% duty cycle
-ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x64
+ipmi-raw 00 30 70 66 01 00 64
      
 #50% duty cycle
-ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x32
+ipmi-raw 00 30 70 66 01 00 32
 The last value is the duty cycle, with max = 64, and minimum = 0.
 You can set the duty cycle in 64 steps, between minimum and full speed.
 */
