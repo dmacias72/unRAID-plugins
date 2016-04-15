@@ -65,7 +65,7 @@ Markdown="false"
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 
 <?if (($netsvc == 'disable') || (($netsvc == 'enable') && ($fanip != 'None')) ):?>
-	<?get_fan_options();?>
+	<?get_fanctrl_options();?>
 <?endif;?>
 
 &nbsp;
@@ -87,7 +87,7 @@ Markdown="false"
 	<tbody>
 <?php
 	$log = '/var/log/ipmifan';
-		echo "<tr><td><a id='open-fanlog' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$fanlog</a></td><td>"
+		echo "<tr><td><a id='open-fanlog' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td>"
 		.filesize($log)."</td><td><a id='delete-fanlog'><i class='fa fa-trash' title='delete'></i></a></td></tr>";	
 ?>
 	</tbody>
