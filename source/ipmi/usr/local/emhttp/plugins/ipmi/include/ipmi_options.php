@@ -16,7 +16,7 @@ $password = isset($cfg['PASSWORD']) ? $cfg['PASSWORD'] : '';
 /* fan control */
 $fanctrl = isset($fancfg['FANCONTROL']) ? $fancfg['FANCONTROL'] :'disable';
 $fanpoll = isset($fancfg['FANPOLL'])    ? $fancfg['FANPOLL']    : 1;
-$fanip   = isset($fancfg['FANIP'])      ? $fancfg['FANIP']      : 'None';
+$fanip = (isset($fancfg['FANIP']) && ($netsvc == 'enable')) ? $fancfg['FANIP'] : '';
 
 /* check if local ipmi driver is loaded */
 if($netsvc == 'disable')
@@ -24,5 +24,7 @@ if($netsvc == 'disable')
 
 /* options for network access */
 $netopts = ($netsvc == 'enable') ? "--always-prefix -h $ipaddr -u $user -p ".
+	base64_decode($password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
+$fanopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
 	base64_decode($password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
 ?>
