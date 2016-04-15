@@ -35,3 +35,10 @@ Icon="sensorspage.png"
 <script type="text/javascript" src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
 <script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.ipmi.js"></script>
+<script type="text/javascript">
+<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
+$(function() {
+  showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');
+});
+<?endif;?>
+</script>

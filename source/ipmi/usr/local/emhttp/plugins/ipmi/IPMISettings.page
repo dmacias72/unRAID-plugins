@@ -59,25 +59,25 @@ Enable Network Connection(s):
 <form markdown="1" name="footer_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
 
-Display Temperature #1:
+Temperature #1:
 : <select name="DISP_TEMP1" class="display">
 		<option value='false'>None</option>
 		<?=ipmi_get_options('Temperature', $disp_temp1);?>
   </select>
 
-Display Temperature #2:
+Temperature #2:
 : <select name="DISP_TEMP2" class="display">
 		<option value='false'>None</option>	
 		<?=ipmi_get_options('Temperature', $disp_temp2);?>
 	</select>
 
-Display Fan Speed #1:
+Fan Speed #1:
 : <select name="DISP_FAN1" class="display">
 		<option value='false'>None</option>
 		<?=ipmi_get_options('Fan', $disp_fan1);?>
 	</select>
 
-Display Fan Speed #2:
+Fan Speed #2:
 : <select name="DISP_FAN2" class="display">
 		<option value='false'>None</option>
 		<?=ipmi_get_options('Fan', $disp_fan2);?>
@@ -87,8 +87,12 @@ Display Fan Speed #2:
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
+
 <script type="text/javascript">
 $(function(){
+	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
+		showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');
+	<?endif;?>
 
 	$('#btnTest').click(function () {
 		EventTest();
