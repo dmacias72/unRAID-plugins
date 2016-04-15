@@ -4,7 +4,7 @@
 ######  DEAMON SECTION  ######
 ##############################
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
-$netopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
+$fanopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
 	base64_decode($password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
 $debug = FALSE;
 
@@ -180,8 +180,8 @@ function get_all_hdds(){
 
 /* get fan and temp sensors */
 function ipmi_get_fantemp() {
-	global $options;
-	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $options 2>/dev/null";
+	global $fanopts;
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $fanopts 2>/dev/null";
 	exec($cmd, $output, $return);
 
 	if ($return)
