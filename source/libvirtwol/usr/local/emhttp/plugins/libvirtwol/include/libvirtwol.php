@@ -23,6 +23,10 @@ $libvirtwol_status = ($libvirtwol_running) ? $status_running : $status_stopped;
 		</select>
 	</dd>
 </dl>
+<blockquote class="inline_help">
+	<p>Enable wake on lan for virtual machines.  Allows you to start a virtual machine by sending a WOL packet with the MAC address of the virtual machine to the unRAID server</p>
+	<p> or broadcast the packet on the same network. It listens on your VM bridge for UDP 7 or 9 and ether proto 0x0842.</p>
+</blockquote>
 <dl>
 	<dt>&nbsp;</dt>
 	<dd><input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
