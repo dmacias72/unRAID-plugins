@@ -28,7 +28,13 @@ Icon="sensorspage.png"
 		<tbody>
 		</tbody>
 	</table>
+	<blockquote class="inline_help">
+		<p>Table of sensor readings that can be sorted and filtered. Thresholds and other values are displayed with the basic/advanced view switch.</p>
+	</blockquote>
 	<button type="button" onClick="done();">Done</button><button type="button" class="reset-sensors" title="reset table sorting filters">Reset</button><input type="button" class="settings" value="Settings">
+	<blockquote class="inline_help">
+		<p>Done button returns to Tools menu. Reset button resets table filters. Settings button returns to settings page.</p>
+	</blockquote>
 </div>
 
 <script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>

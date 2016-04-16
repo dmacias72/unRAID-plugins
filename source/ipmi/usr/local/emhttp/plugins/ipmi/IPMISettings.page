@@ -16,6 +16,9 @@ Enable Event Notifications:
   <?=mk_option($seld, "disable", "No");?>
   <?=mk_option($seld, "enable", "Yes");?>
   </select> &nbsp; <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
+<blockquote class="inline_help">
+	<p>Enable IPMI event notifications. IPMI events will be logged in the system log.  System log is monitored and notification event sent based on severity.</p>
+</blockquote>
 
 Event Polling Time:
 : <select id="IPMIPOLL" class="seld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
@@ -26,33 +29,54 @@ Event Polling Time:
   <?=mk_option($seldpoll, '300', '5 min');?>
   <?=mk_option($seldpoll, '1800', '30 min');?>
   </select>
+<blockquote class="inline_help">
+	<p>Specify how long between checking IPMI event log and adding events to system log. </p>
+</blockquote>
 
 Enable Network Connection(s):
 : <select id="NETWORK" class="seld-run" name="NETWORK" size="1" onChange="checkNETWORK(this.form);"  title="Enable connection to network based ipmi, not necessary for local onboard ipmi">
   <?=mk_option($netsvc, 'disable', 'No');?>
   <?=mk_option($netsvc, 'enable', 'Yes');?>
   </select>
+<blockquote class="inline_help">
+	<p>Enable monitoring of IPMI sensors and events through the network.</p>
+</blockquote>
 
 <label class="seld-run ipmi-lan">Enable Localhost Connection:</label>
 : <select id="LOCAL" class="seld-run ipmi-lan" name="LOCAL" size="1" onChange="checkLOCAL(this.form);" title="Enable localhost connection along with network connections">
   <?=mk_option($local, 'disable', 'No');?>
   <?=mk_option($local, 'enable', 'Yes');?>
   </select>
+<blockquote class="inline_help">
+	<p>Enable monitoring of localhost as well as network servers. Useful for monitoring a backup server or two.</p>
+</blockquote>
 
 <label class="seld-run ipmi-lan">IPMI IP Address(es):</label>
 : <input id="IPADDR" type="text" class="seld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$conn;?></label>
+<blockquote class="inline_help">
+	<p>Add up to four different IPMI IP addresses to monitor sensors and events.</p>
+</blockquote>
 
 <label class="seld-run ipmi-lan">IPMI User Name:</label>
 : <input id="USER" type="text" class="seld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$user;?>" title="username for network access IPMI" placeholder="username for network access" >
+<blockquote class="inline_help">
+	<p>Username for IPMI connections(s).</p>
+</blockquote>
 
 <label class="seld-run ipmi-lan">IPMI Password:</label>
 : <input id="PASSWORD" type="password" class="seld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$password;?>" title="password for network access IPMI" placeholder="password for network access" >
+<blockquote class="inline_help">
+	<p>Password for IPMI connection(s).</p>
+</blockquote>
 
 &nbsp;
 
 <input id="DEFAULT" class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
+<blockquote class="inline_help">
+	<p>Default button resets form.  Readings button redirects to sensor readings and events on the Tools page</p>
+</blockquote>
 
 <div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/mb.png"> Display Settings</span></div>
 
@@ -64,24 +88,36 @@ Temperature #1:
 		<option value='false'>None</option>
 		<?=ipmi_get_options('Temperature', $disp_temp1);?>
   </select>
-
-Temperature #2:
-: <select name="DISP_TEMP2" class="display">
-		<option value='false'>None</option>	
-		<?=ipmi_get_options('Temperature', $disp_temp2);?>
-	</select>
+<blockquote class="inline_help">
+	<p>First temperature sensor to monitor and display in footer of weGui.</p>
+</blockquote>
 
 Fan Speed #1:
 : <select name="DISP_FAN1" class="display">
 		<option value='false'>None</option>
 		<?=ipmi_get_options('Fan', $disp_fan1);?>
 	</select>
+<blockquote class="inline_help">
+	<p>First fan sensor to monitor and display in footer of weGui.</p>
+</blockquote>
+
+Temperature #2:
+: <select name="DISP_TEMP2" class="display">
+		<option value='false'>None</option>	
+		<?=ipmi_get_options('Temperature', $disp_temp2);?>
+	</select>
+<blockquote class="inline_help">
+	<p>Second temperature sensor to monitor and display in footer of weGui.</p>
+</blockquote>
 
 Fan Speed #2:
 : <select name="DISP_FAN2" class="display">
 		<option value='false'>None</option>
 		<?=ipmi_get_options('Fan', $disp_fan2);?>
 	</select>
+<blockquote class="inline_help">
+	<p>Second fan sensor to monitor and display in footer of weGui.</p>
+</blockquote>
 
 &nbsp;
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">

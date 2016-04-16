@@ -17,22 +17,28 @@ Title="Archived Events"
 		<tbody>
 		</tbody>
 	</table>
+<blockquote class="inline_help">
+	<p>Table of IPMI archived events. Can be sorted, filtered and searched. Archive switch enables deleted events to be saved on the flash drive and displayed in the Archived Events tab.</p>
+</blockquote>
 </div>
 <div id="pager-arch">
-  <form>
-    <a class="first"><i class="fa fa-step-backward"></i></a>
-    <a class="prev"><i class="fa fa-backward"></i></a>
-    <span class="pagedisplay"></span>
-    <a class="next"><i class="fa fa-forward"></i></a>
-    <a class="last"><i class="fa fa-step-forward"></i></a>
-    <select class="pagesize">
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="15">15</option>
-      <option value="20">20</option>
-      <option value="all">All</option>
-    </select>
-    &nbsp;
-    <a  title="reset filters" class="reset-archive"><i class="fa fa-undo"></i></a>
-  </form>
+	<form>
+		<a class="first"><i class="fa fa-step-backward"></i></a>
+		<a class="prev"><i class="fa fa-backward"></i></a>
+		<span class="pagedisplay"></span>
+		<a class="next"><i class="fa fa-forward"></i></a>
+		<a class="last"><i class="fa fa-step-forward"></i></a>
+		<select class="pagesize">
+			<option value="5">5</option>
+			<option value="10">10</option>
+			<option value="15">15</option>
+			<option value="20">20</option>
+			<option value="all">All</option>
+		</select>
+		&nbsp;
+		<a  title="reset filters" class="reset-archive"><i class="fa fa-undo"></i></a>
+	</form>
+	<blockquote class="inline_help">
+		<p>Table is split into pages. Drop down selects the number of rows to display per page. Reset button resets the table filters.</p>
+	</blockquote>
 </div>
