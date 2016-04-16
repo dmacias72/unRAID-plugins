@@ -31,6 +31,9 @@ $libvirtwol_status = ($libvirtwol_running) ? $status_running : $status_stopped;
 </div>
 <script type="text/javascript">
 $(function(){
+	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('libvirtwol')):?>
+		showNotice('Wake On Lan <?=$version?> is available. <a>Download Now</a>','ipmi');
+	<?endif;?>
 	checkRUNNING(document.libvirtwol_settings);
 });
 
