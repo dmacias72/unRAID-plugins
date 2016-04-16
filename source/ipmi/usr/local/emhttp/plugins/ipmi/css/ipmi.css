@@ -53,12 +53,12 @@ table.tablesorter.fanlog tr>td {
 table.tablesorter.sensors th:first-child{width:12%;}
 table.tablesorter.sensors td:first-child{width:12%;}
 
-table.tablesorter.events th:first-child{width:12%;}
-table.tablesorter.events td:first-child{width:12%;}
-table.tablesorter.events th:nth-child(2){width:9%;}
-table.tablesorter.events td:nth-child(2){width:9%;}
-table.tablesorter.events th:nth-child(3){width:9%;}
-table.tablesorter.events td:nth-child(3){width:9%;}
+table.tablesorter.events th:first-child{width:10%;}
+table.tablesorter.events td:first-child{width:10%;}
+table.tablesorter.events th:nth-child(2){width:5%;}
+table.tablesorter.events td:nth-child(2){width:5%;}
+table.tablesorter.events th:nth-child(3){width:5%;}
+table.tablesorter.events td:nth-child(3){width:5%;}
 table.tablesorter.events th:nth-child(4){width:16%;}
 table.tablesorter.events td:nth-child(4){width:16%;}
 table.tablesorter.events th:nth-child(7){width:22%;}
