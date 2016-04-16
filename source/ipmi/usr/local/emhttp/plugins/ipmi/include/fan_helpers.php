@@ -52,7 +52,7 @@ function get_fanctrl_options(){
 			// fan control minimum speed
 			$fan_min = 'FANMIN'.$i;
 			echo '<dl class="fanctrl">'.
-			'<dt><dl><dd>Fan speed minimum:</dd></dl></dt><dd>'.
+			'<dt><dl><dd>Fan speed minimum (1-64):</dd></dl></dt><dd>'.
 			'<select name="'.$fan_min.'" class="fanctrl">';
 			echo get_min_options($fancfg[$fan_min]);
 			echo '</select></dd></dl>';
