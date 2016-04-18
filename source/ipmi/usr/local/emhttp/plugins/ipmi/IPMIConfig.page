@@ -1,0 +1,6 @@
+Title="IPMI Config Editor"
+Markdown="false"
+---
+<?
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_config.php';
+?>

@@ -9,6 +9,10 @@ $(function(){
 		location = '/Settings/IPMI';
 	});
 
+	$('#edit').click(function() {
+		location = '/Settings/IPMIConfig';
+	});
+
 	$("#tab3").click(function () {
 		$('#adv-switch').hide();
 		$('#arch-switch').show();
