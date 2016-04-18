@@ -1,4 +1,4 @@
-<?php
+<?
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 
 /* ipmi settings variables*/
@@ -29,5 +29,4 @@ if(($mod) || ($netsvc == 'enable')) {
 if($netsvc == 'enable'){
 	$conn = ($sensors) ? "Connection successful" : "Connection failed";
 }
-
 ?>

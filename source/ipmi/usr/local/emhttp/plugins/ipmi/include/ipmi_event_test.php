@@ -1,4 +1,4 @@
-<?php
+<?
 /*
 lun netfn cmd dir evm stype num etype state data data
 ipmi-raw 0 4 02 41 04 01 30 01 09 ff ff Temp UC hi

@@ -1,7 +1,8 @@
-<?php
+<?
 /* read config files */
-$cfg_file    = '/boot/config/plugins/ipmi/ipmi.cfg';
-$fancfg_file = '/boot/config/plugins/ipmi/fan.cfg';
+$plg_path    = '/boot/config/plugins/ipmi';
+$cfg_file    = "$plg_path/ipmi.cfg";
+$fancfg_file = "$plg_path/fan.cfg";
 if (is_file($cfg_file))
 	$cfg    = parse_ini_file($cfg_file);
 if (is_file($fancfg_file))

@@ -1,4 +1,4 @@
-<?php
+<?
 $log = "/boot/config/plugins/ipmi/archived_events.log";
 $event = $_GET["event"];
 

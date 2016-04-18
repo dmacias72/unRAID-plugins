@@ -1,7 +1,7 @@
 Menu="IPMI:1"
 Title="Settings"
 ---
-<?php require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php'; ?>
+<? require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php'; ?>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
 
@@ -123,8 +123,7 @@ Fan Speed #2:
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
-
-<script type="text/javascript">
+<script>
 $(function(){
 	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
 		showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');

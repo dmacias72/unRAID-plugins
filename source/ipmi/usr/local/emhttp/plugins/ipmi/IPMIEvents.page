@@ -1,5 +1,6 @@
 Menu="IPMITools:2"
 Title="Event Log"
+Markdown="false"
 ---
 <div>
 	<table class="tablesorter hover-highlight events" id="tblEvent">			

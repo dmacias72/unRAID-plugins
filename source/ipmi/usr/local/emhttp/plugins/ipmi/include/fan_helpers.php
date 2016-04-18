@@ -1,4 +1,4 @@
-<?php
+<?
 /* get fan and temp sensors array */
 function ipmi_get_fantemp() {
 	global $fanopts, $hdd_temp;

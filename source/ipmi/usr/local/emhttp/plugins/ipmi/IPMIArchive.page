@@ -1,5 +1,6 @@
 Menu="IPMITools:3"
 Title="Archived Events"
+Markdown="false"
 ---
 <div>
 	<table class="tablesorter hover-highlight archive" id="tblArchive">			

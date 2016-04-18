@@ -1,5 +1,6 @@
 Menu="Buttons:2"
 Link="nav-user"
+Markdown="false"
 ---
 <?PHP
 /* Copyright 2015, Bergware International.

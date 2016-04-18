@@ -102,7 +102,7 @@ Markdown="false"
 		<th>Delete</th>
 	</thead>
 	<tbody>
-<?php
+<?
 	$log = '/var/log/ipmifan';
 		echo "<tr><td><a id='open-fanlog' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td>"
 		.filesize($log)."</td><td><a id='delete-fanlog'><i class='fa fa-trash' title='delete'></i></a></td></tr>";	
@@ -110,9 +110,9 @@ Markdown="false"
 	</tbody>
 </table>
 
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
+<script src="/webGui/javascript/jquery.switchbutton.js"></script>
 
-<script type="text/javascript">
+<script>
 $(function(){
 	//advanced view switch set cookie and toggle advanced columns
 	$('#advancedview').switchButton({

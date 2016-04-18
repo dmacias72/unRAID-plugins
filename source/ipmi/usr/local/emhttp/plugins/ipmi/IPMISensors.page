@@ -1,6 +1,6 @@
 Menu="IPMITools:1"
 Title="Sensors"
-Icon="sensorspage.png"
+Markdown="false"
 ---
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 <link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
@@ -31,17 +31,20 @@ Icon="sensorspage.png"
 	<blockquote class="inline_help">
 		<p>Table of sensor readings that can be sorted and filtered. Thresholds and other values are displayed with the basic/advanced view switch.</p>
 	</blockquote>
-	<button type="button" onClick="done();">Done</button><button type="button" class="reset-sensors" title="reset table sorting filters">Reset</button><input type="button" class="settings" value="Settings">
+	<dl>
+		<dt><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button><input type="button" class="settings" value="Settings"></dt>
+		<dd><input type="button" id="edit" value="Edit"><button type="button" onClick="done();">Done</button></dd>
+	</dl>
 	<blockquote class="inline_help">
-		<p>Done button returns to Tools menu. Reset button resets table filters. Settings button returns to settings page.</p>
+		<p>Reset Filters button resets table filters. Settings button navigates to the IPMI settings page.  Edit button allows you to edit your IPMI thresholds and sensor events configuration.  Done button navigates to the Tools menu. </p>
 	</blockquote>
 </div>
 
-<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
-<script type="text/javascript" src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
-<script type="text/javascript" src="/plugins/ipmi/js/jquery.ipmi.js"></script>
-<script type="text/javascript">
+<script src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
+<script src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
+<script src="/webGui/javascript/jquery.switchbutton.js"></script>
+<script src="/plugins/ipmi/js/jquery.ipmi.js"></script>
+<script>
 <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
 $(function() {
   showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');

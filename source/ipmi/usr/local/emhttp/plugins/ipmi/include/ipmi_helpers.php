@@ -1,4 +1,4 @@
-<?php
+<?
 //ipmi-sensors-config --filename=ipmi.config --checkout
 //ipmi-sensors-config --filename=ipmi.config --commit
 
