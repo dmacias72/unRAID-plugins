@@ -79,9 +79,13 @@ $(function() {
 		hintOptions: {}
 	});
 
+	setTimeout(function() {
+		editor.refresh();
+	}, 1);
+
 	$('#btnSubmit').click(function () {
+		editor.save();
 		$.post('/plugins/ipmi/include/ipmi_config_save.php', $('#cfgform').serializeArray(), function (data) {
-			alert(data);
 			if(data.success){
 				location = '/Tools/IPMITools';
 			}
