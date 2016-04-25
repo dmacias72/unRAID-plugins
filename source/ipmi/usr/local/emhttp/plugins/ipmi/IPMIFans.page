@@ -99,13 +99,15 @@ Markdown="false"
 	<thead>
 		<th>Logfile</th>
 		<th>Size</th>
-		<th>Delete</th>
+		<th>Clear</th>
 	</thead>
 	<tbody>
 <?
 	$log = '/var/log/ipmifan';
-		echo "<tr><td><a id='open-fanlog' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td>"
-		.filesize($log)."</td><td><a id='delete-fanlog'><i class='fa fa-trash' title='delete'></i></a></td></tr>";	
+	if(is_file($log)){
+		echo "<tr><td><a id='fanlog-file' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
+		.filesize($log)."</td><td><a id='fanlog-clear'><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
+	}
 ?>
 	</tbody>
 </table>
@@ -126,7 +128,7 @@ $(function(){
 		$.cookie('fanctrl_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
 	});
 
-	$('#delete-fanlog').on('click', deleteFanLOG);
+	$('#fanlog-clear').on('click', clearFanLOG);
 
 	$('#readings').click(function() {
 		$.cookie('one', 'tab1', { expires:null, path: '/'});
@@ -166,11 +168,10 @@ function verifyFANDATA(form) {
 	form.FANCONTROL.value = form.FANCONTROL.value.replace(/ /g,'_');
 }
 
-function deleteFanLOG(){
-	var par = $(this).parent().parent();
-	var id = par.children('td:nth-child(1)').text().trim();
-	par.remove();
-	    $.get('/webGui/include/DeleteLogFile.php', 'log='+id,function() {});
+function clearFanLOG(){
+		    $.get('/plugins/ipmi/include/fanlog_clear.php', {},function() {
+	    	$('#fanlog-size').html('0');
+	    });
 };
 
 </script>
