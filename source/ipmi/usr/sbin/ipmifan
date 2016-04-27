@@ -248,7 +248,7 @@ while(TRUE){ while(TRUE){
 ####  DO YOUR STUFF HERE  ####
 
 	/* Get sensor info and check connection */
-	if(($mod) || ($netsvc == 'enable'))
+	if(($mod == 1) || ($netsvc == 'enable'))
 		$sensors = ipmi_get_fantemp();
 
 	for ($i = 0; $i < 7; $i++) {

@@ -21,7 +21,7 @@ $disp_fan1  = isset($cfg['DISP_FAN1'])  ? $cfg['DISP_FAN1']  : "";
 $disp_fan2  = isset($cfg['DISP_FAN2'])  ? $cfg['DISP_FAN2']  : "";
 
 /* Get sensor info and check connection */
-if(($mod) || ($netsvc == 'enable')) {
+if(($mod == 1) || ($netsvc == 'enable')) {
 	$sensors = ipmi_sensors();
 	$fantemp = ipmi_get_fantemp();
 	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
