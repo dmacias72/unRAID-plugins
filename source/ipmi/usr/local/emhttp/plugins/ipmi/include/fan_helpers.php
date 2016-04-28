@@ -37,6 +37,9 @@ function get_fanctrl_options(){
 		if ($sensor['Type'] == 'Fan'){
 			$fan_temp = 'FANTEMP'.$i;
 			$fan_sensor = $fantemp[$fancfg[$fan_temp]];
+			$templo = 'TEMPLO'.$i;
+			$temphi = 'TEMPHI'.$i;
+			$fan_min = 'FANMIN'.$i;
 			
 			// hidden fan id
 			echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
@@ -44,18 +47,11 @@ function get_fanctrl_options(){
 			// fan name: reading = temp name: reading
 			echo '<dl><dt>'.$sensor['Name'].' ('.floatval($sensor['Reading']).' '.$sensor['Units'].'):</dt><dd>';
 			if ($fan_sensor['Name'])
-				echo $fan_sensor['Name'].' ('.floatval($fan_sensor['Reading']).' '.$fan_sensor['Units'].')';
+				echo $fan_sensor['Name'].' ('.floatval($fan_sensor['Reading']).' '.$fan_sensor['Units'].'), '.
+				$fancfg[$templo].', '.$fancfg[$temphi].', '.$fancfg[$fan_min];
 			else
 				echo 'Auto';
 			echo '</dd></dl>';
-
-			// fan control minimum speed
-			$fan_min = 'FANMIN'.$i;
-			echo '<dl class="fanctrl">'.
-			'<dt><dl><dd>Fan speed minimum (1-64):</dd></dl></dt><dd>'.
-			'<select name="'.$fan_min.'" class="fanctrl">';
-			echo get_min_options($fancfg[$fan_min]);
-			echo '</select></dd></dl>';
 
 			// temperature sensor
 			echo '<dl class="fanctrl">'.
@@ -66,7 +62,6 @@ function get_fanctrl_options(){
 			echo '</select></dd></dl>';
 
 			// low temperature threshold
-			$templo = 'TEMPLO'.$i;
 			echo '<dl class="fanctrl">'.
 			'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
 			'<dd><select name="'.$templo.'" class="fanctrl">'.
@@ -75,13 +70,20 @@ function get_fanctrl_options(){
 			echo '</select></dd></dl>';
 		
 			// high temperature threshold
-			$temphi = 'TEMPHI'.$i;
 			echo '<dl class="fanctrl">'.
 			'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
 			'<dd><select name="'.$temphi.'" class="fanctrl">'.
 			'<option value="0">Auto</option>';
 			echo	get_temp_range('HI', $fancfg[$temphi]);
+			echo '</select></dd></dl>';
+
+			echo '<dl class="fanctrl">'.
+			// fan control minimum speed
+			'<dt><dl><dd>Fan speed minimum (1-64):</dd></dl></dt><dd>'.
+			'<select name="'.$fan_min.'" class="fanctrl">';
+			echo get_min_options($fancfg[$fan_min]);
 			echo '</select></dd></dl>&nbsp;';
+
 			$i++;
 		}
 	}
