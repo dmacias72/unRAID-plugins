@@ -4,8 +4,6 @@
 ######  DEAMON SECTION  ######
 ##############################
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
-$fanopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
-	base64_decode($password)." --session-timeout=5000 --retransmission-timeout=1000" : '';
 $debug = FALSE;
 
 set_time_limit(0);
