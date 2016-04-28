@@ -69,7 +69,7 @@ function ipmi_events($archive=null){
 	global $netopts;
 	if($archive) {
 		$filename = "/boot/config/plugins/ipmi/archived_events.log";
-		$output = file($filename, FILE_IGNORE_NEW_LINES);
+		$output = is_file($filename) ? file($filename, FILE_IGNORE_NEW_LINES) : [] ;
 	} else {
 		$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $netopts 2>/dev/null";
 		exec($cmd, $output, $return); 
