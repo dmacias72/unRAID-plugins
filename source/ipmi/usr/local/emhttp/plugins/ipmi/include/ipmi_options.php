@@ -16,7 +16,7 @@ $password = isset($cfg['PASSWORD']) ? $cfg['PASSWORD'] : '';
 
 /* fan control */
 $fanctrl = isset($fancfg['FANCONTROL']) ? $fancfg['FANCONTROL'] :'disable';
-$fanpoll = isset($fancfg['FANPOLL'])    ? $fancfg['FANPOLL']    : 1;
+$fanpoll = isset($fancfg['FANPOLL'])    ? $fancfg['FANPOLL']    : 3;
 $fanip = (isset($fancfg['FANIP']) && ($netsvc == 'enable')) ? $fancfg['FANIP'] : '';
 
 /* check if local ipmi driver is loaded */
