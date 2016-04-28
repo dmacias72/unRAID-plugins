@@ -106,7 +106,7 @@ Markdown="false"
 	$log = '/var/log/ipmifan';
 	if(is_file($log)){
 		echo "<tr><td><a id='fanlog-file' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
-		.filesize($log)."</td><td><a id='fanlog-clear'><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
+		.filesize($log)."</td><td><a id='fanlog-clear' href='#'><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
 	}
 ?>
 	</tbody>
@@ -169,9 +169,9 @@ function verifyFANDATA(form) {
 }
 
 function clearFanLOG(){
-		    $.get('/plugins/ipmi/include/fanlog_clear.php', {},function() {
-	    	$('#fanlog-size').html('0');
-	    });
-};
+	$.get('/plugins/ipmi/include/fanlog_clear.php', {},function() {
+		$('#fanlog-size').html('0');
+	});
+}
 
 </script>
