@@ -24,14 +24,13 @@ $disp_fan2  = isset($cfg['DISP_FAN2'])  ? $cfg['DISP_FAN2']  : "";
 /* Get sensor info and check connection */
 $fantemp = [];
 $sensors = [];
-$board = '';
+$board = 'unknown';
 if(($mod == 1) || ($netsvc == 'enable')) {
 	$sensors = ipmi_sensors();
 	$fantemp = ipmi_get_fantemp();
 	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
 }
-$conn = '';
 if($netsvc == 'enable'){
-	$conn = ($sensors) ? "Connection successful" : "Connection failed";
+	$conn = (!empty($sensors)) ? "Connection successful" : "Connection failed";
 }
 ?>
