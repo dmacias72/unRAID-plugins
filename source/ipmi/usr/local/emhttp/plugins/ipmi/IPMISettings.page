@@ -5,7 +5,7 @@ Title="Settings"
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
 
-<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span><span class='status' id='notify-status'>Event Notification: <?=$seld_status;?> </span></div>
+<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span><span class='status' id='board-img' style="margin-top: 50px;margin-left: -200px"><img src="/plugins/ipmi/images/<?=$board;?>.png"></span><span class='status' id='notify-status'>Event Notification: <?=$seld_status;?> </span></div>
 
 <form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -82,6 +82,9 @@ Enable Network Connection(s):
 
 <form markdown="1" name="footer_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
+<blockquote class="inline_help">
+	<p>Display Settings can be applied at any time.</p>
+</blockquote>
 
 Temperature #1:
 : <select name="DISP_TEMP1" class="display">
@@ -89,7 +92,7 @@ Temperature #1:
 		<?=ipmi_get_options('Temperature', $disp_temp1);?>
   </select>
 <blockquote class="inline_help">
-	<p>First temperature sensor to monitor and display in footer of weGui.</p>
+	<p>First temperature sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
 Fan Speed #1:
@@ -98,7 +101,7 @@ Fan Speed #1:
 		<?=ipmi_get_options('Fan', $disp_fan1);?>
 	</select>
 <blockquote class="inline_help">
-	<p>First fan sensor to monitor and display in footer of weGui.</p>
+	<p>First fan sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
 Temperature #2:
@@ -107,7 +110,7 @@ Temperature #2:
 		<?=ipmi_get_options('Temperature', $disp_temp2);?>
 	</select>
 <blockquote class="inline_help">
-	<p>Second temperature sensor to monitor and display in footer of weGui.</p>
+	<p>Second temperature sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
 Fan Speed #2:
@@ -116,7 +119,7 @@ Fan Speed #2:
 		<?=ipmi_get_options('Fan', $disp_fan2);?>
 	</select>
 <blockquote class="inline_help">
-	<p>Second fan sensor to monitor and display in footer of weGui.</p>
+	<p>Second fan sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
 &nbsp;

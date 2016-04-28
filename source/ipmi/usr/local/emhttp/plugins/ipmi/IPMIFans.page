@@ -4,7 +4,7 @@ Markdown="false"
 ---
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
-<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span><span class='status' id='fanctrl-status'>Fan Control: <?=$fanctrl_status;?></span></div>
+<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span><span class='status' id='board-img' style="margin-top: 50px;margin-left: -200px"><img src="/plugins/ipmi/images/<?=$board;?>.png"></span><span class='status' id='fanctrl-status'>Fan Control: <?=$fanctrl_status;?></span></div>
 
 <form name="fanctrl_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
