@@ -125,13 +125,16 @@ Fan Speed #2:
 
 <script>
 $(function(){
+	$('.tabs')
+		.append("<span class='status settings'><label id='bmc-reset' title='go to settings page'><i class='fa fa-refresh'></i> Reset BMC </label></span>");
+
 	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
 		showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');
 	<?endif;?>
 
-	$('#btnTest').click(function () {
-		EventTest();
-	});
+	$('#bmc-rest').on('click', resetBMC);
+	
+	$('#btnTest').on('click', EventTest);
 
 	checkSELD(document.seld_settings);
 	checkNETWORK(document.seld_settings);
@@ -215,4 +218,10 @@ function EventTest() {
 		});
 	});
 }
+
+function resetBMC(){
+	$.get('/plugins/ipmi/include/bmc_reset.php', {},function() {
+	});
+};
+
 </script>
