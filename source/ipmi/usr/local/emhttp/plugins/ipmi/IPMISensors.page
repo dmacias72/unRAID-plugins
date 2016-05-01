@@ -33,7 +33,7 @@ Markdown="false"
 	</blockquote>
 	<dl>
 		<dt><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button><input type="button" class="settings" value="Settings"></dt>
-		<dd><input type="button" id="edit" value="Edit"><button type="button" onClick="done();">Done</button></dd>
+		<dd><input type="button" id="edit" value="Edit" title="edit IPMi sensors configuration"><button type="button" onClick="done();">Done</button></dd>
 	</dl>
 	<blockquote class="inline_help">
 		<p>Reset Filters button resets table filters. Settings button navigates to the IPMI settings page.  Edit button allows you to edit your IPMI thresholds and sensor events configuration.  Done button navigates to the Tools menu. </p>
@@ -47,7 +47,7 @@ Markdown="false"
 <script>
 <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
 $(function() {
-  showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');
+  showNotice('IPMI <?=$version?> available. <a>Download</a>','ipmi');
 });
 <?endif;?>
 </script>
