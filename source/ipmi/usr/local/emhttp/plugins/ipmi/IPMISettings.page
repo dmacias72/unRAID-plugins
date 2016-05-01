@@ -5,7 +5,12 @@ Title="Settings"
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 <script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
 
-<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span><span class='status' id='board-img' style="margin-top: 50px;margin-left: -200px"><img src="/plugins/ipmi/images/<?=$board;?>.png"></span><span class='status' id='notify-status'>Event Notification: <?=$seld_status;?> </span></div>
+<div id="title" style="margin-top: -22px;">
+	<span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span>
+	<span class="status" style="margin-top: 50px;margin-left: -200px;">
+	<img class="board-img" src=""></span>
+	<span class="status" id="notify-status">Event Notification: <?=$seld_status;?> </span>
+</div>
 
 <form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -48,7 +53,7 @@ Enable Network Connection(s):
   <?=mk_option($local, 'enable', 'Yes');?>
   </select>
 <blockquote class="inline_help">
-	<p>Enable monitoring of localhost as well as network servers. Useful for monitoring a backup server or two.</p>
+	<p>Enable monitoring of localhost as well as network servers. Useful when monitoring local server as well as a backup server or two.</p>
 </blockquote>
 
 <label class="seld-run ipmi-lan">IPMI IP Address(es):</label>
@@ -86,40 +91,40 @@ Enable Network Connection(s):
 	<p>Display Settings can be applied at any time.</p>
 </blockquote>
 
-Temperature #1:
-: <select name="DISP_TEMP1" class="display">
+Sensor #1:
+: <select name="DISP_SENSOR1" class="display">
 		<option value='false'>None</option>
-		<?=ipmi_get_options('Temperature', $disp_temp1);?>
+		<?=ipmi_get_options($disp_sensor1);?>
   </select>
 <blockquote class="inline_help">
-	<p>First temperature sensor to monitor and display in footer of webGui.</p>
+	<p>First sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
-Fan Speed #1:
-: <select name="DISP_FAN1" class="display">
+Sensor #2:
+: <select name="DISP_SENSOR2" class="display">
 		<option value='false'>None</option>
-		<?=ipmi_get_options('Fan', $disp_fan1);?>
+		<?=ipmi_get_options($disp_sensor2);?>
 	</select>
 <blockquote class="inline_help">
-	<p>First fan sensor to monitor and display in footer of webGui.</p>
+	<p>Second sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
-Temperature #2:
-: <select name="DISP_TEMP2" class="display">
+Sensor #3:
+: <select name="DISP_SENSOR3" class="display">
 		<option value='false'>None</option>	
-		<?=ipmi_get_options('Temperature', $disp_temp2);?>
+		<?=ipmi_get_options($disp_sensor3);?>
 	</select>
 <blockquote class="inline_help">
-	<p>Second temperature sensor to monitor and display in footer of webGui.</p>
+	<p>Third sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
-Fan Speed #2:
-: <select name="DISP_FAN2" class="display">
+Sensor #4:
+: <select name="DISP_SENSOR4" class="display">
 		<option value='false'>None</option>
-		<?=ipmi_get_options('Fan', $disp_fan2);?>
+		<?=ipmi_get_options($disp_sensor4);?>
 	</select>
 <blockquote class="inline_help">
-	<p>Second fan sensor to monitor and display in footer of webGui.</p>
+	<p>Forth sensor to monitor and display in footer of webGui.</p>
 </blockquote>
 
 &nbsp;
@@ -134,6 +139,13 @@ $(function(){
 	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
 		showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');
 	<?endif;?>
+
+	// if png is missing, replaced with unknown.png
+	$('.board-img')
+		.error(function() {
+			$('.board-img').attr('src', '/plugins/ipmi/images/unknown.png');
+		})
+		.attr('src', "/plugins/ipmi/images/<?=$board;?>.png");
 
 	$('#bmc-rest').on('click', resetBMC);
 	

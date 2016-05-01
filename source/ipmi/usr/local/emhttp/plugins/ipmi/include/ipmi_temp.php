@@ -5,30 +5,25 @@ function format_ipmi_temp($reading, $unit, $dot) {
   return ($reading>0 ? ($unit=='F' ? round(9/5*$reading+32) : str_replace('.',$dot,$reading)) : '##')."<small>&deg;$unit</small>";
 }
 
-if ($disp_temp1 || $disp_temp2 || $disp_fan1 || $disp_fan2){
-	$readings = ipmi_get_readings();
-	$temps = [];
+$disp_sensors = [$disp_sensor1, $disp_sensor2, $disp_sensor3, $disp_sensor4];
 
-	if ($readings[$disp_temp1])
-		$temps[] = "<img src='/plugins/ipmi/icons/cpu.png' title='".$readings[$disp_temp1]['Name']
-			." (".$readings[$disp_temp1]['ID'].")' class='icon'>"
-			.format_ipmi_temp(floatval($readings[$disp_temp1]['Reading']), $_GET['unit'], $_GET['dot']);
-
-	if ($readings[$disp_fan1])
-		$temps[] = "<img src='/plugins/ipmi/icons/fan.png' title='".$readings[$disp_fan1]['Name']
-			." (".$readings[$disp_fan1]['ID'].")' class='icon'>"
-			.floatval($readings[$disp_fan1]['Reading'])."<small>&thinsp;rpm</small>";
-
-	if ($readings[$disp_temp2])
-		$temps[] = "<img src='/plugins/ipmi/icons/mb.png' title='".$readings[$disp_temp2]['Name']
-			." (".$readings[$disp_temp2]['ID'].")' class='icon'>"
-			.format_ipmi_temp(floatval($readings[$disp_temp2]['Reading']), $_GET['unit'], $_GET['dot']);
-
-	if ($readings[$disp_fan2])
-		$temps[] = "<img src='/plugins/ipmi/icons/fan.png' title='".$readings[$disp_fan2]['Name']
-			." (".$readings[$disp_fan2]['ID'].")' class='icon'>"
-			.floatval($readings[$disp_fan2]['Reading'])."<small>&thinsp;rpm</small>";
+if (!empty($disp_sensors)){
+	if(($mod) || ($netsvc == 'enable'))
+		$readings = ipmi_get_readings();
+	$displays = [];
+	foreach($disp_sensors as $disp_sensor){
+		if ($readings[$disp_sensor]){
+			$disp_name    = $readings[$disp_sensor]['Name'];
+			$disp_id      = $readings[$disp_sensor]['ID'];
+			$disp_reading = $readings[$disp_sensor]['Reading'];
+			$displays[]   = ($readings[$disp_sensor]['Type'] == 'Temperature') ? 
+			"<img src='/plugins/ipmi/icons/cpu.png' title='$disp_name ($disp_id)' class='icon'>"
+				.format_ipmi_temp(floatval($disp_reading), $_GET['unit'], $_GET['dot']): 
+			"<img src='/plugins/ipmi/icons/fan.png' title='$disp_name ($disp_id)' class='icon'>"
+				.floatval($disp_reading)."<small>&thinsp;rpm</small>";
+		}
+	}
 }
-if ($temps)
-	echo "<span id='temps' style='margin-right:16px'>".implode('&nbsp;', $temps)."</span>";
+if ($displays)
+	echo "<span id='temps' style='margin-right:16px'>".implode('&nbsp;', $displays)."</span>";
 ?>
