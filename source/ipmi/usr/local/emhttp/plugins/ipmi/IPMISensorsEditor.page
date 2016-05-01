@@ -1,0 +1,6 @@
+Title="IPMI Sensor Config Editor"
+Markdown="false"
+---
+<?
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_sensors_editor.php';
+?>
