@@ -3,9 +3,9 @@
 function ipmi_get_fantemp() {
 	global $fanopts, $hdd_temp;
 	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $fanopts 2>/dev/null";
-	exec($cmd, $output, $return);
+	exec($cmd, $output, $return_var=null);
 
-	if ($return)
+	if ($return_var)
 		return []; // return empty array if error
 
 	// add highest hard drive temp sensor
@@ -31,61 +31,65 @@ function ipmi_get_fantemp() {
 
 /* get all fan options for fan control */
 function get_fanctrl_options(){
-	global $fantemp, $fancfg;
-	$i = 0;
-	foreach($fantemp as $key => $sensor){
-		if ($sensor['Type'] == 'Fan'){
-			$fan_temp = 'FANTEMP'.$i;
-			$fan_sensor = $fantemp[$fancfg[$fan_temp]];
-			$templo = 'TEMPLO'.$i;
-			$temphi = 'TEMPHI'.$i;
-			$fan_min = 'FANMIN'.$i;
+	global $fantemp, $fancfg, $board;
+	if($board == 'ASRock' || $board == 'ASRockRack') {
+		$i = 0;
+		foreach($fantemp as $key => $sensor){
+			if ($sensor['Type'] == 'Fan'){
+				$fan_temp = 'FANTEMP'.$i;
+				$fan_sensor = $fantemp[$fancfg[$fan_temp]];
+				$templo = 'TEMPLO'.$i;
+				$temphi = 'TEMPHI'.$i;
+				$fan_min = 'FANMIN'.$i;
 			
-			// hidden fan id
-			echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
+				// hidden fan id
+				echo '<input type="hidden" name="FAN'.$i.'" value="'.$key.'"/>';
 
-			// fan name: reading = temp name: reading
-			echo '<dl><dt>'.$sensor['Name'].' ('.floatval($sensor['Reading']).' '.$sensor['Units'].'):</dt><dd>';
-			if ($fan_sensor['Name'])
-				echo $fan_sensor['Name'].' ('.floatval($fan_sensor['Reading']).' '.$fan_sensor['Units'].'), '.
-				$fancfg[$templo].', '.$fancfg[$temphi].', '.$fancfg[$fan_min];
-			else
-				echo 'Auto';
-			echo '</dd></dl>';
+				// fan name: reading = temp name: reading
+				echo '<dl><dt>'.$sensor['Name'].' ('.floatval($sensor['Reading']).' '.$sensor['Units'].'):</dt><dd><span class="fanctrl-basic">';
+				if ($fan_sensor['Name'])
+					echo $fan_sensor['Name'].' ('.floatval($fan_sensor['Reading']).' '.$fan_sensor['Units'].'), '.
+					$fancfg[$templo].', '.$fancfg[$temphi].', '.$fancfg[$fan_min];
+				else
+					echo 'Auto';
+				echo '</span><span class="fanctrl-settings">&nbsp;</span></dd></dl>';
 
-			// temperature sensor
-			echo '<dl class="fanctrl">'.
-			'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
-			'<select name="'.$fan_temp.'" class="fanctrl">'.
-			'<option value="0">Auto</option>';
-			echo get_temp_options($fancfg[$fan_temp], true);
-			echo '</select></dd></dl>';
+				// temperature sensor
+				echo '<dl class="fanctrl-settings">'.
+				'<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>'.
+				'<select name="'.$fan_temp.'" class="fanctrl-settings">'.
+				'<option value="0">Auto</option>';
+				echo get_temp_options($fancfg[$fan_temp], true);
+				echo '</select></dd></dl>';
 
-			// low temperature threshold
-			echo '<dl class="fanctrl">'.
-			'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
-			'<dd><select name="'.$templo.'" class="fanctrl">'.
-			'<option value="0">Auto</option>';
-			echo get_temp_range('LO', $fancfg[$templo]);
-			echo '</select></dd></dl>';
+				// low temperature threshold
+				echo '<dl class="fanctrl-settings">'.
+				'<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
+				'<dd><select name="'.$templo.'" class="fanctrl-settings">'.
+				'<option value="0">Auto</option>';
+				echo get_temp_range('LO', $fancfg[$templo]);
+				echo '</select></dd></dl>';
 		
-			// high temperature threshold
-			echo '<dl class="fanctrl">'.
-			'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
-			'<dd><select name="'.$temphi.'" class="fanctrl">'.
-			'<option value="0">Auto</option>';
-			echo	get_temp_range('HI', $fancfg[$temphi]);
-			echo '</select></dd></dl>';
+				// high temperature threshold
+				echo '<dl class="fanctrl-settings">'.
+				'<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
+				'<dd><select name="'.$temphi.'" class="fanctrl-settings">'.
+				'<option value="0">Auto</option>';
+				echo	get_temp_range('HI', $fancfg[$temphi]);
+				echo '</select></dd></dl>';
 
-			echo '<dl class="fanctrl">'.
-			// fan control minimum speed
-			'<dt><dl><dd>Fan speed minimum (1-64):</dd></dl></dt><dd>'.
-			'<select name="'.$fan_min.'" class="fanctrl">';
-			echo get_min_options($fancfg[$fan_min]);
-			echo '</select></dd></dl>&nbsp;';
+				echo '<dl class="fanctrl-settings">'.
+				// fan control minimum speed
+				'<dt><dl><dd>Fan speed minimum (1-64):</dd></dl></dt><dd>'.
+				'<select name="'.$fan_min.'" class="fanctrl-settings">';
+				echo get_min_options($fancfg[$fan_min]);
+				echo '</select></dd></dl>&nbsp;';
 
-			$i++;
+				$i++;
+			}
 		}
+	} else {
+		echo '<dl><dt>&nbsp;</dt><dd><p><font class="red">Your board is not currently supported</font></p></dd></dl>';	
 	}
 }	
 
