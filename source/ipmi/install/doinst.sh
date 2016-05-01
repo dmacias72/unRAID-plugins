@@ -8,6 +8,8 @@ SD_RCFILE="/etc/rc.d/rc.local_shutdown"
 chmod +0755 /usr/local/emhttp/plugins/ipmi/scripts/* \
  /usr/sbin/ipmitail \
  /usr/sbin/ipmifan \
+ /usr/sbin/ipmisel \
+ /usr/sbin/ipmisensors \
  $RC_SCRIPT \
  $RC_SCRIPT2 \
  $RC_SCRIPT3

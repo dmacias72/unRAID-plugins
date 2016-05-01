@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CONFIG="/boot/config/plugins/ipmi/ipmi.cfg"
+OPTIONS=""
+
+# read our configuration
+[ -e "$CONFIG" ] && source "$CONFIG"
+
+if [ $NETWORK == "enable" ]; then
+		OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
+fi
+
+/usr/sbin/ipmi-sensors $OPTIONS
