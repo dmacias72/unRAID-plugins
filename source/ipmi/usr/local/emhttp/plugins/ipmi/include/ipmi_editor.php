@@ -7,7 +7,7 @@ $config      = '';
 if(($ipmi_mod == 1) || ($netsvc == 'enable')) {
 	// Only get config if the current one is 1 hour old or more
 	if(!is_file($config_file) || (filesize($config_file) == 0 )) {
-		$cmd = "ipmi-sensors-config --filename=$config_file --checkout $netopts";
+		$cmd = "ipmi-config --filename=$config_file --checkout $netopts";
 		shell_exec($cmd);
 	}
 	$config = file_get_contents($config_file);
@@ -20,12 +20,6 @@ if(($ipmi_mod == 1) || ($netsvc == 'enable')) {
 	.CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
 	.CodeMirror pre.CodeMirror-placeholder { color: #999; }
 </style>
-
-<form id="autoload_form" method="POST" action="/update.php" target="progressFrame">
-	<input type="hidden" id="autoload" name="LOADCFG" value="disable" />
-	<input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
-	<input type="hidden" id="COMMAND" name="#command" value="" />
-</form>
 
 <blockquote class="inline_help">
 	<p>IPMI Config Editor is used to get and set sensor configuration parameters, such as thresholds and sensor events.
@@ -62,27 +56,9 @@ if(($ipmi_mod == 1) || ($netsvc == 'enable')) {
 <script src="/plugins/ipmi/js/CodeMirror/addon/hint/anyword-hint.js"></script>
 <script>
 $(function() {
-	$('.tabs')
-		.append("<span id='adv-switch' class='status' style='margin-top:28px;'><input type='checkbox' id='autoload-switch'></span>");
-
 	$('#btnCancel').click(function() {
-		location = '/Tools/IPMITools';
+		location = '/Settings/IPMI';
 	});
-
-	//advanced view switch set cookie and toggle advanced columns
-	$('#autoload-switch').switchButton({
-		labels_placement: 'left',
-		on_label: 'Load Config @ unRAID Start',
-		off_label: 'Load Config @ unRAID Start',
-		checked: ($.cookie('ipmi_config') == 'yes')
-	})
-	.change(function () {
-		$.cookie('ipmi_config', $('#autoload-switch')[0].checked ? 'yes' : 'no', { expires: 3650 });
-		setAutoLoad();
-		$.post('/update.php', $('#autoload_form').serializeArray());
-	});
-
-	setAutoLoad();
 
 	var editor = CodeMirror.fromTextArea(document.getElementById("editcfg"), {
 		mode: "properties",
@@ -102,11 +78,11 @@ $(function() {
 	$('#btnSubmit').click(function () {
 		editor.save();
 		$.post('/plugins/ipmi/include/ipmi_config.php', $('#cfgform').serializeArray(),function (data) {
-			var Title = 'IPMI configuration';
+			var Title = 'IPMI Configuration';
 
 			if(data.success)
 				swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
-					location = '/Tools/IPMITools';
+					location = '/Settings/IPMI';
 				});
 
 			if(data.error)
@@ -118,7 +94,7 @@ $(function() {
 	// revert saved config file to bmc config
 	$('#btnRevert').click(function () {
 		$.post('/plugins/ipmi/include/ipmi_config.php', {ipmicfg:null}, function (data) {
-			var Title = 'IPMI configuration';
+			var Title = 'IPMI Configuration';
 	
 			if(data.success)
 				swal({title:Title,text:'reloaded from bmc',type:'success',closeOnConfirm: true,},function() {
@@ -132,12 +108,4 @@ $(function() {
 	});
 
 });
-
-function setAutoLoad() {
-	if ($.cookie('ipmi_config') == 'yes') {
-		$('#autoload').val('enable');
-	}else{
-		$('#autoload').val('disable');
-	}
-}
 </script>

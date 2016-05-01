@@ -76,8 +76,8 @@ Enable Network Connection(s):
 
 &nbsp;
 
-<input id="DEFAULT" class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'">
-: <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
+<input id="DEFAULT" class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Readings" onClick="javascript:location.href='/Tools/IPMITools'" title="go to readings and events page">
+: <input type="button" id="edit" value="Edit" title="edit IPMI configuration"><input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
 <blockquote class="inline_help">
 	<p>Default button resets form.  Readings button redirects to sensor readings and events on the Tools page</p>
@@ -134,11 +134,15 @@ Sensor #4:
 <script>
 $(function(){
 	$('.tabs')
-		.append("<span class='status settings'><label id='bmc-reset' title='go to settings page'><i class='fa fa-refresh'></i> Reset BMC </label></span>");
+		.append("<span class='status settings'><label id='bmc-reset' title='warm reset bmc'><i class='fa fa-refresh'></i> Reset BMC </label></span>");
 
 	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
 		showNotice('IPMI <?=$version?> is available. <a>Download Now</a>','ipmi');
 	<?endif;?>
+
+	$('#edit').click(function() {
+		location = '/Settings/IPMIEditor';
+	});
 
 	// if png is missing, replaced with unknown.png
 	$('.board-img')

@@ -10,7 +10,7 @@ $(function(){
 	});
 
 	$('#edit').click(function() {
-		location = '/Settings/IPMIConfig';
+		location = '/Settings/IPMISensorsEditor';
 	});
 
 	$("#tab3").click(function () {
