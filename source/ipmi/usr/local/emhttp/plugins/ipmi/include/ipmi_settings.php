@@ -25,7 +25,7 @@ $disp_sensor4 = isset($cfg['DISP_SENSOR4']) ? $cfg['DISP_SENSOR4'] : '';
 $fantemp = [];
 $sensors = [];
 $board = 'unknown';
-if(($mod) || ($netsvc == 'enable')) {
+if($mod || ($netsvc == 'enable')) {
 	$sensors = ipmi_sensors();
 	$fantemp = ipmi_get_fantemp();
 	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
