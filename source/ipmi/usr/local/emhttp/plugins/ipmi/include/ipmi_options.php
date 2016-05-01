@@ -19,9 +19,12 @@ $fanctrl = isset($fancfg['FANCONTROL']) ? $fancfg['FANCONTROL'] :'disable';
 $fanpoll = isset($fancfg['FANPOLL'])    ? $fancfg['FANPOLL']    : 3;
 $fanip = (isset($fancfg['FANIP']) && ($netsvc == 'enable')) ? $fancfg['FANIP'] : '';
 
+/* ipmi sensors config */
+$loadcfg = isset($cfg['LOADCFG']) ? $cfg['LOADCFG'] : 'disable';
+
 /* check if local ipmi driver is loaded */
 if($netsvc == 'disable')
-	$mod = shell_exec("modprobe ipmi_si --first-time 2>&1 | grep -q 'Module already in kernel' && echo 1 || echo 0 2> /dev/null");
+	$mod = (trim(shell_exec("modprobe ipmi_si --first-time 2>&1 | grep -q 'Module already in kernel' && echo 1 || echo 0 2> /dev/null")) == 1);
 
 /* options for network access */
 $netopts = ($netsvc == 'enable') ? "--always-prefix -h $ipaddr -u $user -p ".
