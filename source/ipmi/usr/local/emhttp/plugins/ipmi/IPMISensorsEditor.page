@@ -1,6 +1,56 @@
-Title="IPMI Sensor Config Editor"
+Menu="IPMITools:4"
+Title="Sensors Config"
 Markdown="false"
 ---
 <?
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_sensors_editor.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+
+$config_file = "$plg_path/ipmi-sensors.config";
+$ipmi_config = '';
+if($mod || ($netsvc == 'enable')) {
+	// Only get config if the current one is 1 hour old or more
+	if(!is_file($config_file) || (filesize($config_file) == 0 )) {
+		$cmd = "ipmi-sensors-config --filename=$config_file --checkout $netopts";
+		shell_exec($cmd);
+	}
+	$ipmi_config = file_get_contents($config_file);
+}
 ?>
+<div id="title" style="margin-top: -22px;">
+	<span class="left"><img class="icon" src="/plugins/ipmi/icons/configeditor.png"> IPMI Sensors Configuration Editor</span>
+	<span id="load-switch" class="status"><input type="checkbox" id="autoload-switch"></span>
+</div>
+
+<form id="autoload_form" method="POST" action="/update.php" target="progressFrame">
+	<input type="hidden" id="autoload" name="LOADCFG" value="disable" />
+	<input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
+	<input type="hidden" id="COMMAND" name="#command" value="" />
+</form>
+
+<blockquote class="inline_help">
+	<p>IPMI Config Editor is used to get and set sensor configuration parameters, such as thresholds and sensor events.
+	This configuration tool is for advanced IPMI users and generally not-required for IPMI to function.  
+	Since many fields involve decimal numbers, precision/floating point inaccuracies may occur when configuring new thresholds. 
+	The inaccuracies may not be apparent immediately.  It is recommend to verify their changes after configuring new thresholds. 
+	Some sensor configuration may be stored in volatile memory, so you may wish to veryify that new configurations exist after system reboots.  
+	If sensor configuration does not survive then check Load Config @ unRAID Start to load config when system reboots.</p>
+</blockquote>
+
+<form id="cfgform" method="POST">
+
+<textarea id="editcfg" name="ipmicfg" placeholder="Copy &amp; Paste IPMI Configuration Here." autofocus><?= htmlspecialchars($ipmi_config); ?></textarea>
+<input type="hidden" name="commit" value="1" />
+<input type="hidden" name="sensors" value="1" />
+<dl>
+	<dt><input type="button" value="Revert" id="btnRevert" /></dt>
+	<dd><input type="button" value="Save" id="btnSubmit" />
+	<input type="button" value="Cancel" id="btnCancel" />
+	<span><i class="fa fa-warning icon warning"></i>If edits do not survive reboot toggle Load Config Switch to load configuration at system boot</span>
+	</dd>
+</form>
+</dl>
+
+<blockquote class="inline_help">
+	<p>The Revert button resets the stored IPMI config file to the config loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.  
+	</p>
+</blockquote>

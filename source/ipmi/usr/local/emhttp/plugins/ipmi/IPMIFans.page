@@ -2,8 +2,6 @@ Menu="IPMI:2"
 Title="Fan Control"
 Markdown="false"
 ---
-<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
-
 <div id="title" style="margin-top: -22px;">
 	<span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span>
 	<span class="status" style="margin-top: 50px;margin-left: -200px;">
@@ -116,8 +114,6 @@ Markdown="false"
 ?>
 	</tbody>
 </table>
-
-<script src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script>
 $(function(){

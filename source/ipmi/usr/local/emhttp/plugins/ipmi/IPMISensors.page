@@ -6,8 +6,15 @@ Markdown="false"
 <link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
 <link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
+<link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/lib/codemirror.css">
+<link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.css">
+<style type="text/css">
+	.CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
+	.CodeMirror pre.CodeMirror-placeholder { color: #999; }
+</style>
 
 <div>
+	<span id="adv-switch" class="status"><input type='checkbox' id='advancedview'></span>
 	<table class="tablesorter hover-highlight sensors" id="tblSensor">
 		<thead>
 			<tr>
@@ -33,13 +40,18 @@ Markdown="false"
 	</blockquote>
 	<dl>
 		<dt><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button><input type="button" class="settings" value="Settings"></dt>
-		<dd><input type="button" id="edit" value="Edit" title="edit IPMi sensors configuration"><button type="button" onClick="done();">Done</button></dd>
+		<dd><button type="button" onClick="done();">Done</button></dd>
 	</dl>
 	<blockquote class="inline_help">
 		<p>Reset Filters button resets table filters. Settings button navigates to the IPMI settings page.  Edit button allows you to edit your IPMI thresholds and sensor events configuration.  Done button navigates to the Tools menu. </p>
 	</blockquote>
 </div>
 
+<script src="/plugins/ipmi/js/CodeMirror/lib/codemirror.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/display/placeholder.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/mode/properties/properties.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/hint/anyword-hint.js"></script>
 <script src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
 <script src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
 <script src="/webGui/javascript/jquery.switchbutton.js"></script>
