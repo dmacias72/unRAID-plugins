@@ -4,7 +4,12 @@ Markdown="false"
 ---
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
-<div id="title" style="margin-top: -22px;"><span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span><span class='status' id='board-img' style="margin-top: 50px;margin-left: -200px"><img src="/plugins/ipmi/images/<?=$board;?>.png"></span><span class='status' id='fanctrl-status'>Fan Control: <?=$fanctrl_status;?></span></div>
+<div id="title" style="margin-top: -22px;">
+	<span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span>
+	<span class="status" style="margin-top: 50px;margin-left: -200px;">
+	<img class="board-img" src=""></span>
+	<span class="status" id="fanctrl-status">Fan Control: <?=$fanctrl_status;?></span>
+</div>
 
 <form name="fanctrl_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
@@ -13,7 +18,7 @@ Markdown="false"
 <dl>
 	<dt>Fan Control:</dt>
 	<dd> 
-		<select name="FANCONTROL" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
+		<select name="FANCONTROL" class="fanctrl-run" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
 		<?=mk_option($fanctrl, 'disable', 'No')?>
 		<?=mk_option($fanctrl, 'enable', 'Yes')?>
 		</select>
@@ -25,7 +30,7 @@ Markdown="false"
 <dl>
 	<dt>Temperature Polling Time:</dt>
 	<dd>
-		<select id="FANPOLL" class=" fanctrl-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
+		<select id="FANPOLL" class="fanctrl fanctrl-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
 		<?=mk_option($fanpoll, '1', '1 min');?>
 		<?=mk_option($fanpoll, '2', '2 min');?>
 		<?=mk_option($fanpoll, '3', '3 min');?>
@@ -48,7 +53,7 @@ Markdown="false"
 <dl>
 	<dt>Fan Control IP Address:</dt> 
 	<dd>
-		<select id="FANIP" class=" fanctrl-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
+		<select id="FANIP" class="fanctrl fanctrl-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
 		<?get_fanip_options();?>
 	</select>
 	</dd>
@@ -62,7 +67,7 @@ Markdown="false"
 &nbsp;
 
 <dl>
-	<dt><input id="FAN_DEFAULT" class="fanctrl-run" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
+	<dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
 	<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
@@ -116,6 +121,10 @@ Markdown="false"
 
 <script>
 $(function(){
+	// check if board supports ipmi
+	if("<?=$board_status;?>" == true)
+		$('.fanctrl').prop('disabled', true);
+
 	//advanced view switch set cookie and toggle advanced columns
 	$('#advancedview').switchButton({
 		labels_placement: 'left',
@@ -124,9 +133,12 @@ $(function(){
 		checked: ($.cookie('fanctrl_mode') == 'advanced')
 	})
 	.change(function () {
-		$('.fanctrl').toggle('slow');
+		//$('.fanctrl-settings').toggle('slow');
 		$.cookie('fanctrl_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
+		toggleFanCTRL();
 	});
+
+	toggleFanCTRL();
 
 	$('#fanlog-clear').on('click', clearFanLOG);
 
@@ -135,11 +147,11 @@ $(function(){
 		location ='/Tools/IPMITools';
 	});
 
-	if ($.cookie('fanctrl_mode') == 'advanced') {
-		$('.fanctrl').show();
-	}
-
 	checkFANCTRL(document.fanctrl_settings);
+
+	// check if board supports ipmi
+	if("<?=$board_status;?>" == true)
+		$('.fanctrl').prop('disabled', true);
 
 });
 
@@ -174,4 +186,13 @@ function clearFanLOG(){
 	});
 }
 
+function toggleFanCTRL() {
+	if ($.cookie('fanctrl_mode') == 'advanced') {
+		$('.fanctrl-settings').show('slow');
+		$('.fanctrl-basic').hide('slow');
+	}else{
+		$('.fanctrl-basic').show('slow');
+		$('.fanctrl-settings').hide('slow');
+	}
+}
 </script>
