@@ -1,44 +1,9 @@
 $(function(){
-	$('.tabs')
-		.append("<span class='status settings'><label id='settings' title='go to settings page'><i class='fa fa-gear'></i>Settings</label></span>")
-		.append("<span id='adv-switch' class='status'><input type='checkbox' id='advancedview'></span>")
-		.append("<span id='arch-switch' class='status'><input type='checkbox' id='event-arch'></span>");
-
 	$('.settings').click(function() {
 		$.cookie('one', 'tab1', { expires:null, path: '/'});
 		location = '/Settings/IPMI';
 	});
 
-	$('#edit').click(function() {
-		location = '/Settings/IPMISensorsEditor';
-	});
-
-	$("#tab3").click(function () {
-		$('#adv-switch').hide();
-		$('#arch-switch').show();
-	});
-	$("#tab2").click(function () {
-		$('#adv-switch').hide();
-		$('#arch-switch').show();
-	});
-	$("#tab1").click(function () {
-		$('#adv-switch').show();
-		$('#arch-switch').hide();
-	});
-
-	if ($("#tab3")[0].checked){
-		$('#adv-switch').hide();
-		$('#arch-switch').show();
-	}
-	if ($("#tab2")[0].checked){
-		$('#adv-switch').hide();
-		$('#arch-switch').show();
-	}
-	if($("#tab1")[0].checked){
-		$('#adv-switch').show();
-		$('#arch-switch').hide();
-	}
-	
 	//advanced view switch set cookie and toggle advanced columns
 	$('#advancedview').switchButton({
 		labels_placement: 'left',
@@ -67,6 +32,50 @@ $(function(){
 		$("#tab3").parent().show();
 	else
 		$("#tab3").parent().hide();
+
+	/* editor for ipmi sensors configuration */
+	var editor = CodeMirror.fromTextArea(document.getElementById("editcfg"), {
+		mode: "properties",
+		lineNumbers: true,
+		gutters: ["CodeMirror-linenumbers"],
+		extraKeys: {
+			"Ctrl-Space": "autocomplete"
+		},
+		hintOptions: {}
+	});
+
+	$('#tab4').click(function () {
+		editor.refresh();
+	});
+
+	//advanced view switch set cookie and toggle advanced columns
+	$('#autoload-switch').switchButton({
+		labels_placement: 'left',
+		on_label: 'Load Config @ unRAID Start',
+		off_label: 'Load Config @ unRAID Start',
+		checked: ($.cookie('ipmi_config') == 'yes')
+	})
+	.change(function () {
+		$.cookie('ipmi_config', $('#autoload-switch')[0].checked ? 'yes' : 'no', { expires: 3650 });
+		setAutoLoad();
+		$.post('/update.php', $('#autoload_form').serializeArray());
+	});
+
+	setAutoLoad();
+
+	// save config and commit to bmc
+	$('#btnSubmit').click(function () {
+		editor.save();
+		commitConfig();
+	});
+
+	// revert saved config file to bmc config
+	$('#btnRevert').on('click',reloadConfig);
+
+	$('#btnCancel').click(function() {
+		$.cookie('one', 'tab1', { expires:null, path: '/'});
+		location = '/Tools/IPMITools';
+	});
 
 	$('#tblSensor').tablesorter({
 		sortList: [[2,0]],
@@ -420,5 +429,44 @@ function ArchiveDelete(ID) {
 					$('#tblArchive').trigger('update');
 				});
 		});
+	}
+}
+
+/* IPMI Sensors Configuration functions */
+function commitConfig() {
+	$.post('/plugins/ipmi/include/ipmi_config.php', $('#cfgform').serializeArray(),function (data) {
+		var Title = 'IPMI Sensors Configuration';
+
+		if(data.success)
+			swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
+				location = '/Tools/IPMITools';
+			});
+
+		if(data.error)
+			swal({title:Title,text:data.error,type:'error'});
+
+	}, 'json');
+}
+
+function reloadConfig() {
+	$.post('/plugins/ipmi/include/ipmi_config.php', {ipmicfg:null, sensors:1}, function (data) {
+		var Title = 'IPMI Sensors Configuration';
+	
+		if(data.success)
+			swal({title:Title,text:'reloaded from bmc',type:'success',closeOnConfirm: true,},function() {
+				location.reload(true);
+			});
+
+		if(data.error)
+			swal({title:Title,text:data.error,type:'error'});
+
+	}, 'json');
+}
+
+function setAutoLoad() {
+	if ($.cookie('ipmi_config') == 'yes') {
+		$('#autoload').val('enable');
+	}else{
+		$('#autoload').val('disable');
 	}
 }

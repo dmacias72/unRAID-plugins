@@ -7,8 +7,13 @@ table.tablesorter{
 	font-weight: bold;
 }
 
-#settings, #bmc-reset {
+#settings, {
 	cursor: pointer;
+}
+
+#adv-switch, #arch-switch,
+#load-switch {
+	margin-top:-26px;
 }
 
 .advanced, .network,
