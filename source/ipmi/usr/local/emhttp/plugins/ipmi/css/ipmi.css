@@ -7,12 +7,12 @@ table.tablesorter{
 	font-weight: bold;
 }
 
-#settings {
+#settings, #bmc-reset {
 	cursor: pointer;
 }
 
 .advanced, .network,
-.fanctrl, #btnTest {
+.fanctrl-settings, #btnTest {
 		display: none;
 }
 
