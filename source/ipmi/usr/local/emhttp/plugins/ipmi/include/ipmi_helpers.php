@@ -1,11 +1,6 @@
 <?
-//ipmi-sensors-config --filename=ipmi.config --checkout
-//ipmi-sensors-config --filename=ipmi.config --commit
-
-/* get ipmi config and network options */
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/fan_helpers.php';
-
 
 /* get highest temp of hard drives */
 function get_highest_temp(){
@@ -25,13 +20,16 @@ $hdd_temp = get_highest_temp();
 function ipmi_sensors() {
 	global $netopts, $hdd_temp;
 	$cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts 2>/dev/null"; // --non-abbreviated-units 
-	exec($cmd, $output, $return);
+	exec($cmd, $output, $return_var=null);
 
-	if ($return)
+	if ($return_var)
 		return []; // return empty array if error
 
 	// add highest hard drive temp sensor
-	$output[] = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
+	$hdd = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
+	if(!empty($netopts))
+		$hdd = '127.0.0.1:'.$hdd;
+	$output[] = $hdd; 
 
 	// key names for ipmi sensors output
 	$keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
@@ -44,11 +42,10 @@ function ipmi_sensors() {
 
 		// add sensor keys as keys to ipmi sensor output
 		$sensor = ($size_raw < 13) ? []: array_combine($keys, array_slice($sensor_raw,0,13,true));
-		  /*array_combine(array_slice($keys,0,$size_raw,true), $sensor_raw)*/
 
-		if (empty($netopts)){
+		if(empty($netopts))
 			$sensors[$sensor['ID']] = $sensor;
-		}else{
+		else{
 
 			//split id into host and id
 			$id = explode(':',$sensor['ID']);
@@ -72,9 +69,9 @@ function ipmi_events($archive=null){
 		$output = is_file($filename) ? file($filename, FILE_IGNORE_NEW_LINES) : [] ;
 	} else {
 		$cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $netopts 2>/dev/null";
-		exec($cmd, $output, $return); 
+		exec($cmd, $output, $return_var=null); 
 	}
-	if ($return)
+	if ($return_var)
 		return []; // return empty array if error
 
 	// key names for ipmi event output
@@ -127,17 +124,20 @@ function ipmi_events($archive=null){
 /* get reading for a given sensor by name */
 function ipmi_get_readings() {
 	global $netopts, $hdd_temp;
-	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --no-sensor-type-output --interpret-oem-data $netopts 2>/dev/null";
-	exec($cmd, $output, $return);
+	$cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $netopts 2>/dev/null";
+	exec($cmd, $output, $return_var=null);
 
-	if ($return)
+	if($return_var)
 		return []; // return empty array if error
 
 	// add highest hard drive temp sensor
-	$output[] = "99,HDD Temperature,$hdd_temp,C,Ok";
+	$hdd = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
+	if(!empty($netopts))
+		$hdd = '127.0.0.1:'.$hdd; 
+	$output[] = $hdd;
 
 	// key names for ipmi sensors output
-	$keys = ['ID', 'Name', 'Reading', 'Units', 'Event'];
+	$keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
 	$sensors = [];
 
 	foreach($output as $line){
@@ -145,7 +145,7 @@ function ipmi_get_readings() {
 		// add sensor keys as keys to ipmi sensor output
 		$sensor_raw = explode(",", $line);
 		$size_raw = sizeof($sensor_raw);
-		$sensor = ($size_raw < 5) ? []: array_combine($keys, array_slice($sensor_raw,0,5,true));
+		$sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
 
 		if (empty($netopts)){
 			$sensors[$sensor['ID']] = $sensor;
@@ -165,11 +165,11 @@ function ipmi_get_readings() {
 }
 
 /* get select options for a given sensor type */
-function ipmi_get_options($type, $selected=null){
+function ipmi_get_options($selected=null){
 	global $sensors;
 	$options = "";
 	foreach($sensors as $id => $sensor){
-		if ($sensor['Type'] == $type){
+		if (($sensor['Type'] == 'Temperature') || ($sensor['Type'] == 'Fan')){
 			$name = $sensor['Name'];
 			$ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
 			$options .= "<option value='$id'";
@@ -200,5 +200,20 @@ function get_temp_range($range, $selected=null){
 		$options .= ">$temp</option>";
  	}
  	return $options;
+}
+
+// get a json array of the contents of gihub repo
+function get_content_from_github($repo, $file) {
+	$ch = curl_init();
+	$ch_vers = curl_version();
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json', 'Content-Type: application/json']);
+	curl_setopt($ch, CURLOPT_USERAGENT, 'curl/'.$ch_vers['version']);
+	curl_setopt($ch, CURLOPT_URL, $repo);
+	$content = curl_exec($ch);
+	curl_close($ch);
+	if (!empty($content) && (!is_file($file) || $content != file_get_contents($file)))
+		file_put_contents($file, $content);
 }
 ?>
