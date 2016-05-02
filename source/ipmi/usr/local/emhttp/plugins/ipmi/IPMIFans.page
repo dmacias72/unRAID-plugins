@@ -16,7 +16,7 @@ Markdown="false"
 <dl>
 	<dt>Fan Control:</dt>
 	<dd> 
-		<select name="FANCONTROL" class="fanctrl-run" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
+		<select name="FANCONTROL" class="fanctrl" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
 		<?=mk_option($fanctrl, 'disable', 'No')?>
 		<?=mk_option($fanctrl, 'enable', 'Yes')?>
 		</select>
@@ -118,7 +118,7 @@ Markdown="false"
 <script>
 $(function(){
 	// check if board supports ipmi
-	if("<?=$board_status;?>" == true)
+	if("<?=$board_status;?>" == false)
 		$('.fanctrl').prop('disabled', true);
 
 	//advanced view switch set cookie and toggle advanced columns
@@ -144,10 +144,6 @@ $(function(){
 	});
 
 	checkFANCTRL(document.fanctrl_settings);
-
-	// check if board supports ipmi
-	if("<?=$board_status;?>" == true)
-		$('.fanctrl').prop('disabled', true);
 
 });
 
