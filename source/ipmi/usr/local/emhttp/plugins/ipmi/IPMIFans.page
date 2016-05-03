@@ -65,7 +65,7 @@ Markdown="false"
 &nbsp;
 
 <dl>
-	<dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"><input type="button" value="Readings" id="readings"></dt>
+	<dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
 	<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
@@ -130,7 +130,7 @@ $(function(){
 	})
 	.change(function () {
 		//$('.fanctrl-settings').toggle('slow');
-		$.cookie('fanctrl_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
+		$.cookie('fanctrl_view_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
 		toggleFanCTRL();
 	});
 
@@ -179,7 +179,7 @@ function clearFanLOG(){
 }
 
 function toggleFanCTRL() {
-	if ($.cookie('fanctrl_mode') == 'advanced') {
+	if ($.cookie('fanctrl_view_mode') == 'advanced') {
 		$('.fanctrl-settings').show('slow');
 		$('.fanctrl-basic').hide('slow');
 	}else{

@@ -40,3 +40,59 @@ if($mod || ($netsvc == 'enable')) {
 	<p>The Revert button resets the stored IPMI configuration file to the existing configuration loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.  
 	</p>
 </blockquote>
+
+<script>
+$(function(){
+	$('#btnCancel').click(function() {
+		$.cookie('one', 'tab1', { expires:null, path: '/'});
+		location = '/Settings/IPMI';
+	});
+
+	var editor = CodeMirror.fromTextArea($('#editcfg')[0], {
+		mode: 'properties',
+		lineNumbers: true,
+		gutters: ['CodeMirror-linenumbers'],
+		extraKeys: {
+			'Ctrl-Space': 'autocomplete'
+		},
+		hintOptions: {}
+	});
+
+	$('#tab3').click(function () {
+		editor.refresh();
+	});
+
+	// save config and commit to bmc
+	$('#btnSubmit').click(function () {
+		editor.save();
+		$.post('/plugins/ipmi/include/ipmi_config.php', $('#cfgform').serializeArray(),function (data) {
+			var Title = 'IPMI Configuration';
+
+			if(data.success)
+				swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
+					location = '/Settings/IPMI';
+				});
+
+			if(data.error)
+				swal({title:Title,text:data.error,type:'error'});
+
+		}, 'json');
+	});
+
+	// revert saved config file to bmc stored config
+	$('#btnRevert').click(function () {
+		$.post('/plugins/ipmi/include/ipmi_config.php', {ipmicfg:null}, function (data) {
+			var Title = 'IPMI Configuration';
+	
+			if(data.success)
+				swal({title:Title,text:'reloaded from bmc',type:'success',closeOnConfirm: true,},function() {
+					location.reload(true);
+				});
+
+			if(data.error)
+				swal({title:Title,text:data.error,type:'error'});
+
+		}, 'json');
+	});
+});
+</script>
