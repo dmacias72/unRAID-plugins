@@ -108,8 +108,8 @@ Markdown="false"
 <?
 	$log = '/var/log/ipmifan';
 	if(is_file($log)){
-		echo "<tr><td><a id='fanlog-file' title='$log' href='#' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
-		.filesize($log)."</td><td><a id='fanlog-clear' href='#'><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
+		echo "<tr><td><a class='fanlog-a' id='fanlog-file' title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
+		.filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
 	}
 ?>
 	</tbody>
@@ -126,7 +126,7 @@ $(function(){
 		labels_placement: 'left',
 		on_label: 'Advanced View',
 		off_label: 'Basic View',
-		checked: ($.cookie('fanctrl_mode') == 'advanced')
+		checked: ($.cookie('fanctrl_view_mode') == 'advanced')
 	})
 	.change(function () {
 		//$('.fanctrl-settings').toggle('slow');
