@@ -70,7 +70,7 @@ div#chart {
 select .tablesorter input.tablesorter-filter,
 .tablesorter select.tablesorter-filter {
 	width: 50%;
-	min-width: 100px;
+	min-width: 90px;
 	max-width: 150px;
 }
 /*table.tablesorter.tbltests th:nth-child(3){width:5%;text-align:left;}
