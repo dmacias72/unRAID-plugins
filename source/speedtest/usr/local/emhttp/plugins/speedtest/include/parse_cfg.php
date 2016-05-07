@@ -12,4 +12,11 @@ if (!is_file($speedtest_filename)) {
 	$xml = new SimpleXMLElement("<tests></tests>");
 	$xml->asXML($speedtest_filename);
 }
+
+// determine the number of tabs for scheduler
+$scheduler_tab = 3;
+if(is_file('/boot/config/plugins/dynamix.schedules.plg'))
+   $scheduler_tab++;
+if(is_file('/boot/config/plugins/dynamix.smart.drivedb.plg'))
+   $scheduler_tab++;
 ?>
