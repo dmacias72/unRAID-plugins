@@ -1,20 +1,16 @@
-Icon="speedtest.png"
-Menu="SystemInformation"
-Title="Speedtest"
-Type="xmenu"
+Menu="SpeedtestTools:1"
+Title="History"
+Markdown="false"
 ---
 <?php
 require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
 ?>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
 <script type="text/javascript">
 //var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
 var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
 </script>
 
-<!-- Google charts -->
-<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
-
-<!-- tablesorter -->
 <link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
 <link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
 <script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.min.js"></script>
@@ -22,19 +18,21 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
 <script type="text/javascript" src="/plugins/tablesorter/js/widgets/widget-chart.min.js"></script>
 <script type="text/javascript" src="/plugins/tablesorter/js/widgets/widget-columnSelector.min.js"></script>
 
-<!-- buttons -->
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
+
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/speedtest.css">
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
+
 <link rel="stylesheet" href="/plugins/speedtest/css/bootstrap.css">
 <link rel="stylesheet" href="/plugins/speedtest/css/bootstrap-<?=$display["theme"];?>.css">
 <script src="/plugins/speedtest/js/bootstrap.min.js"></script>
 
-<!-- switch button -->
-<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
-
-<!-- speedtest -->
-<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/speedtest.css">
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest.js"></script>
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
+<blockquote class="inline_help">
+	<p>Speedtest results page shows a history of tests in a table that can be sorted and filtered.</p>
+	<p>You can toggle between showing Speedtest image and charts by the Charts on switch in the upper right corner.</p>
+</blockquote>
 
 <div id="wait"></div>
 <div id="chart-container">
@@ -42,7 +40,7 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
     <p></p>
     <div id="chartbar">
 	&nbsp;
-	<!-- row selector -->
+
 	<span class="wrapper">
 		<div class="btn-group chart-filter-all" data-toggle="buttons">
 			<label id="filter" class="btn btn-default btn-sm" title="Chart filtered rows">
@@ -62,17 +60,25 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
       <i id="line" class="fa fa-lg fa-line-chart clickable" title="Line Graph"></i>
   	   <i id="area" class="fa fa-area-chart clickable" title="Area Graph"></i>
      	<i id="vbar" class="fa fa-bar-chart clickable" title="Vertical Bar Chart"></i>
-      <!--<i id="vstack" class="fa fa-tasks fa-rotate-90 clickable" title="Stacking Vertical Bar Chart"></i>-->
   	   <i id="hbar" class="fa fa-align-left clickable" title="Horizontal Bar Chart"></i>
-     	<!--<i id="hstack" class="fa fa-tasks fa-rotate-180 clickable" title="Stacking Horizontal Bar Chart"></i>-->
 	</div>
+	<blockquote class="inline_help">
+		<p>Charts can be modified by using the chart buttons: The Filtered button displays only filtered data from the table, The Visible button displays only the visible data in the table and the All button will show every bit of data from the table.</p>
+		<p>The Begin Test will start a Speedtest and display the results in the table when done.</p>
+		<p>You can also pick the type of chart to display (in order from left to right): Scatter, Line, Area, Vertical Bar and Horizontal Bar.</p>
+		<p>All selections will be saved using browser cookies.</p>
+	</blockquote>
 	<p></p>
 </div>
+
 <div id="shareImage">
 	<img id="image" src="/plugins/speedtest/images/blank.png"/>
 	<div id="begin">
 		<label class="btnBegin btn btn-default btn-sm active"> Begin Test </label>
 	</div>
+	<blockquote class="inline_help">
+		<p>Speedtest image will be shown if selected on the settings page.  Press Begin Test to start a Speedtest.  Results will be displayed in the tabel on completion.</p>
+	</blockquote>
 </div>
 
 <div>
@@ -98,7 +104,7 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
   <form>
     <a class="first"><i class="fa fa-step-backward"></i></a>
     <a class="prev"><i class="fa fa-backward"></i></a>
-    <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+    <span class="pagedisplay"></span>
     <a class="next"><i class="fa fa-forward"></i></a>
     <a class="last"><i class="fa fa-step-forward"></i></a>
     <select class="pagesize">
@@ -111,5 +117,33 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
     &nbsp;
     <a  title="reset filters" class="reset"><i class="fa fa-undo"></i></a>
   </form>
+  <blockquote class="inline_help">
+		<p>Table Page Buttons: First, page of rows display, Previous, Next, Last. number of rows to display per page and reset table filters.   </p>
+	</blockquote>
 </div>
+
 <br>
+
+<script>
+$(function(){
+	// dynamix plugin update api
+	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('speedtest')):?>
+		showNotice('Speedtest <?=$version?> available. <a>Download</a>','speedtest');
+	<?endif;?>
+
+	// hide dummy tab
+	$('#tab2').parent().hide();
+
+	// goto speedtest settings page
+	$('#tab3').click(function() {
+		$.cookie('one', 'tab1', { expires:null, path: '/'});
+		location = '/Settings/SpeedtestSettingsTabs';
+	});
+
+	// goto speedtest scheduler page
+	$('#tab4').click(function() {
+		$.cookie('one', "<?='tab'.$scheduler_tab?>", { expires:null, path: '/'});
+		location = '/Settings/Scheduler';
+	});
+});
+</script>

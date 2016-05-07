@@ -1,0 +1,6 @@
+Menu="SystemInformation"
+Icon="speedtest.png"
+Title="Speedtest"
+Type="xmenu"
+Tabs="true"
+---
