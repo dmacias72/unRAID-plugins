@@ -1,6 +1,5 @@
 Menu="Scheduler"
 Title="Speedtest"
-
 ---
 <?PHP
 /* Copyright 2015, Bergware International.
@@ -11,6 +10,8 @@ Title="Speedtest"
  *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
+ *
+ * Modified for Speedtest by dmacias, 2016
  */
 ?>
 
@@ -24,6 +25,7 @@ $days = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Satur
 $(function() {
   presetSpeedtest(document.speedtest_schedule);
 });
+
 function presetSpeedtest(form) {
   var mode = form.mode.value;
   form.min.disabled = mode==0;
@@ -35,6 +37,7 @@ function presetSpeedtest(form) {
   form.dotm.value = form.dotm.disabled ? '*' : (form.dotm.value=='*' ? 1 : form.dotm.value);
   if (mode==1) {$('#hour1').hide(); $('#hour2').show();} else {$('#hour2').hide(); $('#hour1').show();}
 }
+
 function prepareSpeedtest(form) {
   var mode = form.mode.value;
   form.hour.value = mode!=1 ? form.hour1.value : form.hour2.value;
