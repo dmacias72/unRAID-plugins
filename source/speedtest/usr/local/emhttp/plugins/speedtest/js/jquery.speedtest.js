@@ -1,6 +1,8 @@
 $(function(){
-	$('#title')
-		.append("<span class='status'><label id='settings'><i class='fa fa-gear'></i>Settings</label></span>")
+	// append tabs for settings and scheduler and chart switch
+	$('.tabs')
+		.append('<div class="tab"><input type="radio" name="tabs2" id="tab3"><label for="tab3"><img class="icon" src="/plugins/ipmi/icons/settings.png">Settings</label></div>')
+		.append('<div class="tab"><input type="radio" name="tabs2" id="tab4"><label for="tab4"><img class="icon" src="/plugins/speedtest/icons/scheduler.png">Scheduler</label></div>')
 		.append("<span class='status'><input id='chartSelect' class='hidden' type='checkbox'></span>");
 
 	//load table from xml
@@ -16,7 +18,7 @@ $(function(){
 	var DataType = ($.cookie('speedtest_datatype')) ? $.cookie('speedtest_datatype') : 'filter';
 	$('.btn-group label#'+DataType).addClass('active');
 	
-		//chart switch and cookie
+	//chart switch and cookie
 	$('#chartSelect')
 		.switchButton({
 			labels_placement: 'right',
@@ -27,18 +29,16 @@ $(function(){
 		.change(function () {
 			$.cookie('speedtest_charts',$('#chartSelect')[0].checked ? 'enable' : 'disable', { expires: 3650 });
 			if ($('#chartSelect')[0].checked){
+				//$('#tab2').parent().show();
 				$('#tblTests').trigger('chartData');
 				drawChart();
 			}else {
+				//$('#tab2').parent().hide();
 				shareImage($('#tblTests .lastRow').children("td:nth-child(7)").html());
 			}
 			$('#chart-container, #shareImage').slideToggle();
 		});
 	
-	$('#settings').click(function() {
-		location = '/Settings/SpeedtestSettings';
-	});
-
 	$('.btnBegin').click(beginTEST);// bind click to begin test
 
 	/* Initial settings */
