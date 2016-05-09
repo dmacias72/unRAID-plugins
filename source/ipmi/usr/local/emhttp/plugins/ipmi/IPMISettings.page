@@ -1,21 +1,45 @@
 Menu="IPMI:1"
 Title="Settings"
 ---
-<? require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php'; ?>
+<? require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php';
+
+/* get board info and status */
+$fantemp = [];
+$board = 'unknown';
+
+if($mod || ($netsvc == 'enable')) {
+	$fantemp = ipmi_get_fantemp();
+	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
+}
+
+$boards_repo = 'https://raw.githubusercontent.com/dmacias72/unRAID-plugins/master/plugins/boards.json';
+$boards_file = "$plg_path/boards.json";
+
+if (!is_file($boards_file) || (filemtime($boards_file) < (time() - 3600)))
+	get_content_from_github($boards_repo, $boards_file);
+
+$boards = json_decode(file_get_contents($boards_file), true);
+$board_status = array_key_exists($board, $boards);
+
+/* check connection */
+if ($netsvc == 'enable')
+	$conn = (!empty($sensors)) ? "Connection successful" : "Connection failed";
+?>
+
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 <link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/lib/codemirror.css">
 <link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.css">
 <style type="text/css">
-	.CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
-	.CodeMirror pre.CodeMirror-placeholder { color: #999; }
+    .CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
+    .CodeMirror pre.CodeMirror-placeholder { color: #999; }
 </style>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 
 <div id="title" style="margin-top: -22px;">
-	<span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span>
-	<span class="status" style="margin-top: 50px;margin-left: -200px;">
-	<img class="board-img" src=""></span>
-	<span class="status" id="notify-status">Event Notification: <?=$seld_status;?> </span>
+    <span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span>
+    <span class="status" style="margin-top: 50px;margin-left: -200px;">
+    <img class="board-img" src=""></span>
+    <span class="status" id="notify-status">Event Notification: <?=$seld_status;?> </span>
 </div>
 
 <form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
@@ -27,9 +51,10 @@ Enable Event Notifications:
   <?=mk_option($seld, "disable", "No");?>
   <?=mk_option($seld, "enable", "Yes");?>
   </select> &nbsp; <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
-<blockquote class="inline_help">
-	<p>Enable IPMI event notifications. IPMI events will be logged in the system log.  System log is monitored and notification event sent based on severity.</p>
-</blockquote>
+
+> Enable IPMI event notifications. IPMI events will be logged in the system log.
+>
+> System log is monitored and notification event sent based on severity.
 
 Event Polling Time:
 : <select id="IPMIPOLL" class="seld-run" name="IPMIPOLL" size="1" title="Amount of time between ipmi event log checks">
@@ -40,100 +65,92 @@ Event Polling Time:
   <?=mk_option($seldpoll, '300', '5 min');?>
   <?=mk_option($seldpoll, '1800', '30 min');?>
   </select>
-<blockquote class="inline_help">
-	<p>Specify how long between checking IPMI event log and adding events to system log. </p>
-</blockquote>
+
+> Specify how long between checking IPMI event log and adding events to system log.
 
 Enable Network Connection(s):
 : <select id="NETWORK" class="seld-run" name="NETWORK" size="1" onChange="checkNETWORK(this.form);"  title="Enable connection to network based ipmi, not necessary for local onboard ipmi">
   <?=mk_option($netsvc, 'disable', 'No');?>
   <?=mk_option($netsvc, 'enable', 'Yes');?>
   </select>
-<blockquote class="inline_help">
-	<p>Enable monitoring of IPMI sensors and events through the network.</p>
-</blockquote>
+
+> Enable monitoring of IPMI sensors and events through the network.
 
 <label class="seld-run ipmi-lan">Enable Localhost Connection:</label>
 : <select id="LOCAL" class="seld-run ipmi-lan" name="LOCAL" size="1" onChange="checkLOCAL(this.form);" title="Enable localhost connection along with network connections">
   <?=mk_option($local, 'disable', 'No');?>
   <?=mk_option($local, 'enable', 'Yes');?>
   </select>
-<blockquote class="inline_help">
-	<p>Enable monitoring of localhost as well as network servers. Useful when monitoring local server as well as a backup server or two.</p>
-</blockquote>
+
+> Enable monitoring of localhost as well as network servers.
+>
+> Useful when monitoring local server as well as a backup server or two.
 
 <label class="seld-run ipmi-lan">IPMI IP Address(es):</label>
 : <input id="IPADDR" type="text" class="seld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$conn;?></label>
-<blockquote class="inline_help">
-	<p>Add up to four different IPMI IP addresses to monitor sensors and events.</p>
-</blockquote>
+
+> Add up to four different IPMI IP addresses to monitor sensors and events.
 
 <label class="seld-run ipmi-lan">IPMI User Name:</label>
 : <input id="USER" type="text" class="seld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$user;?>" title="username for network access IPMI" placeholder="username for network access" >
-<blockquote class="inline_help">
-	<p>Username for IPMI connections(s).</p>
-</blockquote>
+
+> Username for IPMI connections(s).
 
 <label class="seld-run ipmi-lan">IPMI Password:</label>
 : <input id="PASSWORD" type="password" class="seld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$password;?>" title="password for network access IPMI" placeholder="password for network access" >
-<blockquote class="inline_help">
-	<p>Password for IPMI connection(s).</p>
-</blockquote>
+
+> Password for IPMI connection(s).
 
 &nbsp;
 
 <input id="DEFAULT" class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Reset BMC" id="bmc-reset" title="do a warm reset of the BMC">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
-<blockquote class="inline_help">
-	<p>Default button resets form.  Readings button redirects to sensor readings and events on the Tools page</p>
-</blockquote>
+
+> Default button resets form.
+>
+> Reset BMC button performs a warm reset of the BMC
 
 <div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/mb.png"> Display Settings</span></div>
 
 <form markdown="1" name="footer_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
-<blockquote class="inline_help">
-	<p>Display Settings can be applied at any time.</p>
-</blockquote>
+
+> Display Settings can be applied at any time.
 
 Sensor #1:
 : <select name="DISP_SENSOR1" class="display">
-		<option value='false'>None</option>
-		<?=ipmi_get_options($disp_sensor1);?>
+        <option value='false'>None</option>
+        <?=ipmi_get_options($disp_sensor1);?>
   </select>
-<blockquote class="inline_help">
-	<p>First sensor to monitor and display in footer of webGui.</p>
-</blockquote>
+
+> First sensor to monitor and display in footer of webGui.
 
 Sensor #2:
 : <select name="DISP_SENSOR2" class="display">
-		<option value='false'>None</option>
-		<?=ipmi_get_options($disp_sensor2);?>
-	</select>
-<blockquote class="inline_help">
-	<p>Second sensor to monitor and display in footer of webGui.</p>
-</blockquote>
+        <option value='false'>None</option>
+        <?=ipmi_get_options($disp_sensor2);?>
+    </select>
+
+> Second sensor to monitor and display in footer of webGui.
 
 Sensor #3:
 : <select name="DISP_SENSOR3" class="display">
-		<option value='false'>None</option>	
-		<?=ipmi_get_options($disp_sensor3);?>
-	</select>
-<blockquote class="inline_help">
-	<p>Third sensor to monitor and display in footer of webGui.</p>
-</blockquote>
+        <option value='false'>None</option>
+        <?=ipmi_get_options($disp_sensor3);?>
+    </select>
+
+> Third sensor to monitor and display in footer of webGui.
 
 Sensor #4:
 : <select name="DISP_SENSOR4" class="display">
-		<option value='false'>None</option>
-		<?=ipmi_get_options($disp_sensor4);?>
-	</select>
-<blockquote class="inline_help">
-	<p>Forth sensor to monitor and display in footer of webGui.</p>
-</blockquote>
+        <option value='false'>None</option>
+        <?=ipmi_get_options($disp_sensor4);?>
+    </select>
 
-&nbsp;
+> Forth sensor to monitor and display in footer of webGui.
+
+<input id="DEFAULT" type="button" value="Default" onClick="resetDispDATA(this.form);">
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
@@ -147,67 +164,73 @@ Sensor #4:
 
 <script>
 $(function(){
-	$('.tabs')
-		.append('<div class="tab"><input type="radio" name="tabs2" id="tab4"><label for="tab4"><img class="icon" src="/plugins/ipmi/icons/readings.png">Readings</label></div>');
+    // append readings tab
+    $('.tabs')
+        .append('<div class="tab"><input type="radio" name="tabs2" id="tab4"><label for="tab4"><img class="icon" src="/plugins/ipmi/icons/readings.png">Readings</label></div>');
 
-	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
-		showNotice('IPMI <?=$version?> available. <a>Download</a>','ipmi');
-	<?endif;?>
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
+        showNotice('IPMI <?=$version?> available. <a>Download</a>','ipmi');
+    <?endif;?>
 
-	// if png is missing, replaced with unknown.png
-	$('.board-img')
-		.error(function() {
-			$('.board-img').attr('src', '/plugins/ipmi/images/unknown.png');
-		})
-		.attr('src', "/plugins/ipmi/images/<?=$board;?>.png");
+    // if png is missing, replaced with unknown.png
+    $('.board-img')
+        .error(function() {
+            $('.board-img').attr('src', '/plugins/ipmi/images/unknown.png');
+        })
+        .attr('src', "/plugins/ipmi/images/<?=$board;?>.png");
 
-	$('#bmc-reset').on('click', resetBMC);
-	
-	$('#btnTest').on('click', EventTest);
+    $('#bmc-reset').on('click', resetBMC);
 
-	$('#tab4').click(function() {
-		$.cookie('one', 'tab1', { expires:null, path: '/'});
-		location = '/Settings/IPMITools';
-	});
+    $('#btnTest').on('click', EventTest);
 
-	checkSELD(document.seld_settings);
-	checkNETWORK(document.seld_settings);
-	checkLOCAL(document.seld_settings);
-	decData(document.seld_settings);
+    $('#tab4').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Settings/IPMITools';
+    });
+
+    checkSELD(document.seld_settings);
+    checkNETWORK(document.seld_settings);
+    checkLOCAL(document.seld_settings);
+    decData(document.seld_settings);
 });
 
 function resetDATA(form) {
-	form.IPMIPOLL.selectedIndex = 2;
-	form.NETWORK.selectedIndex = 0;
-	form.LOCAL.selectedIndex = 0;
-	form.IPADDR.value = '';
-	form.USER.value = '';
-	form.PASSWORD.value = '';
-	form.DISP_TEMP1.selectedIndex = 0;
-	form.DISP_TEMP2.selectedIndex = 0;
-	form.DISP_FAN1.selectedIndex = 0;
-	form.DISP_FAN2.selectedIndex = 0;
-	form.submit();
+    form.IPMIPOLL.selectedIndex = 2;
+    form.NETWORK.selectedIndex = 0;
+    form.LOCAL.selectedIndex = 0;
+    form.IPADDR.value = '';
+    form.USER.value = '';
+    form.PASSWORD.value = '';
+    form.submit();
+}
+
+function resetDispDATA(form) {
+    form.DISP_SENSOR1.selectedIndex = 0;
+    form.DISP_SENSOR2.selectedIndex = 0;
+    form.DISP_SENSOR3.selectedIndex = 0;
+    form.DISP_SENSOR4.selectedIndex = 0;
+    form.submit();
 }
 
 function checkSELD(form) {
-	if (form.IPMISELD.selectedIndex < 1 ){
-		form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_stop';
-		$('#btnApply').prop('disabled', false);
-	}else {
-   	form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_start';
+    if (form.IPMISELD.selectedIndex < 1 ){
+        form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_stop';
+        $('#btnApply').prop('disabled', false);
+    }else {
+    form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_start';
    }
 
-	if ("<?=$seld_run;?>" == true)
-	{
-		$('.seld-run').prop('disabled', true);
-		$('#btnApply').disabled = 'disabled';
-		$('#btnTest').show();
+    if ("<?=$seld_run;?>" == true)
+    {
+        $('.seld-run').prop('disabled', true);
+        $('#btnApply').disabled = 'disabled';
+        $('#btnTest').show();
    }else{
-   	$('.seld-run').prop('disabled', false);
-		$('#btnApply').prop('disabled', false);
-		$('#btnTest').hide();
-	}
+    $('.seld-run').prop('disabled', false);
+        $('#btnApply').prop('disabled', false);
+        $('#btnTest').hide();
+    }
 }
 
 function decData(form) {
@@ -215,64 +238,64 @@ function decData(form) {
 }
 
 function checkNETWORK(form) {
-	if (form.NETWORK.selectedIndex < 1 )
-		$('.ipmi-lan').hide();
-	else {
-   	$('.ipmi-lan').show();
-   	$('.ipmi-lan').prop('disabled', (form.IPMISELD.value == 'enable'));
+    if (form.NETWORK.selectedIndex < 1 )
+        $('.ipmi-lan').hide();
+    else {
+    $('.ipmi-lan').show();
+    $('.ipmi-lan').prop('disabled', (form.IPMISELD.value == 'enable'));
    }
 }
 
 function checkLOCAL(form) {
-	if (form.LOCAL.selectedIndex < 1 ){
-		$('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
-	}else{ 
-		$('.ipmi-ipaddr').mask('localhost,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
-	}
+    if (form.LOCAL.selectedIndex < 1 )
+        $('.ipmi-ipaddr').mask('0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+    else
+        $('.ipmi-ipaddr').mask('localhost,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ,0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
 }
 
 function verifyDATA(form) {
-	form.IPMISELD.value = form.IPMISELD.value.replace(/ /g,'_');
-	form.NETWORK.value = form.NETWORK.value.replace(/ /g,'_');
-	form.USER.value = form.USER.value.replace(/ /g,'_');
-	form.PASSWORD.value = btoa(form.PASSWORD.value);
+    form.IPMISELD.value = form.IPMISELD.value.replace(/ /g,'_');
+    form.NETWORK.value = form.NETWORK.value.replace(/ /g,'_');
+    form.USER.value = form.USER.value.replace(/ /g,'_');
+    form.PASSWORD.value = btoa(form.PASSWORD.value);
 }
 
-
+// send random test event
 function EventTest() {
-	$.getJSON('/plugins/ipmi/include/ipmi_event_test.php',
-		function(Message) {
-		swal({
-			title: 'Sample Event Sent:', 
-			text: Message, 
-			type: 'success',
-			showCancelButton: false,
-			closeOnConfirm: true,
-		}, function() {
-		});
-	});
+    $.getJSON('/plugins/ipmi/include/ipmi_event_test.php',
+        function(Message) {
+        swal({
+            title: 'Sample Event Sent:',
+            text: Message,
+            type: 'success',
+            showCancelButton: false,
+            closeOnConfirm: true,
+        }, function() {
+        });
+    });
 }
 
+// do a warm reset of the bmc
 function resetBMC(){
-	swal({
-		title: 'Are you sure?', 
-		text: 'You want to warm reset the BMC!?', 
-		type: 'warning',
-		showCancelButton: true,
-		closeOnConfirm: true,
-	}, function() {
-		$.post('/plugins/ipmi/include/bmc_reset.php', {},function(data) {
+    swal({
+        title: 'Are you sure?',
+        text: 'You want to do a warm reset of the BMC!?',
+        type: 'warning',
+        showCancelButton: true,
+        closeOnConfirm: true,
+    }, function() {
+        $.post('/plugins/ipmi/include/bmc_reset.php', {},function(data) {
 
-			if(data.success)
-				swal({title:Title,text:'warm reset of BMC sucessful',type:'success',closeOnConfirm: true,},function() {
-					location.reload(true);
-				});
+            if(data.success)
+                swal({title:Title,text:'warm reset of BMC sucessful',type:'success',closeOnConfirm: true,},function() {
+                    location.reload(true);
+                });
 
-			if(data.error)
-				swal({title:Title,text:data.error,type:'error'});
+            if(data.error)
+                swal({title:Title,text:data.error,type:'error'});
 
-		}, 'json');
-	});
+        }, 'json');
+    });
 };
 
 </script>
