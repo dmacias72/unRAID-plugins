@@ -4,9 +4,9 @@ $cmd = "bmc-device --warm-reset $netopts";
 exec($cmd, $output, $return_var=null);
 
 if($return_var)
-	$return = ['error' => $output];
+    $return = ['error' => $output];
 else
-	$return = ['success' => true];
+    $return = ['success' => true];
 
 echo json_encode($return);
 ?>
