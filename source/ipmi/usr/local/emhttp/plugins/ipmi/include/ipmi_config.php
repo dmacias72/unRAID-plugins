@@ -15,22 +15,22 @@ EOF;
 
 $shortopts = 'cs';
 $longopts = [
-	'commit',
-	'debug',
-	'sensors',
-	'help',
-	'version'
+    'commit',
+    'debug',
+    'sensors',
+    'help',
+    'version'
 ];
 $args = getopt($shortopts, $longopts);
 
 if (array_key_exists('help', $args)) {
-	echo $usage.PHP_EOL;
-	exit(0);
+    echo $usage.PHP_EOL;
+    exit(0);
 }
 
 if (array_key_exists('version', $args)) {
-	echo 'IPMI Sensors Config: 1.0'.PHP_EOL;
-	exit(0);
+    echo 'IPMI Sensors Config: 1.0'.PHP_EOL;
+    exit(0);
 }
 
 $arg_commit  = (array_key_exists('c', $args) || array_key_exists('commit', $args));
@@ -49,29 +49,29 @@ $config = (array_key_exists('ipmicfg', $_POST)) ? str_replace("\r", '', $_POST['
 $config_old = (is_file($config_file)) ? file_get_contents($config_file) : '';
 
 if(($arg_commit) && (!empty($config_old))){
-	$config = $config_old;
+    $config = $config_old;
 }
 
 if($commit && !empty($config)){
-	// save config file changes
-	file_put_contents($config_file, $config);
-	$cmd .= "--commit $netopts 2>&1";
+    // save config file changes
+    file_put_contents($config_file, $config);
+    $cmd .= "--commit $netopts 2>&1";
 
 }else
-	$cmd .= "--checkout $netopts 2>&1";
+    $cmd .= "--checkout $netopts 2>&1";
 
 exec($cmd, $output, $return_var=null);
 
 if($return_var){
 
-	// revert config file if there's an error with commit
-	if(($commit) && !empty($config_old))
-		file_put_contents($config_file, $config_old);
+    // revert config file if there's an error with commit
+    if(($commit) && !empty($config_old))
+        file_put_contents($config_file, $config_old);
 
-	$return = ['error' => $output];
+    $return = ['error' => $output];
 
 }else
-	$return = ['success' => true];
+    $return = ['success' => true];
 
 echo json_encode($return);
 ?>
