@@ -2,11 +2,14 @@ Menu="IPMI:2"
 Title="Fan Control"
 Markdown="false"
 ---
+<?
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
+?>
 <div id="title" style="margin-top: -22px;">
-	<span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span>
-	<span class="status" style="margin-top: 50px;margin-left: -200px;">
-	<img class="board-img" src=""></span>
-	<span class="status" id="fanctrl-status">Fan Control: <?=$fanctrl_status;?></span>
+    <span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span>
+    <span class="status" style="margin-top: 50px;margin-left: -200px;">
+    <img class="board-img" src=""></span>
+    <span class="status" id="fanctrl-status">Fan Control: <?=$fanctrl_status;?></span>
 </div>
 
 <form name="fanctrl_settings" method="POST" action="/update.php" target="progressFrame">
@@ -14,34 +17,34 @@ Markdown="false"
 <input type="hidden" id="FANCMD" name="#command" value="" />
 
 <dl>
-	<dt>Fan Control:</dt>
-	<dd> 
-		<select name="FANCONTROL" class="fanctrl" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
-		<?=mk_option($fanctrl, 'disable', 'No')?>
-		<?=mk_option($fanctrl, 'enable', 'Yes')?>
-		</select>
-	</dd>
+    <dt>Fan Control:</dt>
+    <dd> 
+        <select name="FANCONTROL" class="fanctrl" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
+        <?=mk_option($fanctrl, 'disable', 'No')?>
+        <?=mk_option($fanctrl, 'enable', 'Yes')?>
+        </select>
+    </dd>
 </dl>
 <blockquote class="inline_help">
-	<p>Enable IPMI Fan Control daemon to run in the background.  It will also automatically start when system starts.</p>
+    <p>Enable IPMI Fan Control daemon to run in the background.  It will also automatically start when system starts.</p>
 </blockquote>
 <dl>
-	<dt>Temperature Polling Time:</dt>
-	<dd>
-		<select id="FANPOLL" class="fanctrl fanctrl-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
-		<?=mk_option($fanpoll, '1', '1 min');?>
-		<?=mk_option($fanpoll, '2', '2 min');?>
-		<?=mk_option($fanpoll, '3', '3 min');?>
-		<?=mk_option($fanpoll, '4', '4 min');?>
-		<?=mk_option($fanpoll, '5', '5 min');?>
-		<?=mk_option($fanpoll, '10', '10 min');?>
-		<?=mk_option($fanpoll, '15', '15 min');?>
-		<?=mk_option($fanpoll, '30', '30 min');?>
-  		</select>
-  	</dd>
+    <dt>Temperature Polling Time:</dt>
+    <dd>
+        <select id="FANPOLL" class="fanctrl fanctrl-run" name="FANPOLL" size="1" title="Amount of time between ipmi temperature checks">
+        <?=mk_option($fanpoll, '1', '1 min');?>
+        <?=mk_option($fanpoll, '2', '2 min');?>
+        <?=mk_option($fanpoll, '3', '3 min');?>
+        <?=mk_option($fanpoll, '4', '4 min');?>
+        <?=mk_option($fanpoll, '5', '5 min');?>
+        <?=mk_option($fanpoll, '10', '10 min');?>
+        <?=mk_option($fanpoll, '15', '15 min');?>
+        <?=mk_option($fanpoll, '30', '30 min');?>
+        </select>
+    </dd>
 </dl>
 <blockquote class="inline_help">
-	<p>Specify how long between checking the temperature sensors and executing fan speed changes.  Default is 3 minutes.</p>
+    <p>Specify how long between checking the temperature sensors and executing fan speed changes.  Default is 3 minutes.</p>
 </blockquote>
 
 <input type="hidden" name="IPMIBOARD" value="<?=$board;?>">
@@ -49,15 +52,15 @@ Markdown="false"
 <?if ($netsvc == 'enable'):?>
 
 <dl>
-	<dt>Fan Control IP Address:</dt> 
-	<dd>
-		<select id="FANIP" class="fanctrl fanctrl-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
-		<?get_fanip_options();?>
-	</select>
-	</dd>
+    <dt>Fan Control IP Address:</dt> 
+    <dd>
+        <select id="FANIP" class="fanctrl fanctrl-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
+        <?get_fanip_options();?>
+    </select>
+    </dd>
 </dl>
 <blockquote class="inline_help">
-	<p>If network connections are enabled, select which ipmi ip address to use for controlling fans.  Only one system can be controlled.</p>
+    <p>If network connections are enabled, select which ipmi ip address to use for controlling fans.  Only one system can be controlled.</p>
 </blockquote>
 
 <?endif;?>
@@ -65,8 +68,8 @@ Markdown="false"
 &nbsp;
 
 <dl>
-	<dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
-	<dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
+    <dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
+    <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 </form>
 
@@ -77,114 +80,133 @@ Markdown="false"
 <form name="fanctrl_options" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 <blockquote class="inline_help">
-	<p>List all fans available for control with current speed and corresponding temperature sensor with its current value.</p>
-	<p>Fan speed minimum (1-64):  Select the lowest value for which a fan can be set. Useful to prevent fan from stopping or going below a certain rpm. A value of 64 is full on.</p>
-	<p>Temperature sensor:  Temperature sensor to monitor when determining fan speed.</p>
-	<p>Low temperature threshold (°C):  Lowest temperature in the linear range to determine fan speed.  Below this temperature the fan will turn off unless minimum is set. </p>
-	<p>High temperature threshold (°C):  Highest temperature in the linear range to determine fan speed. Above this temperature fan with run at full speed.</p>
+    <p>List all fans available for control with current speed and corresponding temperature sensor with its current value.</p>
+    <p>Fan speed minimum (1-64):  Select the lowest value for which a fan can be set. Useful to prevent fan from stopping or going below a certain rpm. A value of 64 is full on.</p>
+    <p>Temperature sensor:  Temperature sensor to monitor when determining fan speed.</p>
+    <p>Low temperature threshold (°C):  Lowest temperature in the linear range to determine fan speed.  Below this temperature the fan will turn off unless minimum is set. </p>
+    <p>High temperature threshold (°C):  Highest temperature in the linear range to determine fan speed. Above this temperature fan with run at full speed.</p>
 </blockquote>
-
+<div id="fanctrl-options">
 <?if (($netsvc == 'disable') || (($netsvc == 'enable') && ($fanip != 'None')) ):?>
-	<?get_fanctrl_options();?>
+    <?get_fanctrl_options();?>
 <?endif;?>
-
+</div>
 &nbsp;
 
 <dl>
-	<dt>&nbsp;</dt>
-	<dd><input type="submit" value="Apply" onClick="verifyFANOPT(this.form)"><input type="button" value="Done" onClick="done()"></dd>
+    <dt>&nbsp;</dt>
+    <dd><input type="submit" value="Apply" onClick="verifyFANOPT(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 
 </form>
 
 <div id="title" ><span class="left"><img class="icon" src="/plugins/ipmi/icons/fan.png"> Fan Control Log </span></div>
 <table class="tablesorter fanlog" style="margin-top: -22px;">
-	<thead>
-		<th>Logfile</th>
-		<th>Size</th>
-		<th>Clear</th>
-	</thead>
-	<tbody>
+    <thead>
+        <th>Logfile</th>
+        <th>Size</th>
+        <th>Clear</th>
+    </thead>
+    <tbody>
 <?
-	$log = '/var/log/ipmifan';
-	if(is_file($log)){
-		echo "<tr><td><a class='fanlog-a' id='fanlog-file' title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
-		.filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
-	}
+    $log = '/var/log/ipmifan';
+    if(is_file($log)){
+        echo "<tr><td><a class='fanlog-a' id='fanlog-file' title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
+        .filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
+    }
 ?>
-	</tbody>
+    </tbody>
 </table>
 
 <script>
 $(function(){
-	// check if board supports ipmi
-	if("<?=$board_status;?>" == false)
-		$('.fanctrl').prop('disabled', true);
+    // check if board supports ipmi
+    if("<?=$board_status;?>" == false)
+        $('.fanctrl').prop('disabled', true);
 
-	//advanced view switch set cookie and toggle advanced columns
-	$('#advancedview').switchButton({
-		labels_placement: 'left',
-		on_label: 'Advanced View',
-		off_label: 'Basic View',
-		checked: ($.cookie('fanctrl_view_mode') == 'advanced')
-	})
-	.change(function () {
-		//$('.fanctrl-settings').toggle('slow');
-		$.cookie('fanctrl_view_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
-		toggleFanCTRL();
-	});
+    //advanced view switch set cookie and toggle advanced columns
+    $('#advancedview').switchButton({
+        labels_placement: 'left',
+        on_label: 'Advanced View',
+        off_label: 'Basic View',
+        checked: ($.cookie('fanctrl_view_mode') == 'advanced')
+    })
+    .change(function () {
+        //$('.fanctrl-settings').toggle('slow');
+        $.cookie('fanctrl_view_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
+        toggleFanCTRL();
+    });
 
-	toggleFanCTRL();
+    toggleFanCTRL();
 
-	$('#fanlog-clear').on('click', clearFanLOG);
+    $('.fanctrl-temp')
+        .each(function() {
+            if($(this)[0].selectedIndex == 0){
+                var FanName = '.' + $(this).attr('name');
+                $(FanName).prop('disabled', true);
+            }
+        })
+        .on('change', function() {
+            var FanName = '.' + $(this).attr('name');
+            if($(this)[0].selectedIndex == 0)
+                $(FanName).prop('disabled', true);
+            else
+                $(FanName).prop('disabled', false);
+        });
 
-	$('#readings').click(function() {
-		$.cookie('one', 'tab1', { expires:null, path: '/'});
-		location ='/Tools/IPMITools';
-	});
+    $('#fanlog-clear').on('click', clearFanLOG);
 
-	checkFANCTRL(document.fanctrl_settings);
+
+    $('#readings').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location ='/Tools/IPMITools';
+    });
+
+    checkFANCTRL(document.fanctrl_settings);
 
 });
 
 function resetFANDATA(form) {
-		form.submit();
+    form.FANCONTROL.selectedIndex = 0;
+    form.FANPOLL.selectedIndex = 2;
+    form.FANIP.selectedIndex = 0;
+    form.submit();
 }
 
 function checkFANCTRL(form) {
-	if (form.FANCONTROL.selectedIndex < 1 ){
-		form.FANCMD.value = '/usr/local/emhttp/plugins/ipmi/scripts/fanctrl_stop';
-	}else {
-   	form.FANCMD.value = '/usr/local/emhttp/plugins/ipmi/scripts/fanctrl_start';
-   }
+    if (form.FANCONTROL.selectedIndex < 1 ){
+        form.FANCMD.value = '/usr/local/emhttp/plugins/ipmi/scripts/fanctrl_stop';
+    }else {
+        form.FANCMD.value = '/usr/local/emhttp/plugins/ipmi/scripts/fanctrl_start';
+    }
 
-	if ("<?=$fanctrl_run;?>" == true)
-	{
-		$('.fanctrl-run').prop('disabled', true);
-		$('#btnFanApply').disabled = 'disabled';
-   }else{
-   	$('.fanctrl-run').prop('disabled', false);
-		$('#btnFanApply').prop('disabled', false);
-	}
+    if ("<?=$fanctrl_run;?>" == true)
+    {
+        $('.fanctrl-run').prop('disabled', true);
+        $('#btnFanApply').disabled = 'disabled';
+    }else{
+        $('.fanctrl-run').prop('disabled', false);
+        $('#btnFanApply').prop('disabled', false);
+    }
 }
 
 function verifyFANDATA(form) {
-	form.FANCONTROL.value = form.FANCONTROL.value.replace(/ /g,'_');
+    form.FANCONTROL.value = form.FANCONTROL.value.replace(/ /g,'_');
 }
 
 function clearFanLOG(){
-	$.get('/plugins/ipmi/include/fanlog_clear.php', {},function() {
-		$('#fanlog-size').html('0');
-	});
+    $.get('/plugins/ipmi/include/fanlog_clear.php', {},function() {
+        $('#fanlog-size').html('0');
+    });
 }
 
 function toggleFanCTRL() {
-	if ($.cookie('fanctrl_view_mode') == 'advanced') {
-		$('.fanctrl-settings').show('slow');
-		$('.fanctrl-basic').hide('slow');
-	}else{
-		$('.fanctrl-basic').show('slow');
-		$('.fanctrl-settings').hide('slow');
-	}
+    if ($.cookie('fanctrl_view_mode') == 'advanced') {
+        $('.fanctrl-settings').show('slow');
+        $('.fanctrl-basic').hide('slow');
+    }else{
+        $('.fanctrl-basic').show('slow');
+        $('.fanctrl-settings').hide('slow');
+    }
 }
 </script>

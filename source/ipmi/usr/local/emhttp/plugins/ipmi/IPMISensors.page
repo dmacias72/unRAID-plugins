@@ -8,37 +8,37 @@ Markdown="false"
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
 <div>
-	<span id="adv-switch" class="status"><input type='checkbox' id='advancedview'></span>
-	<table class="tablesorter hover-highlight sensors" id="tblSensor">
-		<thead>
-			<tr>
-				<th class="sorter-false filter-false"> Status </th>
-				<th class="network sorter-ipv4Address filter-ip" data-placeholder="by ip address"> IP Address </th>
-				<th class="advanced filter-false"> ID </th>
-				<th class="filter-false"> Sensor </th>
-				<th class="advanced filter-false"> Lower <br> Non-Recover </th>
-				<th class="advanced filter-false"> Lower <br> Critical </th>
-				<th class="advanced filter-false"> Lower <br> Non-Critical </th>
-				<th class="filter-reading" data-placeholder="by status"> Reading </th>
-				<th class="filter-type" data-placeholder="by type"> Type </th>
-				<th class="advanced filter-false"> Upper <br> Non-Critical </th>
-				<th class="advanced filter-false"> Upper <br> Critical </th>
-				<th class="advanced filter-false"> Upper <br> Non-Recover </th>
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-	<blockquote class="inline_help">
-		<p>Table of sensor readings that can be sorted and filtered. Thresholds and other values are displayed with the basic/advanced view switch.</p>
-	</blockquote>
-	<dl>
-		<dt><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button></dt>
-		<dd><button type="button" onClick="done();">Done</button></dd>
-	</dl>
-	<blockquote class="inline_help">
-		<p>Reset Filters button resets table filters. Settings button navigates to the IPMI settings page.  Edit button allows you to edit your IPMI thresholds and sensor events configuration.  Done button navigates to the Tools menu. </p>
-	</blockquote>
+    <span id="adv-switch" class="status"><input type='checkbox' id='advancedview'></span>
+    <table class="tablesorter hover-highlight sensors" id="tblSensor">
+        <thead>
+            <tr>
+                <th class="sorter-false filter-false"> Status </th>
+                <th class="network sorter-ipv4Address filter-ip" data-placeholder="by ip address"> IP Address </th>
+                <th class="advanced filter-false"> ID </th>
+                <th class="filter-false"> Sensor </th>
+                <th class="advanced filter-false"> Lower <br> Non-Recover </th>
+                <th class="advanced filter-false"> Lower <br> Critical </th>
+                <th class="advanced filter-false"> Lower <br> Non-Critical </th>
+                <th class="filter-reading" data-placeholder="by status"> Reading </th>
+                <th class="filter-type" data-placeholder="by type"> Type </th>
+                <th class="advanced filter-false"> Upper <br> Non-Critical </th>
+                <th class="advanced filter-false"> Upper <br> Critical </th>
+                <th class="advanced filter-false"> Upper <br> Non-Recover </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <blockquote class="inline_help">
+        <p>Table of sensor readings that can be sorted and filtered. Thresholds and other values are displayed with the basic/advanced view switch.</p>
+    </blockquote>
+    <dl>
+        <dt><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button></dt>
+        <dd><button type="button" onClick="done();">Done</button></dd>
+    </dl>
+    <blockquote class="inline_help">
+        <p>Reset Filters button resets table filters. Settings button navigates to the IPMI settings page.  Edit button allows you to edit your IPMI thresholds and sensor events configuration.  Done button navigates to the Tools menu. </p>
+    </blockquote>
 </div>
 
 <script src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
@@ -46,72 +46,72 @@ Markdown="false"
 <script src="/webGui/javascript/jquery.switchbutton.js"></script>
 <script>
 $(function(){
-	$('.tabs')
-		.append('<div class="tab"><input type="radio" name="tabs2" id="tab5"><label for="tab5"><img class="icon" src="/plugins/ipmi/icons/settings.png">Settings</label></div>');
+    $('.tabs')
+        .append('<div class="tab"><input type="radio" name="tabs2" id="tab5"><label for="tab5"><img class="icon" src="/plugins/ipmi/icons/settings.png">Settings</label></div>');
 
-	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
-		$(function() {
-			showNotice('IPMI <?=$version?> available. <a>Download</a>','ipmi');
-		});
-	<?endif;?>
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
+        $(function() {
+            showNotice('IPMI <?=$version?> available. <a>Download</a>','ipmi');
+        });
+    <?endif;?>
 
-	$('.settings').click(function() {
-		$.cookie('one', 'tab1', { expires:null, path: '/'});
-		location = '/Settings/IPMI';
-	});
+    $('.settings').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Settings/IPMI';
+    });
 
-	$('#tab5').click(function() {
-		$.cookie('one', 'tab1', { expires:null, path: '/'});
-		location = '/Settings/IPMI';
-	});
+    $('#tab5').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Settings/IPMI';
+    });
 
-	//advanced view switch set cookie and toggle advanced columns
-	$('#advancedview').switchButton({
-		labels_placement: 'left',
-		on_label: 'Advanced View',
-		off_label: 'Basic View',
-		checked: ($.cookie('ipmi_sensor_mode') == 'advanced')
-	})
-	.change(function () {
-		$('.advanced').toggle('slow');
-		$.cookie('ipmi_sensor_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
-	});
+    //advanced view switch set cookie and toggle advanced columns
+    $('#advancedview').switchButton({
+        labels_placement: 'left',
+        on_label: 'Advanced View',
+        off_label: 'Basic View',
+        checked: ($.cookie('ipmi_sensor_mode') == 'advanced')
+    })
+    .change(function () {
+        $('.advanced').toggle('slow');
+        $.cookie('ipmi_sensor_mode', $('#advancedview')[0].checked ? 'advanced' : 'basic', { expires: 3650 });
+    });
 
-	$('#tblSensor').tablesorter({
-		sortList: [[2,0]],
-		widgets: ['saveSort', 'filter', 'stickyHeaders'],
-		widgetOptions: {
-			stickyHeaders_filteredToTop: true,
-			filter_hideEmpty : true,
-			filter_liveSearch : true,
-			filter_saveFilters : true,
-			filter_reset : '.reset-sensors',
-			filter_functions: {
-				'.filter-ip' : true,
-				'.filter-type' : true,
-				'.filter-reading' : {
-					'nominal'		: function(e, n, f, i, $r, c, data) {
-						return (data.$row.find('td.reading font').prop('color') == 'green'); },
-					'warning'		: function(e, n, f, i, $r, c, data) {
-						return (data.$row.find('td.reading font').prop('color') == 'orange'); },
-					'critical'		: function(e, n, f, i, $r, c, data) {
-						return (data.$row.find('td.reading font').prop('color') == 'red'); }
-				}
-			}
-		}
-	});
+    $('#tblSensor').tablesorter({
+        sortList: [[2,0]],
+        widgets: ['saveSort', 'filter', 'stickyHeaders'],
+        widgetOptions: {
+            stickyHeaders_filteredToTop: true,
+            filter_hideEmpty : true,
+            filter_liveSearch : true,
+            filter_saveFilters : true,
+            filter_reset : '.reset-sensors',
+            filter_functions: {
+                '.filter-ip' : true,
+                '.filter-type' : true,
+                '.filter-reading' : {
+                    'nominal'  : function(e, n, f, i, $r, c, data) {
+                        return (data.$row.find('td.reading font').prop('color') == 'green'); },
+                    'warning'  : function(e, n, f, i, $r, c, data) {
+                        return (data.$row.find('td.reading font').prop('color') == 'orange'); },
+                    'critical' : function(e, n, f, i, $r, c, data) {
+                        return (data.$row.find('td.reading font').prop('color') == 'red'); }
+                }
+            }
+        }
+    });
 
-	// add network class to ip address filter row cells
-	$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
+    // add network class to ip address filter row cells
+    $('#tblSensor tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
 
-	// add advanced class to select tablesorter filter row cells
-	var tdAdv = [3, 5, 6, 7, 10, 11, 12];
-	$.each(tdAdv , function (index, value) {
-		$('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
-	});
+    // add advanced class to select tablesorter filter row cells
+    var tdAdv = [3, 5, 6, 7, 10, 11, 12];
+    $.each(tdAdv , function (index, value) {
+        $('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
+    });
 
-	sensorArray(false);
-	sensorRefresh();
+    sensorArray(false);
+    sensorRefresh();
 
 });
 
@@ -126,87 +126,87 @@ function sensorRefresh() {
 
 /* load ipmi sensor table */
 function sensorArray(Refresh){
-  	$.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
-  		$.each(sensors, function (i, sensor) {
- 			var LowerNR = parseFloat(sensor.LowerNR);
-			var LowerC = parseFloat(sensor.LowerC);
-			var LowerNC = parseFloat(sensor.LowerNC);
-			var UpperNC = parseFloat(sensor.UpperNC);
-			var UpperC = parseFloat(sensor.UpperC);
-			var UpperNR = parseFloat(sensor.UpperNR);
-			var Color = 'green';
+    $.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
+        $.each(sensors, function (i, sensor) {
+            var LowerNR = parseFloat(sensor.LowerNR);
+            var LowerC = parseFloat(sensor.LowerC);
+            var LowerNC = parseFloat(sensor.LowerNC);
+            var UpperNC = parseFloat(sensor.UpperNC);
+            var UpperC = parseFloat(sensor.UpperC);
+            var UpperNR = parseFloat(sensor.UpperNR);
+            var Color = 'green';
 
-			// only process sensor if reading is valid
- 			if (sensor.Reading != 'N/A'){
-				var Reading = parseFloat(sensor.Reading);
-				if (sensor.Type == 'Voltage'){
+            // only process sensor if reading is valid
+            if (sensor.Reading != 'N/A'){
+                var Reading = parseFloat(sensor.Reading);
+                if (sensor.Type == 'Voltage'){
 
-					// if voltage is less than lower non-critical
-					// or voltage is greater than upper non-critical show critical
-					if (Reading < LowerNC && Reading > UpperNC)
-						Color = 'orange';
+                    // if voltage is less than lower non-critical
+                    // or voltage is greater than upper non-critical show critical
+                    if (Reading < LowerNC && Reading > UpperNC)
+                        Color = 'orange';
 
-					// if voltage is less than lower critical
-					// or voltage is greater than upper critical show non-recoverable
-					if (Reading < LowerC || Reading > UpperC)
-						Color = 'red';
+                    // if voltage is less than lower critical
+                    // or voltage is greater than upper critical show non-recoverable
+                    if (Reading < LowerC || Reading > UpperC)
+                        Color = 'red';
 
-				} else if (sensor.Type == 'Fan'){
+                } else if (sensor.Type == 'Fan'){
 
-					// if Fan RPMs are less than lower non-critical
-					if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
-						Color = "red";
+                    // if Fan RPMs are less than lower non-critical
+                    if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
+                        Color = "red";
 
-				} else if(sensor.Type == 'Temperature'){
-					sensor.Units = '&deg;'+sensor.Units;
+                } else if(sensor.Type == 'Temperature'){
+                    sensor.Units = '&deg;'+sensor.Units;
 
-					// if Temperature is greater than upper non-critical
-					if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
-						Color = 'red';
-				}
-			}else {
-				var Reading = sensor.Reading; // reading equals N/A
-				Color = 'blue';
-			}
+                    // if Temperature is greater than upper non-critical
+                    if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
+                        Color = 'red';
+                }
+            }else {
+                var Reading = sensor.Reading; // reading equals N/A
+                Color = 'blue';
+            }
 
-			if(Refresh) {
-				$("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+" "+sensor.Units+"</font>");
-			} else {
-				Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
-				$('#tblSensor tbody')
-				.append("<tr id='"+i+"'>"+
-				"<td title='"+sensor.State+"'><img src='/plugins/dynamix/images/"+ State[sensor.State] +"-on.png'/></td>"+ //state
-				"<td class='network'>"+Host+"</td>"+ // sensor host ip address
-				"<td class='advanced'>"+sensor.ID+"</td>"+ // sensor id
-				"<td>"+sensor.Name+"</td>"+ //sensor name
-				"<td class='advanced'>"+ sensor.LowerNR +"</td>"+ // lower non recoverable
-				"<td class='advanced'>"+ sensor.LowerC +"</td>"+ // lower critical
-				"<td class='advanced'>"+ sensor.LowerNC +"</td>"+ // lower non critical
-				"<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +" "+ sensor.Units +"</font></td>"+ //sensor reading
-				"<td>"+sensor.Type+"</td>"+ //sensor units
-				"<td class='advanced'>"+ sensor.UpperNC +"</td>"+ // upper non critical
-				"<td class='advanced'>"+ sensor.UpperC +"</td>"+ // upper critical
-				"<td class='advanced'>"+ sensor.UpperNR +"</td>"+ // upper non recoverable
-				"</tr>");
-			}
-		});
-		if (!Refresh) {
-			if(Host === '')
-				$('.network').hide();
-			else
-				$('.network').show();
+            if(Refresh) {
+                $("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+" "+sensor.Units+"</font>");
+            } else {
+                Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
+                $('#tblSensor tbody')
+                .append("<tr id='"+i+"'>"+
+                "<td title='"+sensor.State+"'><img src='/plugins/dynamix/images/"+ State[sensor.State] +"-on.png'/></td>"+ //state
+                "<td class='network'>"+Host+"</td>"+ // sensor host ip address
+                "<td class='advanced'>"+sensor.ID+"</td>"+ // sensor id
+                "<td>"+sensor.Name+"</td>"+ //sensor name
+                "<td class='advanced'>"+ sensor.LowerNR +"</td>"+ // lower non recoverable
+                "<td class='advanced'>"+ sensor.LowerC +"</td>"+ // lower critical
+                "<td class='advanced'>"+ sensor.LowerNC +"</td>"+ // lower non critical
+                "<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +" "+ sensor.Units +"</font></td>"+ //sensor reading
+                "<td>"+sensor.Type+"</td>"+ //sensor units
+                "<td class='advanced'>"+ sensor.UpperNC +"</td>"+ // upper non critical
+                "<td class='advanced'>"+ sensor.UpperC +"</td>"+ // upper critical
+                "<td class='advanced'>"+ sensor.UpperNR +"</td>"+ // upper non recoverable
+                "</tr>");
+            }
+        });
+        if (!Refresh) {
+            if(Host === '')
+                $('.network').hide();
+            else
+                $('.network').show();
 
-			if ($('#advancedview')[0].checked)
-				$('.advanced').show();
-			else
-				$('.advanced').hide();
-			
-			// restore filters
-			var lastSearch = $('#tblSensor')[0].config.lastSearch;
-			$('#tblSensor').trigger('update');
-			$('#tblSensor').trigger('search', [lastSearch]);
-		}
-	});
+            if ($('#advancedview')[0].checked)
+                $('.advanced').show();
+            else
+                $('.advanced').hide();
+
+            // restore filters
+            var lastSearch = $('#tblSensor')[0].config.lastSearch;
+            $('#tblSensor').trigger('update');
+            $('#tblSensor').trigger('search', [lastSearch]);
+        }
+    });
 };
 
 </script>
