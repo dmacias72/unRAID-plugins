@@ -11,9 +11,12 @@ table.tablesorter{
 	cursor: pointer;
 }
 
-#adv-switch, #arch-switch,
-#load-switch {
+#adv-switch, #arch-switch {
 	margin-top:-26px;
+}
+
+#load-switch {
+	margin-top:-32px;
 }
 
 .advanced, .network,
