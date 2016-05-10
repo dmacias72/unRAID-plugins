@@ -1,0 +1,44 @@
+#!/bin/sh
+# load ipmi sensors configuration:
+CFGFILE="/boot/config/plugins/ipmi/ipmi.cfg"
+CONFIG="/boot/config/plugins/ipmi/ipmi.config"
+PROG="/usr/sbin/ipmi-sensors-config --filename=$CONFIG"
+OPTIONS=""
+
+# read our configuration
+[ -e "$CFGFILE" ] && source "$CFGFILE"
+
+if [ $NETWORK == "enable" ]; then
+    OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
+fi
+
+# Commit ipmi sensors configuration:
+ipmicfg_commit() {
+		if [ "$LOADCFG" == "enable" ]; then
+			echo "committing ipmi sensors configuration..."
+		  	sleep 1
+
+			nohup	 $PROG $OPTIONS > /dev/null 2>&1 | logger -tipmi &
+		else
+			echo "auto load config is not enabled "
+		fi
+}
+
+# Checkout ipmi sensors configuration:
+ipmicfg_checkout() {
+			echo "checking out ipmi sensors configuration..."
+		  	sleep 1
+
+			nohup	 $PROG --checkout $OPTIONS > /dev/null 2>&1 | logger -tipmi &
+}
+
+case "$1" in
+'commit')
+  ipmicfg_commit
+  ;;
+'checkout')
+  ipmicfg_checkout
+  ;;
+*)
+  echo "usage rc.ipmicfg: commit|checkout"
+esac

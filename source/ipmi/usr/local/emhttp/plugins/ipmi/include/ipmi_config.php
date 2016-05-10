@@ -39,7 +39,7 @@ $arg_sensors = (array_key_exists('s', $args) || array_key_exists('sensors', $arg
 $cmd_sensors = ($arg_sensors || array_key_exists('sensors', $_POST)) ? '-sensors' : '';
 
 $config_file = "$plg_path/ipmi$cmd_sensors.config";
-$cmd         = "ipmi$cmd_sensors-config --filename=$config_file ";
+$cmd         = "/usr/sbin/ipmi$cmd_sensors-config --filename=$config_file ";
 $commit      = array_key_exists('commit', $_POST);
 
 // remove carriage returns

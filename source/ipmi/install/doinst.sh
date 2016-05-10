@@ -10,6 +10,7 @@ chmod +0755 /usr/local/emhttp/plugins/ipmi/scripts/* \
  /usr/sbin/ipmifan \
  /usr/sbin/ipmisel \
  /usr/sbin/ipmisensors \
+/etc/rc.d/rc.ipmicfg \
  $RC_SCRIPT \
  $RC_SCRIPT2 \
  $RC_SCRIPT3
