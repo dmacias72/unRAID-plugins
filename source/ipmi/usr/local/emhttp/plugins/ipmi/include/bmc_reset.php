@@ -1,5 +1,6 @@
 <?
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+
 $cmd = "bmc-device --warm-reset $netopts";
 exec($cmd, $output, $return_var=null);
 

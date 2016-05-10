@@ -1,5 +1,6 @@
 <?
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+
 $cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data ';
 $log = "/boot/config/plugins/ipmi/archived_events.log";
 $event = $_GET["event"];
