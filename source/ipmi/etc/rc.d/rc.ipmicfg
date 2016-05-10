@@ -1,7 +1,7 @@
 #!/bin/sh
 # load ipmi sensors configuration:
 CFGFILE="/boot/config/plugins/ipmi/ipmi.cfg"
-CONFIG="/boot/config/plugins/ipmi/ipmi.config"
+CONFIG="/boot/config/plugins/ipmi/ipmi-sensors.config"
 PROG="/usr/sbin/ipmi-sensors-config --filename=$CONFIG"
 OPTIONS=""
 

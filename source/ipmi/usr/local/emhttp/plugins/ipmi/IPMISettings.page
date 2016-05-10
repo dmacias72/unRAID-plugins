@@ -152,7 +152,7 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
-        showNotice('IPMI <?=$version?> available. <a>Download</a>','ipmi');
+        showNotice('IPMI <?=$version?> available. <a>Install</a>','ipmi');
     <?endif;?>
 
     // if png is missing, replaced with unknown.png
