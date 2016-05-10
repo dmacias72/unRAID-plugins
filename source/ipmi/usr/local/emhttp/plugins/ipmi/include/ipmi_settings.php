@@ -1,7 +1,7 @@
 <?
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_display.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 
 /* ipmi settings variables*/
 $seld     = isset($cfg['IPMISELD']) ? $cfg['IPMISELD'] : "disable";
