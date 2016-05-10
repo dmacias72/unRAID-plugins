@@ -1,7 +1,7 @@
 #!/bin/sh
 RC_SCRIPT="/etc/rc.d/rc.ipmiseld"
 RC_SCRIPT2="/etc/rc.d/rc.ipmitail"
-RC_SCRIPT3="/etc/rc.d/rc.ipmifan"
+RC_SCRIPT3="/usr/sbin/ipmifan"
 SD_RCFILE="/etc/rc.d/rc.local_shutdown"
 
 # Update file permissions of scripts
@@ -28,6 +28,6 @@ fi
 
 # Add stop script to rc.local_shutdown script
 if ! grep "$RC_SCRIPT3" $SD_RCFILE >/dev/null 2>&1
-	then echo -e "\n[ -x $RC_SCRIPT3 ] && $RC_SCRIPT3 stop" >> $SD_RCFILE
+	then echo -e "\n[ -x $RC_SCRIPT3 ] && $RC_SCRIPT3 -q" >> $SD_RCFILE
 fi
 [ ! -x $SD_RCFILE ] && chmod u+x $SD_RCFILE
