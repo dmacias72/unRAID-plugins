@@ -4,7 +4,26 @@ Markdown="false"
 ---
 <?
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
+
+/* get board info and status */
+$fantemp = [];
+$board = 'unknown';
+
+if ($mod || ($netsvc == 'enable')){
+	$fantemp = ipmi_get_fantemp();
+	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
+}
+
+$boards_repo = 'https://raw.githubusercontent.com/dmacias72/unRAID-plugins/master/plugins/boards.json';
+$boards_file = "$plg_path/boards.json";
+
+if (!is_file($boards_file) || (filemtime($boards_file) < (time() - 3600)))
+	get_content_from_github($boards_repo, $boards_file);
+
+$boards = json_decode(file_get_contents($boards_file), true);
+$board_status = array_key_exists($board, $boards);
 ?>
+
 <div id="title" style="margin-top: -22px;">
     <span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span>
     <span class="status" style="margin-top: 50px;margin-left: -200px;">
@@ -109,11 +128,11 @@ require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
     </thead>
     <tbody>
 <?
-    $log = '/var/log/ipmifan';
-    if(is_file($log)){
-        echo "<tr><td><a class='fanlog-a' id='fanlog-file' title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
-        .filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
-    }
+$log = '/var/log/ipmifan';
+if(is_file($log)){
+    echo "<tr><td><a class='fanlog-a' id='fanlog-file' title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
+    .filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
+}
 ?>
     </tbody>
 </table>
@@ -141,17 +160,12 @@ $(function(){
 
     $('.fanctrl-temp')
         .each(function() {
-            if($(this)[0].selectedIndex == 0){
-                var FanName = '.' + $(this).attr('name');
-                $(FanName).prop('disabled', true);
-            }
+            var FanName = '.' + $(this).attr('name');
+            $(FanName).prop('disabled', ($(this)[0].selectedIndex == 0));
         })
         .on('change', function() {
             var FanName = '.' + $(this).attr('name');
-            if($(this)[0].selectedIndex == 0)
-                $(FanName).prop('disabled', true);
-            else
-                $(FanName).prop('disabled', false);
+            $(FanName).prop('disabled', ($(this)[0].selectedIndex == 0));
         });
 
     $('#fanlog-clear').on('click', clearFanLOG);
