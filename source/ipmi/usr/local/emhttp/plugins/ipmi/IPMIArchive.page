@@ -146,7 +146,7 @@ function ArchiveDelete(ID) {
 		var trID = $('#'+ID);
 		$.get(EventDelete, {event: ID},
 			function() {
-				//remove table row
+				//animate and remove table row
 				trID
 				.children('td')
 				.animate({ padding: 0 })
