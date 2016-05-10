@@ -62,11 +62,11 @@ if (array_key_exists('version', $args)) {
 $arga   = (array_key_exists('a', $args) || array_key_exists('auto', $args));
 $argf   = (array_key_exists('full', $args));
 $force  = (array_key_exists('f', $args) || array_key_exists('force', $args));
-$argq   = (array_key_exists('quiet', $args));
+$argq   = (array_key_exists('q', $args) || array_key_exists('quiet', $args));
 $argv   = (array_key_exists('v', $args) || array_key_exists('verbose', $args));
 $debug  = (array_key_exists('debug', $args));
 $daemon = (array_key_exists('d', $args) || array_key_exists('daemon', $args));
-$quit   =  (array_key_exists('q', $args) || array_key_exists('quit', $args));
+$quit   =  (array_key_exists('quit', $args));
 
 if(is_file($lockfile)){
 	$lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
@@ -115,7 +115,7 @@ if(!($force) && ($fanctrl == 'disable' )){
 
 if($daemon){
 	exec("php $service 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
-	syslog(LOG_INFO, "process started. To terminate it, type: $prog -q");
+	syslog(LOG_INFO, "process started. To terminate it, type: $prog --quit");
 	exit(0);
 }
 
