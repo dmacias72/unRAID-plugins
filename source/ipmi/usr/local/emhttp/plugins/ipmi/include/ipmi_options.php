@@ -13,7 +13,7 @@ $password = isset($cfg['PASSWORD']) ? $cfg['PASSWORD'] : '';
 
 /* check if local ipmi driver is loaded */
 if($netsvc == 'disable')
-    $mod = (is_file('/dev/ipmi0') || is_file('/dev/ipmi/0') || is_file('/dev/ipmidev/0'));
+    $mod = (file_exists('/dev/ipmi0') || file_exists('/dev/ipmi/0') || file_exists('/dev/ipmidev/0')); // Thanks to ljm42
     //$mod = (trim(shell_exec("modprobe ipmi_si --first-time 2>&1 | grep -q 'Module already in kernel' && echo 1 || echo 0 2> /dev/null")) == 1);
 
 /* options for network access */
