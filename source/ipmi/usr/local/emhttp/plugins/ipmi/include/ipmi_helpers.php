@@ -15,6 +15,34 @@ function get_highest_temp(){
 
 $hdd_temp = get_highest_temp();
 
+// get options for high or low temp thresholds
+function get_temp_range($range, $selected=null){
+    $temps = [20,80];
+    if ($range == 'HI')
+      rsort($temps);
+    $options = "";
+    foreach(range($temps[0], $temps[1], 5) as $temp){
+        $options .= "<option value='$temp'";
+
+        // set saved option as selected
+        if ($selected == $temp)
+            $options .= " selected";
+
+        $options .= ">$temp</option>";
+    }
+    return $options;
+}
+
+function get_ignored() {
+    global $ignore;
+    //get list of ignored sensors
+    if(!empty($netopts)){
+        foreach($ignore as $id){
+        explode('_', $id);
+        }
+    }
+}
+
 /* get an array of all sensors and their values */
 function ipmi_sensors() {
     global $netopts, $hdd_temp;
@@ -170,23 +198,26 @@ function ipmi_get_options($selected=null){
     foreach($sensors as $id => $sensor){
         if (($sensor['Type'] == 'Temperature') || ($sensor['Type'] == 'Fan')){
             $name = $sensor['Name'];
+            $reading  = $sensor['Reading'];
             $ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
+            $units    = ($reading == 'N/A')    ? '' : $sensor['Units'];
             $options .= "<option value='$id'";
 
             // set saved option as selected
             if ($selected == $id)
                 $options .= " selected";
 
-        $options .= ">$name$ip</option>";
+        $options .= ">$name$ip - $reading $units</option>";
         }
     }
     return $options;
 }
 
-/* get select options for a given sensor type */
+/* get select options for available sensors */
 function ipmi_get_selected(){
-    global $sensors, $ignore;
-    $options = (!empty($sensors)) ? '<option value="">Toggle all sensors</option>' : '';
+    //global $sensors, $ignore
+    $sensors = [];
+    $options = (!empty($sensors)) ? '<option value="">Toggle All</option>' : '<option value="" disabled>No Sensors Available</option>';
     foreach($sensors as $id => $sensor){
         $name     = $sensor['Name'];
         $reading  = $sensor['Reading'];
@@ -200,24 +231,6 @@ function ipmi_get_selected(){
 
         $options .= ">$name$ip - $reading $units</option>";
 
-    }
-    return $options;
-}
-
-// get options for high or low temp thresholds
-function get_temp_range($range, $selected=null){
-    $temps = [20,80];
-    if ($range == 'HI')
-      rsort($temps);
-    $options = "";
-    foreach(range($temps[0], $temps[1], 5) as $temp){
-        $options .= "<option value='$temp'";
-
-        // set saved option as selected
-        if ($selected == $temp)
-            $options .= " selected";
-
-        $options .= ">$temp</option>";
     }
     return $options;
 }
