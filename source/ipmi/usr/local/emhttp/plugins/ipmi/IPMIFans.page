@@ -2,27 +2,7 @@ Menu="IPMI:2"
 Title="Fan Control"
 Markdown="false"
 ---
-<?
-require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
-
-/* get board info and status */
-$fantemp = [];
-$board = 'unknown';
-
-if ($mod || ($netsvc == 'enable')){
-	$fantemp = ipmi_get_fantemp();
-	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
-}
-
-$boards_repo = 'https://raw.githubusercontent.com/dmacias72/unRAID-plugins/master/plugins/boards.json';
-$boards_file = "$plg_path/boards.json";
-
-if (!is_file($boards_file) || (filemtime($boards_file) < (time() - 3600)))
-	get_content_from_github($boards_repo, $boards_file);
-
-$boards = json_decode(file_get_contents($boards_file), true);
-$board_status = array_key_exists($board, $boards);
-?>
+<? require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';?>
 
 <div id="title" style="margin-top: -22px;">
     <span class="left"><img class="icon" src="/plugins/ipmi/icons/fancontrol.png"> Fan Control </span>
