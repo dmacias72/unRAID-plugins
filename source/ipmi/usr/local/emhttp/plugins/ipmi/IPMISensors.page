@@ -33,8 +33,8 @@ Markdown="false"
         <p>Table of sensor readings that can be sorted and filtered. Thresholds and other values are displayed with the basic/advanced view switch.</p>
     </blockquote>
     <dl>
-        <dt><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button></dt>
-        <dd><button type="button" onClick="done();">Done</button></dd>
+        <dt>&nbsp;</dt>
+        <dd><button type="button" class="reset-sensors" title="reset table sorting filters">Reset Filters</button><button type="button" onClick="done();">Done</button></dd>
     </dl>
     <blockquote class="inline_help">
         <p>Reset Filters button resets table filters. Settings button navigates to the IPMI settings page.  Edit button allows you to edit your IPMI thresholds and sensor events configuration.  Done button navigates to the Tools menu. </p>
