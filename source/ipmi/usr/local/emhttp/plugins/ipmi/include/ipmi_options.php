@@ -11,6 +11,8 @@ $ipaddr   = isset($cfg['IPADDR'])   ? $cfg['IPADDR']   : '';
 $user     = isset($cfg['USER'])     ? $cfg['USER']     : '';
 $password = isset($cfg['PASSWORD']) ? $cfg['PASSWORD'] : '';
 
+$ignore   = isset($cfg['IGNORE'])   ? explode(',', $cfg['IGNORE']) : [];
+
 /* check if local ipmi driver is loaded */
 if($netsvc == 'disable')
     $mod = (file_exists('/dev/ipmi0') || file_exists('/dev/ipmi/0') || file_exists('/dev/ipmidev/0')); // Thanks to ljm42

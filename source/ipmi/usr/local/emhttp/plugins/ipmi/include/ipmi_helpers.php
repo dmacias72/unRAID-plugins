@@ -18,7 +18,7 @@ $hdd_temp = get_highest_temp();
 /* get an array of all sensors and their values */
 function ipmi_sensors() {
     global $netopts, $hdd_temp;
-    $cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts 2>/dev/null"; // --non-abbreviated-units 
+    $cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts 2>/dev/null"; // --non-abbreviated-units
     exec($cmd, $output, $return_var=null);
 
     if ($return_var)
@@ -28,7 +28,7 @@ function ipmi_sensors() {
     $hdd = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
     if(!empty($netopts))
         $hdd = '127.0.0.1:'.$hdd;
-    $output[] = $hdd; 
+    $output[] = $hdd;
 
     // key names for ipmi sensors output
     $keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
@@ -68,7 +68,7 @@ function ipmi_events($archive=null){
         $output = is_file($filename) ? file($filename, FILE_IGNORE_NEW_LINES) : [] ;
     } else {
         $cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $netopts 2>/dev/null";
-        exec($cmd, $output, $return_var=null); 
+        exec($cmd, $output, $return_var=null);
     }
     if ($return_var)
         return []; // return empty array if error
@@ -132,7 +132,7 @@ function ipmi_get_readings() {
     // add highest hard drive temp sensor
     $hdd = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
     if(!empty($netopts))
-        $hdd = '127.0.0.1:'.$hdd; 
+        $hdd = '127.0.0.1:'.$hdd;
     $output[] = $hdd;
 
     // key names for ipmi sensors output
@@ -182,7 +182,28 @@ function ipmi_get_options($selected=null){
     }
     return $options;
 }
- 
+
+/* get select options for a given sensor type */
+function ipmi_get_selected(){
+    global $sensors, $ignore;
+    $options = (!empty($sensors)) ? '<option value="">Toggle all sensors</option>' : '';
+    foreach($sensors as $id => $sensor){
+        $name     = $sensor['Name'];
+        $reading  = $sensor['Reading'];
+        $pattern  = '/^'.$id.'.*/'; 
+        $ip       = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
+        $units    = ($reading == 'N/A')    ? '' : $sensor['Units'];
+        $options .= "<option value='$id'";
+
+        // only select sensors that are not saved
+        $options .= preg_grep($pattern, $ignore) ?  '' : " selected";
+
+        $options .= ">$name$ip - $reading $units</option>";
+
+    }
+    return $options;
+}
+
 // get options for high or low temp thresholds
 function get_temp_range($range, $selected=null){
     $temps = [20,80];

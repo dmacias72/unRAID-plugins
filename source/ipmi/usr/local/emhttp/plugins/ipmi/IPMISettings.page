@@ -1,12 +1,7 @@
 Menu="IPMI:1"
 Title="Settings"
 ---
-<? require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php';
-
-/* check connection */
-if ($netsvc == 'enable')
-	$conn = (!empty($sensors)) ? "Connection successful" : "Connection failed";
-?>
+<? require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings.php';?>
 
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 <link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/lib/codemirror.css">
@@ -16,6 +11,7 @@ if ($netsvc == 'enable')
     .CodeMirror pre.CodeMirror-placeholder { color: #999; }
 </style>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/jquery-ui-1.11.2.custom.css">
 
 <div id="title" style="margin-top: -22px;">
     <span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span>
@@ -23,6 +19,21 @@ if ($netsvc == 'enable')
     <img class="board-img" src=""></span>
     <span class="status" id="notify-status">Event Notification: <?=$seld_status;?> </span>
 </div>
+
+<form markdown="1" name="ignore_settings">
+
+Available Sensors List:
+: <select multiple id="ignore" name="IGNORE">
+        <?=ipmi_get_selected();?>
+  </select>
+
+> Checked sensors will show in all dropdown menus and reading display.
+>
+> Unchecked will not be displayed.
+
+</form>
+
+<br>
 
 <form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -152,8 +163,32 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
-        showNotice('IPMI <?=$version?> available. <a>Install</a>','ipmi');
+        showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
     <?endif;?>
+
+    $('#ignore').dropdownchecklist( {
+        emptyText: 'No sensors available',
+        icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
+        width: 200,
+        explicitClose: 'save',
+        closeRadioOnClick: true,
+        firstItemChecksAll: true,
+        textFormatFunction: function(options) { return 'Select available sensors'; },
+        onComplete: function(selector){
+        var values = '';
+        for( i=0; i < selector.options.length; i++ ) {
+            if ((selector.options[i].selected == false) && (selector.options[i].value != '')){
+                if (values != '')
+                    values += ',';
+                values += selector.options[i].value;
+            }
+        }
+        alert(values);
+        $.post('/update.php', {'#file': 'ipmi/ipmi.cfg', IGNORE: values},function () {
+            $('#ingore').dropdownchecklist('refresh');
+        });
+        }
+});
 
     // if png is missing, replaced with unknown.png
     $('.board-img')
