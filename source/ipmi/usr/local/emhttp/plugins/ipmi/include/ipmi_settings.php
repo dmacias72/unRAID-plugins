@@ -1,6 +1,7 @@
 <?
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_display.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_helpers.php';
 
 /* ipmi settings variables*/
@@ -23,8 +24,8 @@ $board = 'unknown';
 
 if ($mod || ($netsvc == 'enable')){
     $sensors = ipmi_sensors();
-	$fantemp = ipmi_get_fantemp();
-	$board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
+    $fantemp = ipmi_get_fantemp();
+    $board   = trim(shell_exec("ipmi-fru $netopts | grep 'Board Manufacturer' | awk -F 'r:' '{print $2}'")); // motherboard
 }
 
 $boards_repo = 'https://raw.githubusercontent.com/dmacias72/unRAID-plugins/master/plugins/boards.json';
