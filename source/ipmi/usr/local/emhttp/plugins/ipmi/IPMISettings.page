@@ -11,7 +11,6 @@ Title="Settings"
     .CodeMirror pre.CodeMirror-placeholder { color: #999; }
 </style>
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
-<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/jquery-ui-1.11.2.custom.css">
 
 <div id="title" style="margin-top: -22px;">
     <span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span>
@@ -19,21 +18,6 @@ Title="Settings"
     <img class="board-img" src=""></span>
     <span class="status" id="notify-status">Event Notification: <?=$seld_status;?> </span>
 </div>
-
-<form markdown="1" name="ignore_settings">
-
-Available Sensors List:
-: <select multiple id="ignore" name="IGNORE">
-        <?=ipmi_get_selected();?>
-  </select>
-
-> Checked sensors will show in all dropdown menus and reading display.
->
-> Unchecked will not be displayed.
-
-</form>
-
-<br>
 
 <form markdown="1" name="seld_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -96,7 +80,7 @@ Enable Network Connection(s):
 
 &nbsp;
 
-<input id="DEFAULT" class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Reset BMC" id="bmc-reset" title="do a warm reset of the BMC">
+<input class="seld-run" type="button" value="Default" onClick="resetDATA(this.form);"><input type="button" value="Reset BMC" id="bmc-reset" title="do a warm reset of the BMC">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()">
 </form>
 
@@ -105,6 +89,27 @@ Enable Network Connection(s):
 > Reset BMC button performs a warm reset of the BMC
 
 <div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/mb.png"> Display Settings</span></div>
+
+<form markdown="1" name="ignore_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
+<input type="hidden" id="IGNORE" name="IGNORE" value="<?=$ignore;?>" />
+
+Available Sensors List:
+: <select multiple id="select">
+        <?=ipmi_get_selected();?>
+  </select>
+
+> Checked sensors will show in all dropdown menus and reading display.
+>
+> Unchecked will not be displayed.
+
+&nbsp;
+
+&nbsp;
+: <input type="submit" value="Save" onClick="verifyIgnoreDATA(this.form)"><input type="button" value="Done" onClick="done()">
+</form>
+
+<div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/sensors2.png"> Footer Settings</span></div>
 
 <form markdown="1" name="footer_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -143,7 +148,9 @@ Sensor #4:
 
 > Forth sensor to monitor and display in footer of webGui.
 
-<input id="DEFAULT" type="button" value="Default" onClick="resetDispDATA(this.form);">
+&nbsp;
+
+<input type="button" value="Default" onClick="resetDispDATA(this.form);">
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
@@ -166,14 +173,13 @@ $(function(){
         showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
     <?endif;?>
 
-    $('#ignore').dropdownchecklist( {
-        emptyText: 'No sensors available',
+    $('#select').dropdownchecklist( {
+        emptyText: 'No Sensors Available',
         icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
-        width: 200,
-        explicitClose: 'save',
-        closeRadioOnClick: true,
+        width: 235,
+        explicitClose: 'close',
         firstItemChecksAll: true,
-        textFormatFunction: function(options) { return 'Select available sensors'; },
+        textFormatFunction: function(options) { return 'Select Available Sensors'; },
         onComplete: function(selector){
         var values = '';
         for( i=0; i < selector.options.length; i++ ) {
@@ -183,10 +189,7 @@ $(function(){
                 values += selector.options[i].value;
             }
         }
-        alert(values);
-        $.post('/update.php', {'#file': 'ipmi/ipmi.cfg', IGNORE: values},function () {
-            $('#ingore').dropdownchecklist('refresh');
-        });
+        $('#IGNORE').val(values);
         }
 });
 
