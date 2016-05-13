@@ -2,14 +2,14 @@
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 
 $cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data ';
-$log = "/boot/config/plugins/ipmi/archived_events.log";
+$log = '/boot/config/plugins/ipmi/archived_events.log';
 $event = $_GET["event"];
 $archive = $_GET["archive"];
 
 /* network options */
 if($netsvc == 'enable') {
     if($event){
-        $id = explode("_", $event);
+        $id = explode('_', $event);
         $event = $id[1];
         $options = " -h ".long2ip($id[0]);
     }else
@@ -21,7 +21,7 @@ if($netsvc == 'enable') {
 /* archive */
 if($archive) {
     if($event)
-        $append = "--display=".$event.$options;
+        $append = '--display='.$event.$options;
     else
         $append = $options;
 
@@ -29,9 +29,9 @@ if($archive) {
 }
 
 if($event)
-    $options = "--delete=".$event.$options;
+    $options = '--delete='.$event.$options;
 else
-    $options = "--clear ".$options;
+    $options = '--clear '.$options;
 
 shell_exec($cmd.$options);
 ?>
