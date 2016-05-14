@@ -94,7 +94,7 @@ Enable Network Connection(s):
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
 <input type="hidden" id="IGNORE" name="IGNORE" value="<?=$ignore;?>" />
 
-Available Sensors List:
+Available Sensors:
 : <select multiple id="select">
         <?=ipmi_get_selected();?>
   </select>
@@ -106,7 +106,7 @@ Available Sensors List:
 &nbsp;
 
 &nbsp;
-: <input type="submit" value="Save" onClick="verifyIgnoreDATA(this.form)"><input type="button" value="Done" onClick="done()">
+: <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
 <div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/sensors2.png"> Footer Settings</span></div>
