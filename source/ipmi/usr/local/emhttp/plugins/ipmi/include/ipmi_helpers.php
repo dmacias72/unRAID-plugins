@@ -33,16 +33,6 @@ function get_temp_range($range, $selected=null){
     return $options;
 }
 
-function get_ignored() {
-    global $ignore;
-    //get list of ignored sensors
-    if(!empty($netopts)){
-        foreach($ignore as $id){
-        explode('_', $id);
-        }
-    }
-}
-
 /* get an array of all sensors and their values */
 function ipmi_sensors() {
     global $netopts, $hdd_temp;
@@ -215,19 +205,23 @@ function ipmi_get_options($selected=null){
 
 /* get select options for available sensors */
 function ipmi_get_selected(){
-    //global $sensors, $ignore
-    $sensors = [];
+    global $sensors, $netopts, $ignore;
+    $ignored = explode(',', $ignore); // create array of ignored sensors
     $options = (!empty($sensors)) ? '<option value="">Toggle All</option>' : '<option value="" disabled>No Sensors Available</option>';
     foreach($sensors as $id => $sensor){
         $name     = $sensor['Name'];
         $reading  = $sensor['Reading'];
-        $pattern  = '/^'.$id.'.*/'; 
-        $ip       = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
+        $ip       = ''; 
         $units    = ($reading == 'N/A')    ? '' : $sensor['Units'];
+        if(!empty($netopts)){
+            $ip = " (${sensor['IP']})";
+            $id = $sensor['IP'].':'.explode('_', $id)[1];
+        }
+        $pattern  = '/^'.$id.'.*/'; // id to search for
         $options .= "<option value='$id'";
 
         // only select sensors that are not saved
-        $options .= preg_grep($pattern, $ignore) ?  '' : " selected";
+        $options .= preg_grep($pattern, $ignored) ?  '' : " selected"; // search for id in array
 
         $options .= ">$name$ip - $reading $units</option>";
 
