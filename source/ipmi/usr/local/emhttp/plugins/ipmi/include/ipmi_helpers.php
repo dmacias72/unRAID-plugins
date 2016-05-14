@@ -206,24 +206,19 @@ function ipmi_get_options($selected=null){
 /* get select options for available sensors */
 function ipmi_get_selected(){
     global $sensors, $netopts, $ignore;
-    $ignored = explode(',', $ignore); // create array of ignored sensors
+    $ignored = array_flip(explode(',', $ignore)); // create array of ignored sensors
     $options = (!empty($sensors)) ? '<option value="">Toggle All</option>' : '<option value="" disabled>No Sensors Available</option>';
-    foreach($sensors as $id => $sensor){
-        $name     = $sensor['Name'];
+    foreach($sensors as $sensor){
+        $id       = $sensor['ID'];
         $reading  = $sensor['Reading'];
-        $ip       = ''; 
-        $units    = ($reading == 'N/A')    ? '' : $sensor['Units'];
-        if(!empty($netopts)){
-            $ip = " (${sensor['IP']})";
-            $id = $sensor['IP'].':'.explode('_', $id)[1];
-        }
-        $pattern  = '/^'.$id.'.*/'; // id to search for
+        $units    = ($reading == 'N/A') ? '' : " ${sensor['Units']}";
+        $ip       = (empty($netopts))   ? '' : " ${sensor['IP']}";
         $options .= "<option value='$id'";
 
-        // only select sensors that are not saved
-        $options .= preg_grep($pattern, $ignored) ?  '' : " selected"; // search for id in array
+        // search for id in array to not select ignored sensors
+        $options .= array_key_exists($id, $ignored) ?  '' : " selected";
 
-        $options .= ">$name$ip - $reading $units</option>";
+        $options .= ">${sensor['Name']}$ip - $reading$units</option>";
 
     }
     return $options;
