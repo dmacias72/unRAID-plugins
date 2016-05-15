@@ -5,9 +5,9 @@ Markdown="false"
 <?
 $config_file = "$plg_path/ipmi.config";
 $ipmi_config = '';
-if($mod || ($netsvc == 'enable')) {
+if($ipmi || !empty($netopts)) {
     // Only get config if the current one is 1 hour old or more
-    if(!is_file($config_file) || (filesize($config_file) == 0 )) {
+    if(!file_exists($config_file) || (filesize($config_file) == 0 )) {
         $cmd = "ipmi-config --filename=$config_file --checkout $netopts";
         shell_exec($cmd);
     }
