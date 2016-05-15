@@ -111,9 +111,9 @@ Dashboard Display:
         <?=ipmi_get_dashtypes();?>
   </select>
 
-> Check sensor types to show in Dashboard display.
+> Check sensor types to show in Dashboard display. Unchecked sensor types will not be displayed.
 >
-> Unchecked sensors will not be displayed.
+> Uncheck all sensor types to disable IPMI Dashboard summary.
 
 &nbsp;
 
