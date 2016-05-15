@@ -1,10 +1,34 @@
 <?
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/fan_helpers.php';
+
+$action = array_key_exists('action', $_GET) ? $_GET['action'] : '';
+$hdd_temp = get_highest_temp();
+
+if (!empty($action)) {
+    $state = ['Critical' => 'red', 'Warning' => 'yellow', 'Nominal' => 'green', 'N/A' => 'blue'];
+    if ($action == 'ipmisensors'){
+        $return  = ['Sensors' => ipmi_sensors(),'Network' => ($netsvc == 'enable'),'State' => $state];
+        echo json_encode($return);
+    }
+    elseif($action == 'ipmievents'){
+        $return  = ['Events' => ipmi_events(),'Network' => ($netsvc == 'enable'),'State' => $state];
+        echo json_encode($return);
+    }
+    elseif($action == 'ipmiarch'){
+        $return  = ['Archives' => ipmi_events(true), 'Network' => ($netsvc == 'enable'), 'State' => $state];
+        echo json_encode($return);
+    }
+    elseif($action == 'ipmidash') {
+        $return  = ['Sensors' => ipmi_sensors(),'DashTypes' => $dashtypes,'Network' => ($netsvc == 'enable'),'State' => $state];
+        echo json_encode($return);
+    }
+}
 
 /* get highest temp of hard drives */
 function get_highest_temp(){
     $hdds = parse_ini_file('/var/local/emhttp/disks.ini',true);
-    $highest_temp = "0";
+    $highest_temp = '0';
     foreach ($hdds as $hdd) {
         $temp = $hdd['temp'];
         if(is_numeric($temp))
@@ -13,9 +37,7 @@ function get_highest_temp(){
     return $highest_temp;
 }
 
-$hdd_temp = get_highest_temp();
-
-// get options for high or low temp thresholds
+/* get options for high or low temp thresholds */
 function get_temp_range($range, $selected=null){
     $temps = [20,80];
     if ($range == 'HI')
@@ -34,20 +56,28 @@ function get_temp_range($range, $selected=null){
 }
 
 /* get an array of all sensors and their values */
-function ipmi_sensors() {
-    global $netopts, $hdd_temp;
-    $cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts 2>/dev/null"; // --non-abbreviated-units
+function ipmi_sensors($all=false) {
+    global $ipmi, $netopts, $hdd_temp, $ignore;
+
+    // return empty array if no ipmi detected or network options
+    if(!$ipmi && empty($netopts))
+        return [];
+
+    $ignored = ($all) ? '' : "-R $ignore";
+    $cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null"; // --non-abbreviated-units
     exec($cmd, $output, $return_var=null);
 
     if ($return_var)
         return []; // return empty array if error
 
-    // add highest hard drive temp sensor
-    $hdd = "99,HDD Temperature,Temperature,Nominal,$hdd_temp,C,N/A,N/A,N/A,N/A,N/A,N/A,Ok";
-    if(!empty($netopts))
-        $hdd = '127.0.0.1:'.$hdd;
-    $output[] = $hdd;
-
+    // add highest hard drive temp sensor and check if hdd is ignored
+    $hdd = ((preg_match('/99/', $ignore)) && !$all) ? '' :
+        "99,HDD Temperature,Temperature,Nominal,$hdd_temp,C,N/A,N/A,N/A,45.00,50.00,N/A,Ok";
+    if(!empty($hdd)){
+        if(!empty($netopts))
+            $hdd = '127.0.0.1:'.$hdd;
+        $output[] = $hdd;
+    }
     // key names for ipmi sensors output
     $keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
     $sensors = [];
@@ -80,7 +110,12 @@ function ipmi_sensors() {
 
 /* get array of events and their values */
 function ipmi_events($archive=null){
-    global $netopts;
+    global $ipmi, $netopts;
+
+    // return empty array if no ipmi detected or network options
+    if(!$ipmi && empty($netopts))
+        return [];
+
     if($archive) {
         $filename = "/boot/config/plugins/ipmi/archived_events.log";
         $output = is_file($filename) ? file($filename, FILE_IGNORE_NEW_LINES) : [] ;
@@ -88,8 +123,10 @@ function ipmi_events($archive=null){
         $cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $netopts 2>/dev/null";
         exec($cmd, $output, $return_var=null);
     }
+
+    // return empty array if error
     if ($return_var)
-        return []; // return empty array if error
+        return [];
 
     // key names for ipmi event output
     $keys = ['ID','Date','Time','Name','Type','State','Event'];
@@ -138,50 +175,7 @@ function ipmi_events($archive=null){
     return $events;
 }
 
-/* get reading for a given sensor by name */
-function ipmi_get_readings() {
-    global $netopts, $hdd_temp;
-    $cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $netopts 2>/dev/null";
-    exec($cmd, $output, $return_var=null);
-
-    if($return_var)
-        return []; // return empty array if error
-
-    // add highest hard drive temp sensor
-    $hdd = "99,HDD Temperature,Temperature,$hdd_temp,C,Ok";
-    if(!empty($netopts))
-        $hdd = '127.0.0.1:'.$hdd;
-    $output[] = $hdd;
-
-    // key names for ipmi sensors output
-    $keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
-    $sensors = [];
-
-    foreach($output as $line){
-
-        // add sensor keys as keys to ipmi sensor output
-        $sensor_raw = explode(",", $line);
-        $size_raw = sizeof($sensor_raw);
-        $sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
-
-        if (empty($netopts)){
-            $sensors[$sensor['ID']] = $sensor;
-        }else{
-            //split id into host and id
-            $id = explode(':',$sensor['ID']);
-            $sensor['IP'] = trim($id[0]);
-            $sensor['ID'] = trim($id[1]);
-            if ($sensor['IP'] == 'localhost')
-                $sensor['IP'] = '127.0.0.1';
-
-            // add sensor to array of sensors
-            $sensors[ip2long($sensor['IP']).'_'.$sensor['ID']] = $sensor;
-        }
-    }
-    return $sensors; // sensor readings
-}
-
-/* get select options for a given sensor type */
+/* get select options for a fan and temp sensors */
 function ipmi_get_options($selected=null){
     global $sensors;
     $options = "";
@@ -203,11 +197,18 @@ function ipmi_get_options($selected=null){
     return $options;
 }
 
-/* get select options for available sensors */
-function ipmi_get_selected(){
-    global $sensors, $netopts, $ignore;
-    $ignored = array_flip(explode(',', $ignore)); // create array of ignored sensors
-    $options = (!empty($sensors)) ? '<option value="">Toggle All</option>' : '<option value="" disabled>No Sensors Available</option>';
+/* get select options for enabled sensors */
+function ipmi_get_enabled(){
+    global $ipmi, $netopts, $ignore;
+
+    // return empty array if no ipmi detected or network options
+    if(!$ipmi && empty($netopts))
+        return [];
+
+    $sensors = ipmi_sensors(true);
+    $ignored = array_flip(explode(',', $ignore)); // create array of keyed ignored sensors
+    $options = (!empty($sensors)) ? '<option value="">Select All</option>' :
+        '<option value="" disabled>No Sensors Available</option>';
     foreach($sensors as $sensor){
         $id       = $sensor['ID'];
         $reading  = $sensor['Reading'];
@@ -220,6 +221,18 @@ function ipmi_get_selected(){
 
         $options .= ">${sensor['Name']}$ip - $reading$units</option>";
 
+    }
+    return $options;
+}
+
+// get options for dashboard types
+function ipmi_get_dashtypes() {
+    global $dashtypes;
+    $sensors = array_flip(explode(',', $dashtypes)); // create array of keyed dash sensors
+    $types   = ['Temperature','Fan','Voltage'];
+    $options = '<option value="">Select All</option>';
+    foreach($types as $type){
+        $options .="<option value='$type'".(array_key_exists($type, $sensors) ? ' selected':'').">$type</option>";
     }
     return $options;
 }

@@ -1,7 +1,11 @@
 <?
 /* get fan and temp sensors array */
 function ipmi_get_fantemp() {
-    global $fanopts, $hdd_temp;
+    global $ipmi, $fanopts, $hdd_temp;
+
+    if(!$ipmi && empty($fanopts))
+        return [];
+
     $cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output --interpret-oem-data $fanopts 2>/dev/null";
     exec($cmd, $output, $return_var=null);
 

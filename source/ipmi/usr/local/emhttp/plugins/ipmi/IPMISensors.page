@@ -79,6 +79,9 @@ $(function(){
 
     $('#tblSensor').tablesorter({
         sortList: [[2,0]],
+        sortReset: true,
+        sortRestart : true,
+        sortInitialOrder: 'asc',
         widgets: ['saveSort', 'filter', 'stickyHeaders'],
         widgetOptions: {
             stickyHeaders_filteredToTop: true,
@@ -102,44 +105,43 @@ $(function(){
     });
 
     // add network class to ip address filter row cells
-    $('#tblSensor tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
+    $('#tblSensor tr.tablesorter-filter-row').children('td:nth-child(2)').addClass('network');
 
     // add advanced class to select tablesorter filter row cells
     var tdAdv = [3, 5, 6, 7, 10, 11, 12];
     $.each(tdAdv , function (index, value) {
-        $('#tblSensor tr.tablesorter-filter-row').children("td:nth-child("+value+")").addClass('advanced');
+        $('#tblSensor tr.tablesorter-filter-row').children('td:nth-child('+value+')').addClass('advanced');
     });
 
     sensorArray(false);
-    sensorRefresh();
+    setTimeout(sensorRefresh, 20000);
 
 });
 
-var Host;
-var State = {'Critical':'red', 'Warning':'yellow', 'Nominal':'green', 'N/A':'blue'};
-
 /* sensor refresh */
 function sensorRefresh() {
-  sensorArray(true);
-   setTimeout(sensorRefresh, 20000);
+    sensorArray(true);
+    setTimeout(sensorRefresh, 20000);
 };
 
 /* load ipmi sensor table */
 function sensorArray(Refresh){
-    $.getJSON('/plugins/ipmi/include/ipmi_sensors.php', function(sensors) {
-        $.each(sensors, function (i, sensor) {
+    $.getJSON('/plugins/ipmi/include/ipmi_helpers.php', {action:'ipmisensors'}, function(data) {
+        $.each(data.Sensors, function (i, sensor) {
             var LowerNR = parseFloat(sensor.LowerNR);
-            var LowerC = parseFloat(sensor.LowerC);
+            var LowerC  = parseFloat(sensor.LowerC);
             var LowerNC = parseFloat(sensor.LowerNC);
             var UpperNC = parseFloat(sensor.UpperNC);
-            var UpperC = parseFloat(sensor.UpperC);
+            var UpperC  = parseFloat(sensor.UpperC);
             var UpperNR = parseFloat(sensor.UpperNR);
-            var Color = 'green';
+            var Color   = 'green';
+            var Units   = '';
 
             // only process sensor if reading is valid
             if (sensor.Reading != 'N/A'){
                 var Reading = parseFloat(sensor.Reading);
                 if (sensor.Type == 'Voltage'){
+                    Units += ' ';
 
                     // if voltage is less than lower non-critical
                     // or voltage is greater than upper non-critical show critical
@@ -152,56 +154,62 @@ function sensorArray(Refresh){
                         Color = 'red';
 
                 } else if (sensor.Type == 'Fan'){
+                    Units += ' ';
 
                     // if Fan RPMs are less than lower non-critical
                     if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
                         Color = "red";
 
                 } else if(sensor.Type == 'Temperature'){
-                    sensor.Units = '&deg;'+sensor.Units;
+                    Units += '&deg;';
 
-                    // if Temperature is greater than upper non-critical
-                    if (Reading > UpperNC || Reading > UpperC || Reading > UpperNR)
+                    // if temperature is greater than upper non-critical show critical
+                    if (Reading > UpperNC)
+                        Color = 'orange';
+
+                    // if temperature is greater than upper critical show non-recoverable
+                    if (Reading > UpperC)
                         Color = 'red';
                 }
+                Units += sensor.Units;
             }else {
-                var Reading = sensor.Reading; // reading equals N/A
-                Color = 'blue';
+                var Reading = sensor.Reading;
+                Color = 'blue'; // reading equals N/A
             }
 
             if(Refresh) {
-                $("#"+i+" td.reading").html("<font color='"+ Color + "'>"+Reading+" "+sensor.Units+"</font>");
+                $('#'+i+' td.reading').html('<font color="'+ Color + '">'+ Reading + Units +'</font>');
             } else {
-                Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP;
+                var Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP; // check if network connection was used
                 $('#tblSensor tbody')
-                .append("<tr id='"+i+"'>"+
-                "<td title='"+sensor.State+"'><img src='/plugins/dynamix/images/"+ State[sensor.State] +"-on.png'/></td>"+ //state
-                "<td class='network'>"+Host+"</td>"+ // sensor host ip address
-                "<td class='advanced'>"+sensor.ID+"</td>"+ // sensor id
-                "<td>"+sensor.Name+"</td>"+ //sensor name
-                "<td class='advanced'>"+ sensor.LowerNR +"</td>"+ // lower non recoverable
-                "<td class='advanced'>"+ sensor.LowerC +"</td>"+ // lower critical
-                "<td class='advanced'>"+ sensor.LowerNC +"</td>"+ // lower non critical
-                "<td class='reading'>"+ "<font color='"+ Color + "'>"+ Reading +" "+ sensor.Units +"</font></td>"+ //sensor reading
-                "<td>"+sensor.Type+"</td>"+ //sensor units
-                "<td class='advanced'>"+ sensor.UpperNC +"</td>"+ // upper non critical
-                "<td class='advanced'>"+ sensor.UpperC +"</td>"+ // upper critical
-                "<td class='advanced'>"+ sensor.UpperNR +"</td>"+ // upper non recoverable
-                "</tr>");
+                .append('<tr id="'+i+'">'+
+                '<td title="'+sensor.State+'"><img src="/plugins/dynamix/images/'+ data.State[sensor.State] +'-on.png"/></td>'+ //state
+                '<td class="network">' +Host+'</td>'+ // sensor host ip address
+                '<td class="advanced">'+ sensor.ID      +'</td>'+ // sensor id
+                '<td>'+sensor.Name+'</td>'+ //sensor name
+                '<td class="advanced">'+ sensor.LowerNR +'</td>'+ // lower non recoverable
+                '<td class="advanced">'+ sensor.LowerC  +'</td>'+ // lower critical
+                '<td class="advanced">'+ sensor.LowerNC +'</td>'+ // lower non critical
+                '<td class="reading">' + '<font color="'+ Color + '">'+ Reading + Units +'</font></td>'+ //sensor reading
+                '<td>'+sensor.Type+'</td>'+ //sensor type
+                '<td class="advanced">'+ sensor.UpperNC +'</td>'+ // upper non critical
+                '<td class="advanced">'+ sensor.UpperC  +'</td>'+ // upper critical
+                '<td class="advanced">'+ sensor.UpperNR +'</td>'+ // upper non recoverable
+                '</tr>');
             }
         });
         if (!Refresh) {
-            if(Host === '')
-                $('.network').hide();
-            else
+            if(data.Network)
                 $('.network').show();
+            else
+                $('.network').hide();
 
             if ($('#advancedview')[0].checked)
                 $('.advanced').show();
             else
                 $('.advanced').hide();
 
-            // restore filters
+            // restore filters and update table for tablesorter
             var lastSearch = $('#tblSensor')[0].config.lastSearch;
             $('#tblSensor').trigger('update');
             $('#tblSensor').trigger('search', [lastSearch]);

@@ -3,184 +3,188 @@ Title="Event Log"
 Markdown="false"
 ---
 <div>
-	<span id="arch-switch" class="status"><input type="checkbox" id="event-arch"></span>
-	<table class="tablesorter hover-highlight events" id="tblEvent">			
-		<thead>
-			<tr>
-				<th class="sorter-false filter-false"> Status </th>
-				<th class="network sorter-ipv4Address filter-ip" data-placeholder="by IP Address"> IP Address </th>
-				<th class="filter-false"> Event ID </th>
-				<th class="filter-time" data-placeholder="by timestamp"> Timestamp </th>
-				<th class="filter-name" data-placeholder="Search..."> Sensor Name </th>
-				<th class="filter-type" data-placeholder="by type"> Sensor Type </th>
-				<th class="filter-desc" data-placeholder="Search..."> Description </th>
-				<th class="filter-false sorter-false"><a id='allEvents' title='clear all'><i class="fa fa-trash"> Clear All </i></a></th>
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
-	<blockquote class="inline_help">
-		<p>Table of IPMI events. Can be sorted, filtered and searched. Archive switch enables deleted events to be saved on the flash drive and displayed in the Archived Events tab.</p>
-	</blockquote>
+    <span id="arch-switch" class="status"><input type="checkbox" id="event-arch"></span>
+    <table class="tablesorter hover-highlight events" id="tblEvent">
+        <thead>
+            <tr>
+                <th class="sorter-false filter-false"> Status </th>
+                <th class="network sorter-ipv4Address filter-ip" data-placeholder="by IP Address"> IP Address </th>
+                <th class="filter-false"> Event ID </th>
+                <th class="filter-time" data-placeholder="by timestamp"> Timestamp </th>
+                <th class="filter-name" data-placeholder="Search..."> Sensor Name </th>
+                <th class="filter-type" data-placeholder="by type"> Sensor Type </th>
+                <th class="filter-desc" data-placeholder="Search..."> Description </th>
+                <th class="filter-false sorter-false"><a id='allEvents' title='clear all'><i class="fa fa-trash"> Clear All </i></a></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <blockquote class="inline_help">
+        <p>Table of IPMI events. Can be sorted, filtered and searched. Archive switch enables deleted events to be saved on the flash drive and displayed in the Archived Events tab.</p>
+    </blockquote>
 </div>
 <div id="pager" class="pager">
-	<form>
-		<a class="first"><i class="fa fa-step-backward"></i></a>
-		<a class="prev"><i class="fa fa-backward"></i></a>
-		<span class="pagedisplay"></span>
-		<a class="next"><i class="fa fa-forward"></i></a>
-		<a class="last"><i class="fa fa-step-forward"></i></a>
-		<select class="pagesize">
-			<option value="5">5</option>
-			<option value="10">10</option>
-			<option value="15">15</option>
-			<option value="20">20</option>
-			<option value="all">All</option>
-		</select>
-		&nbsp;
-		<a  title="reset filters" class="reset-events"><i class="fa fa-undo"></i></a>
-	</form>
-	<blockquote class="inline_help">
-		<p>Table is split into pages. Drop down selects the number of rows to display per page. Reset button resets the table filters.</p>
-	</blockquote>
+    <form>
+        <a class="first"><i class="fa fa-step-backward"></i></a>
+        <a class="prev"><i class="fa fa-backward"></i></a>
+        <span class="pagedisplay"></span>
+        <a class="next"><i class="fa fa-forward"></i></a>
+        <a class="last"><i class="fa fa-step-forward"></i></a>
+        <select class="pagesize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="all">All</option>
+        </select>
+        &nbsp;
+        <a  title="reset filters" class="reset-events"><i class="fa fa-undo"></i></a>
+    </form>
+    <blockquote class="inline_help">
+        <p>Table is split into pages. Drop down selects the number of rows to display per page. Reset button resets the table filters.</p>
+    </blockquote>
 </div>
 <script type="text/javascript" src="/plugins/tablesorter/js/parsers/parser-network.min.js"></script>
 <script>
 $(function(){
-	//event archive switch set cookie and toggle archive setting
-	$('#event-arch').switchButton({
-		labels_placement: 'left',
-		on_label: 'Archive On',
-		off_label: 'Archive Off',
-		checked: ($.cookie('ipmi_event_archive') == 1)
-	})
-	.change(function () {
-		$.cookie('ipmi_event_archive', $('#event-arch')[0].checked ? 1 : 0, { expires: 3650 });
-		$("#tab3").parent().toggle();
-	});
+    //event archive switch set cookie and toggle archive setting
+    $('#event-arch').switchButton({
+        labels_placement: 'left',
+        on_label: 'Archive On',
+        off_label: 'Archive Off',
+        checked: ($.cookie('ipmi_event_archive') == 1)
+    })
+    .change(function () {
+        $.cookie('ipmi_event_archive', $('#event-arch')[0].checked ? 1 : 0, { expires: 3650 });
+        $('#tab3').parent().toggle();
+    });
 
-	if($.cookie('ipmi_event_archive') == 1)
-		$("#tab3").parent().show();
-	else
-		$("#tab3").parent().hide();
+    if($.cookie('ipmi_event_archive') == 1)
+        $('#tab3').parent().show();
+    else
+        $('#tab3').parent().hide();
 
-	$('#tblEvent').tablesorter({
-		sortList: [[2,1]],
-		widgets: ['saveSort', 'filter', 'stickyHeaders'],
-		widgetOptions: {
-			stickyHeaders_filteredToTop: true,
-			filter_hideEmpty : true,
-			filter_liveSearch : true,
-			filter_saveFilters : true,
-			filter_reset : '.reset-events',
-			filter_functions: {
-				'.filter-ip' : true,
-				'.filter-type' : true,
-				'.filter-time' : {
-					'3 days'		: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 259200000); }, //3*24*60*60 3 days
-					'1 week'		: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 604800000); }, //7*24*60*60 1 week
-					'2 weeks'	: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 1209600000); }, //14*24*60*60 2 weeks
-					'1 month'	: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 2592000000); }, //30*24*60*60 1 month
-					'6 months'	: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 15724800000); }, //26*7*24*60*60 6 months
-					'1 year'		: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 31449600000); } //52*7*24*60*60 1 year
-				}
-			}
-		}
-	})
-	.tablesorterPager({
-		container: $('#pager'),
-		fixedHeight: false,
-		size: 20
-	});
+    $('#tblEvent').tablesorter({
+        sortList: [[2,1]],
+        sortReset: true,
+        sortRestart : true,
+        sortInitialOrder: 'asc',
+        widgets: ['saveSort', 'filter', 'stickyHeaders'],
+        widgetOptions: {
+            stickyHeaders_filteredToTop: true,
+            filter_hideEmpty : true,
+            filter_liveSearch : true,
+            filter_saveFilters : true,
+            filter_reset : '.reset-events',
+            filter_functions: {
+                '.filter-ip' : true,
+                '.filter-type' : true,
+                '.filter-time' : {
+                    '3 days'		: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 259200000); }, //3*24*60*60 3 days
+                    '1 week'		: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 604800000); }, //7*24*60*60 1 week
+                    '2 weeks'	: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 1209600000); }, //14*24*60*60 2 weeks
+                    '1 month'	: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 2592000000); }, //30*24*60*60 1 month
+                    '6 months'	: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 15724800000); }, //26*7*24*60*60 6 months
+                    '1 year'		: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 31449600000); } //52*7*24*60*60 1 year
+                }
+            }
+        }
+    })
+    .tablesorterPager({
+        container: $('#pager'),
+        fixedHeight: false,
+        size: 20
+    });
 
-	// add network class to ip address filter row cells
-	$('#tblEvent tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
+    // add network class to ip address filter row cells
+    $('#tblEvent tr.tablesorter-filter-row').children('td:nth-child(2)').addClass('network');
 
-	eventArray();
+    eventArray();
 });
 
 /* load ipmi event table */
 function eventArray(){
-	$.getJSON('/plugins/ipmi/include/ipmi_events.php', function(events) {
-		$.each(events, function (i, event) {
-			Host = (typeof event.IP == 'undefined') ? '' : event.IP;
-			$('#tblEvent tbody')
-			.append("<tr id='"+i+"'>"+
-			"<td title='"+ event.State +"'><img src='/plugins/dynamix/images/"+ State[event.State] +"-on.png'/></td>"+ //state
-			"<td class='network'>"+ Host +"</td>"+ //event host ip address
-			"<td>"+ event.ID +"</td>"+ //event id
-			"<td>"+ event.Date+"</td>"+ //time stamp
-			"<td>"+ event.Name +"</td>"+ //sensor name
-			"<td>"+ event.Type +"</td>"+ //event type
-			"<td>"+ event.Event +"</td>"+ //event description
-			"<td><a class='delete'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
-			"</tr>");
-		});
+    $.getJSON('/plugins/ipmi/include/ipmi_helpers.php', {action:'ipmievents'}, function(data) {
+        $.each(data.Events, function (i, event) {
+            var Host = (typeof event.IP == 'undefined') ? '' : event.IP; // check if network connection was used
+            $('#tblEvent tbody')
+            .append('<tr id="'+i+'">'+
+            '<td title="'+ event.State +'"><img src="/plugins/dynamix/images/'+ data.State[event.State] +'-on.png"/></td>'+ //state
+            '<td class="network">'+ Host +'</td>'+ //event host ip address
+            '<td>'+ event.ID    +'</td>'+ //event id
+            '<td>'+ event.Date  +'</td>'+ //time stamp
+            '<td>'+ event.Name  +'</td>'+ //sensor name
+            '<td>'+ event.Type  +'</td>'+ //event type
+            '<td>'+ event.Event +'</td>'+ //event description
+            '<td><a class="delete"><i class="fa fa-trash" title="delete"></i></a></td>'+ //delete icon
+            '</tr>');
+        });
 
-		if(Host === '')
-			$('.network').hide();
-		else
-			$('.network').show();
+        if(data.Network)
+            $('.network').show();
+        else
+            $('.network').hide();
 
-		$('.delete').click(function () {
-			Delete($(this).parent().parent().attr('id'));
-		});
+        $('.delete').click(function () {
+            Delete($(this).parent().parent().attr('id'));
+        });
 
-		var lastSearch = $("#tblEvent")[0].config.lastSearch;
-		$('#tblEvent').trigger('update'); //update table for tablesorter
-		$("#tblEvent").trigger("search", [lastSearch]);
-			
-		$('#allEvents').click(function() {
-			Delete(0);
-		});
-	});
+        // restore filters and update table for tablesorter
+        var lastSearch = $('#tblEvent')[0].config.lastSearch;
+        $('#tblEvent').trigger('update');
+        $('#tblEvent').trigger('search', [lastSearch]);
+
+        $('#allEvents').click(function() {
+            Delete(0);
+        });
+    });
 }
 
 /* delete event function */
 function Delete(ID) {
-	var EventDelete = '/plugins/ipmi/include/ipmi_event_delete.php';
-	var Archive = $.cookie('ipmi_event_archive');
-	if (ID == 0) {
-		swal({
-			title: 'Are you sure?', 
-			text: 'You want to remove all events!?', 
-			type: 'warning',
-			showCancelButton: true,
-			closeOnConfirm: true,
-		}, function() {
-			$.get(EventDelete, {archive: Archive, event: ID}, function() {
-				$('#tblEvent tbody').empty(); // empty table
-				if(Archive == 1){
-					archiveArray();
-				}
-			});
-		});
-	} else {
-		var trID = $('#'+ID);
-		$.get(EventDelete, {archive: Archive, event: ID},
-			function() {
-				//remove table row
-				trID
-				.children('td')
-				.animate({ padding: 0 })
-				.wrapInner('<div />')
-				.children()
-				.slideUp(function() {
-					trID.remove();
-					$('#tblEvent').trigger('update');
-				});
-			if(Archive == 1){
-				archiveArray();
-			}
-		});
-	}
+    var EventDelete = '/plugins/ipmi/include/ipmi_event_delete.php';
+    var Archive = $.cookie('ipmi_event_archive');
+    if (ID == 0) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to remove all events!?',
+            type: 'warning',
+            showCancelButton: true,
+            closeOnConfirm: true,
+        }, function() {
+            $.get(EventDelete, {archive: Archive, event: ID}, function() {
+                $('#tblEvent tbody').empty();
+                if(Archive == 1){
+                    archiveArray();
+                }
+            });
+        });
+    } else {
+        var trID = $('#'+ID);
+        $.get(EventDelete, {archive: Archive, event: ID},
+            function() {
+                //animate removal of table row
+                trID
+                .children('td')
+                .animate({ padding: 0 })
+                .wrapInner('<div />')
+                .children()
+                .slideUp(function() {
+                    trID.remove();
+                    $('#tblEvent').trigger('update');
+                });
+            if(Archive == 1){
+                archiveArray();
+            }
+        });
+    }
 }
 
 </script>

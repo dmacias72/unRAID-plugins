@@ -3,161 +3,164 @@ Title="Archived Events"
 Markdown="false"
 ---
 <div>
-	<table class="tablesorter hover-highlight archive" id="tblArchive">			
-		<thead>
-			<tr>
-				<th class="sorter-false filter-false"> Status </th>
-				<th class="network sorter-ipv4Address filter-ip-arch" data-placeholder="by IP Address"> IP Address </th>
-				<th class="filter-time-arch" data-placeholder="by timestamp"> Timestamp </th>
-				<th class="filter-name-arch" data-placeholder="Search..."> Sensor Name </th>
-				<th class="filter-type-arch" data-placeholder="by type"> Sensor Type </th>
-				<th class="filter-desc-arch" data-placeholder="Search..."> Description </th>
-				<th class="filter-false sorter-false"><a id='allArchive' title='clear all'><i class="fa fa-trash"> Clear All </i></a></th>
-			</tr>
-		</thead>
-		<tbody>
-		</tbody>
-	</table>
+    <table class="tablesorter hover-highlight archive" id="tblArchive">
+        <thead>
+            <tr>
+                <th class="sorter-false filter-false"> Status </th>
+                <th class="network sorter-ipv4Address filter-ip-arch" data-placeholder="by IP Address"> IP Address </th>
+                <th class="filter-time-arch" data-placeholder="by timestamp"> Timestamp </th>
+                <th class="filter-name-arch" data-placeholder="Search..."> Sensor Name </th>
+                <th class="filter-type-arch" data-placeholder="by type"> Sensor Type </th>
+                <th class="filter-desc-arch" data-placeholder="Search..."> Description </th>
+                <th class="filter-false sorter-false"><a id='allArchive' title='clear all'><i class="fa fa-trash"> Clear All </i></a></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 <blockquote class="inline_help">
-	<p>Table of IPMI archived events. Can be sorted, filtered and searched. Archive switch enables deleted events to be saved on the flash drive and displayed in the Archived Events tab.</p>
+    <p>Table of IPMI archived events. Can be sorted, filtered and searched. Archive switch enables deleted events to be saved on the flash drive and displayed in the Archived Events tab.</p>
 </blockquote>
 </div>
 <div id="pager-arch">
-	<form>
-		<a class="first"><i class="fa fa-step-backward"></i></a>
-		<a class="prev"><i class="fa fa-backward"></i></a>
-		<span class="pagedisplay"></span>
-		<a class="next"><i class="fa fa-forward"></i></a>
-		<a class="last"><i class="fa fa-step-forward"></i></a>
-		<select class="pagesize">
-			<option value="5">5</option>
-			<option value="10">10</option>
-			<option value="15">15</option>
-			<option value="20">20</option>
-			<option value="all">All</option>
-		</select>
-		&nbsp;
-		<a  title="reset filters" class="reset-archive"><i class="fa fa-undo"></i></a>
-	</form>
-	<blockquote class="inline_help">
-		<p>Table is split into pages. Drop down selects the number of rows to display per page. Reset button resets the table filters.</p>
-	</blockquote>
+    <form>
+        <a class="first"><i class="fa fa-step-backward"></i></a>
+        <a class="prev"><i class="fa fa-backward"></i></a>
+        <span class="pagedisplay"></span>
+        <a class="next"><i class="fa fa-forward"></i></a>
+        <a class="last"><i class="fa fa-step-forward"></i></a>
+        <select class="pagesize">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="all">All</option>
+        </select>
+        &nbsp;
+        <a  title="reset filters" class="reset-archive"><i class="fa fa-undo"></i></a>
+    </form>
+    <blockquote class="inline_help">
+        <p>Table is split into pages. Drop down selects the number of rows to display per page. Reset button resets the table filters.</p>
+    </blockquote>
 </div>
 
 <script>
 $(function(){
-	$('#tblArchive').tablesorter({
-		sortList: [[2,1]],
-		widgets: ['saveSort', 'filter', 'stickyHeaders'],
-		widgetOptions: {
-			stickyHeaders_filteredToTop: true,
-			filter_hideEmpty : true,
-			filter_liveSearch : true,
-			filter_saveFilters : true,
-			filter_reset : '.reset-archive',
-			filter_functions: {
-				'.filter-ip-arch' : true,
-				'.filter-type-arch' : true,
-				'.filter-time-arch' : {
-					'3 days'		: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 259200000); }, //3*24*60*60 3 days
-					'1 week'		: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 604800000); }, //7*24*60*60 1 week
-					'2 weeks'	: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 1209600000); }, //14*24*60*60 2 weeks
-					'1 month'	: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 2592000000); }, //30*24*60*60 1 month
-					'6 months'	: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 15724800000); }, //26*7*24*60*60 6 months
-					'1 year'		: function(e, n, f, i, $r, c, data) {
-						return ($.now() - n <= 31449600000); } //52*7*24*60*60 1 year
-				}
-			}
-		}
-	})
-	.tablesorterPager({
-		container: $('#pager-arch'),
-		fixedHeight: false,
-		size: 20
-	});
+    $('#tblArchive').tablesorter({
+        sortList: [[2,1]],
+        sortReset: true,
+        sortRestart : true,
+        sortInitialOrder: 'asc',
+        widgets: ['saveSort', 'filter', 'stickyHeaders'],
+        widgetOptions: {
+            stickyHeaders_filteredToTop: true,
+            filter_hideEmpty : true,
+            filter_liveSearch : true,
+            filter_saveFilters : true,
+            filter_reset : '.reset-archive',
+            filter_functions: {
+                '.filter-ip-arch' : true,
+                '.filter-type-arch' : true,
+                '.filter-time-arch' : {
+                    '3 days'		: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 259200000); }, //3*24*60*60 3 days
+                    '1 week'		: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 604800000); }, //7*24*60*60 1 week
+                    '2 weeks'	: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 1209600000); }, //14*24*60*60 2 weeks
+                    '1 month'	: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 2592000000); }, //30*24*60*60 1 month
+                    '6 months'	: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 15724800000); }, //26*7*24*60*60 6 months
+                    '1 year'		: function(e, n, f, i, $r, c, data) {
+                        return ($.now() - n <= 31449600000); } //52*7*24*60*60 1 year
+                }
+            }
+        }
+    })
+    .tablesorterPager({
+        container: $('#pager-arch'),
+        fixedHeight: false,
+        size: 20
+    });
 
-	// add network class to ip address filter row cells
-	$('#tblArchive tr.tablesorter-filter-row').children("td:nth-child(2)").addClass('network');
+    // add network class to ip address filter row cells
+    $('#tblArchive tr.tablesorter-filter-row').children('td:nth-child(2)').addClass('network');
 
-	archiveArray();
+    archiveArray();
 
 });
 
 /* load ipmi archive table */
 function archiveArray(){
-	$('#tblArchive tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
-	$.getJSON('/plugins/ipmi/include/ipmi_archive.php', function(archives) {
-		$('#tblArchive tbody').empty();
-		$.each(archives, function (i, archive) {
-			Host = (typeof archive.IP == 'undefined') ? '' : archive.IP;
-			$('#tblArchive tbody')
-			.append("<tr id='"+i+"'>"+
-			"<td title='"+ archive.State +"'><img src='/plugins/dynamix/images/"+ State[archive.State] +"-on.png'/></td>"+ //state
-			"<td class='network'>"+ Host +"</td>"+ //archive host ip address
-			"<td>"+ archive.Date+"</td>"+ //time stamp
-			"<td>"+ archive.Name +"</td>"+ //sensor name
-			"<td>"+ archive.Type +"</td>"+ //archive type
-			"<td>"+ archive.Event +"</td>"+ //archive description
-			"<td></td>"+//<a class='delete-archive'><i class='fa fa-trash' title='delete'></i></a></td>"+ //delete icon
-			"</tr>");
-		});
+    $('#tblArchive tbody').html("<tr><td colspan='6'><br><i class='fa fa-spinner fa-spin icon'></i><em>Please wait, retrieving event information ...</em></td><tr>");
+    $.getJSON('/plugins/ipmi/include/ipmi_helpers.php', {action:'ipmiarch'}, function(data) {
+        $('#tblArchive tbody').empty();
+        $.each(data.Archives, function (i, archive) {
+            var Host = (typeof archive.IP == 'undefined') ? '' : archive.IP; // check if network was connection used
+            $('#tblArchive tbody')
+            .append('<tr id="'+i+'">'+
+            '<td title="'+ archive.State +'"><img src="/plugins/dynamix/images/'+ data.State[archive.State] +'-on.png"/></td>'+ //state
+            '<td class="network">'+ Host +'</td>'+ //archive host ip address
+            '<td>'+ archive.Date  +'</td>'+ //time stamp
+            '<td>'+ archive.Name  +'</td>'+ //sensor name
+            '<td>'+ archive.Type  +'</td>'+ //archive type
+            '<td>'+ archive.Event +'</td>'+ //archive description
+            '<td></td>'+//<a class="delete-archive"><i class="fa fa-trash" title="delete"></i></a></td>'+ //delete icon
+            '</tr>');
+        });
 
-		if(Host === '')
-			$('.network').hide();
-		else
-			$('.network').show();
+        if(data.Network)
+            $('.network').show();
+        else
+            $('.network').hide();
 
-		$('.delete-archive').click(function () {
-			ArchiveDelete($(this).parent().parent().attr('id'));
-		});
+        $('.delete-archive').click(function () {
+            ArchiveDelete($(this).parent().parent().attr('id'));
+        });
 
-		var lastSearch = $("#tblArchive")[0].config.lastSearch;
-		$('#tblArchive').trigger('update'); //update table for tablesorter
-		$("#tblArchive").trigger("search", [lastSearch]);
-			
-		$('#allArchive').click(function() {
-			ArchiveDelete(0);
-		});
-	});
+        var lastSearch = $('#tblArchive')[0].config.lastSearch;
+        $('#tblArchive').trigger('update'); //update table for tablesorter
+        $('#tblArchive').trigger('search', [lastSearch]);
+
+        $('#allArchive').click(function() {
+            ArchiveDelete(0);
+        });
+    });
 }
 
 /* delete archive function */
 function ArchiveDelete(ID) {
-	var EventDelete = '/plugins/ipmi/include/ipmi_archive_delete.php';
-	if (ID == 0) {
-		swal({
-			title: 'Are you sure?', 
-			text: 'You want to remove all archived events!?', 
-			type: 'warning',
-			showCancelButton: true,
-			closeOnConfirm: true,
-		}, function() {
-			$.get(EventDelete, {event: ID}, function() {
-				$('#tblArchive tbody').empty(); // empty table
-				}
-			);
-		});
-	} else {
-		var trID = $('#'+ID);
-		$.get(EventDelete, {event: ID},
-			function() {
-				//animate and remove table row
-				trID
-				.children('td')
-				.animate({ padding: 0 })
-				.wrapInner('<div />')
-				.children()
-				.slideUp(function() {
-					trID.remove();
-					$('#tblArchive').trigger('update');
-				});
-		});
-	}
+    var EventDelete = '/plugins/ipmi/include/ipmi_archive_delete.php';
+    if (ID == 0) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You want to remove all archived events!?',
+            type: 'warning',
+            showCancelButton: true,
+            closeOnConfirm: true,
+        }, function() {
+            $.get(EventDelete, {event: ID}, function() {
+                $('#tblArchive tbody').empty();
+                }
+            );
+        });
+    } else {
+        var trID = $('#'+ID);
+        $.get(EventDelete, {event: ID},
+            function() {
+                //animate removal of table row
+                trID
+                .children('td')
+                .animate({ padding: 0 })
+                .wrapInner('<div />')
+                .children()
+                .slideUp(function() {
+                    trID.remove();
+                    $('#tblArchive').trigger('update');
+                });
+        });
+    }
 }
 
 </script>
