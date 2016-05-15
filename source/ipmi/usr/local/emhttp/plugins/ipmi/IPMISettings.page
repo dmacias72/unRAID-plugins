@@ -13,7 +13,7 @@ Title="Settings"
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
 
 <div id="title" style="margin-top: -22px;">
-    <span class="left"><img class="icon" src="/plugins/ipmi/icons/ipmi.png"> IPMI Settings</span>
+    <span class="left"><img class="icon" src="/plugins/ipmi/icons/sensors.png"> IPMI Settings</span>
     <span class="status" style="margin-top: 50px;margin-left: -200px;">
     <img class="board-img" src=""></span>
     <span class="status" id="notify-status">Event Notification: <?=$seld_status;?> </span>
@@ -27,7 +27,7 @@ Enable Event Notifications:
 : <select id="IPMISELD" name="IPMISELD" size="1" onChange="checkSELD(this.form);" title="Enable event notifications and local system logging for ipmi events">
   <?=mk_option($seld, "disable", "No");?>
   <?=mk_option($seld, "enable", "Yes");?>
-  </select> &nbsp; <input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
+  </select>&nbsp;<input id="btnTest" type="button" value="Test" title="send a random sample event to your ipmi hardware">
 
 > Enable IPMI event notifications. IPMI events will be logged in the system log.
 >
@@ -63,17 +63,17 @@ Enable Network Connection(s):
 >
 > Useful when monitoring local server as well as a backup server or two.
 
-<label class="seld-run ipmi-lan">IPMI IP Address(es):</label>
+<label class="seld-run ipmi-lan">IP Address(es):</label>
 : <input id="IPADDR" type="text" class="seld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$conn;?></label>
 
 > Add up to four different IPMI IP addresses to monitor sensors and events.
 
-<label class="seld-run ipmi-lan">IPMI User Name:</label>
+<label class="seld-run ipmi-lan">User Name:</label>
 : <input id="USER" type="text" class="seld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$user;?>" title="username for network access IPMI" placeholder="username for network access" >
 
 > Username for IPMI connections(s).
 
-<label class="seld-run ipmi-lan">IPMI Password:</label>
+<label class="seld-run ipmi-lan">Password:</label>
 : <input id="PASSWORD" type="password" class="seld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$password;?>" title="password for network access IPMI" placeholder="password for network access" >
 
 > Password for IPMI connection(s).
@@ -92,24 +92,36 @@ Enable Network Connection(s):
 
 <form markdown="1" name="ignore_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
+
 <input type="hidden" id="IGNORE" name="IGNORE" value="<?=$ignore;?>" />
 
 Available Sensors:
 : <select multiple id="select">
-        <?=ipmi_get_selected();?>
+        <?=ipmi_get_enabled();?>
   </select>
 
-> Checked sensors will show in all dropdown menus and reading display.
+> Check sensors to show in all dropdown menus and readings display.
 >
-> Unchecked will not be displayed.
+> Unchecked sensors will not be displayed.
+
+<input type="hidden" id="DASHTYPES" name="DASHTYPES" value="<?=$dashtypes;?>" />
+
+Dashboard Display:
+: <select multiple id="select-dash" title="Enable IPMI sensors on the dashboard">
+        <?=ipmi_get_dashtypes();?>
+  </select>
+
+> Check sensor types to show in Dashboard display.
+>
+> Unchecked sensors will not be displayed.
 
 &nbsp;
 
-&nbsp;
+<input type="button" value="Default" onClick="resetDispDATA(this.form);">
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
-<div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/sensors2.png"> Footer Settings</span></div>
+<div id="title"><span class="left"><img class="icon" src="/plugins/ipmi/icons/cpu.png"> Footer Settings</span></div>
 
 <form markdown="1" name="footer_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
@@ -150,7 +162,7 @@ Sensor #4:
 
 &nbsp;
 
-<input type="button" value="Default" onClick="resetDispDATA(this.form);">
+<input type="button" value="Default" onClick="resetFootDATA(this.form);">
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
@@ -173,13 +185,14 @@ $(function(){
         showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
     <?endif;?>
 
+    // select available sensors
     $('#select').dropdownchecklist( {
         emptyText: 'No Sensors Available',
         icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
         width: 235,
         explicitClose: 'close',
         firstItemChecksAll: true,
-        textFormatFunction: function(options) { return 'Select Available Sensors'; },
+        textFormatFunction: function(options) { return 'Select Sensors (unchecked will be ignored)'; },
         onComplete: function(selector){
         var values = '';
         for( i=0; i < selector.options.length; i++ ) {
@@ -191,7 +204,28 @@ $(function(){
         }
         $('#IGNORE').val(values);
         }
-});
+    });
+
+    // select sensor types for dashboard
+    $('#select-dash').dropdownchecklist( {
+        emptyText: 'None',
+        icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
+        width: 235,
+        explicitClose: 'close',
+        firstItemChecksAll: true,
+        textFormatFunction: function(options) { return 'Select Sensors Types for Dashboard'; },
+        onComplete: function(selector){
+        var values = '';
+        for( i=0; i < selector.options.length; i++ ) {
+            if ((selector.options[i].selected == true) && (selector.options[i].value != '')){
+                if (values != '')
+                    values += ',';
+                values += selector.options[i].value;
+            }
+        }
+        $('#DASHTYPES').val(values);
+        }
+    });
 
     // if png is missing, replaced with unknown.png
     $('.board-img')
@@ -226,6 +260,12 @@ function resetDATA(form) {
 }
 
 function resetDispDATA(form) {
+    form.IGNORE.value = '';
+    form.DASHTYPES.value = '';
+    form.submit();
+}
+
+function resetFootDATA(form) {
     form.DISP_SENSOR1.selectedIndex = 0;
     form.DISP_SENSOR2.selectedIndex = 0;
     form.DISP_SENSOR3.selectedIndex = 0;
