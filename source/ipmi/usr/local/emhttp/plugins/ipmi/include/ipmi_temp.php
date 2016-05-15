@@ -9,7 +9,7 @@ function format_ipmi_temp($reading, $unit, $dot) {
 $disp_sensors = [$disp_sensor1, $disp_sensor2, $disp_sensor3, $disp_sensor4];
 
 if (!empty($disp_sensors)){
-    if(($mod) || ($netsvc == 'enable'))
+    if(($ipmi) || ($netsvc == 'enable'))
         $readings = ipmi_sensors();
     $displays = [];
     foreach($disp_sensors as $disp_sensor){
