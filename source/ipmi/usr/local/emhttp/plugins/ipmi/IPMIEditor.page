@@ -6,21 +6,21 @@ Markdown="false"
 $config_file = "$plg_path/ipmi.config";
 $ipmi_config = '';
 if($mod || ($netsvc == 'enable')) {
-	// Only get config if the current one is 1 hour old or more
-	if(!is_file($config_file) || (filesize($config_file) == 0 )) {
-		$cmd = "ipmi-config --filename=$config_file --checkout $netopts";
-		shell_exec($cmd);
-	}
-	$ipmi_config = file_get_contents($config_file);
+    // Only get config if the current one is 1 hour old or more
+    if(!is_file($config_file) || (filesize($config_file) == 0 )) {
+        $cmd = "ipmi-config --filename=$config_file --checkout $netopts";
+        shell_exec($cmd);
+    }
+    $ipmi_config = file_get_contents($config_file);
 }
 ?>
 <div id="title" style="margin-top: -22px;">
-	<span class="left"><img class="icon" src="/plugins/ipmi/icons/configeditor.png"> IPMI Configuration Editor</span>
+    <span class="left"><img class="icon" src="/plugins/ipmi/icons/configeditor.png"> IPMI Configuration Editor</span>
 </div>
 
 <blockquote class="inline_help">
-	<p>IPMI Config Editor is used to get and set configuration parameters in IPMI. In can be used to configured usernames, passwords, networking information, security, Serial-over-LAN (SOL), Platform Event Filtering (PEF), boot devices, power restoration policy, and many more configuration options.
-	</p>
+    <p>IPMI Config Editor is used to get and set configuration parameters in IPMI. In can be used to configured usernames, passwords, networking information, security, Serial-over-LAN (SOL), Platform Event Filtering (PEF), boot devices, power restoration policy, and many more configuration options.
+    </p>
 </blockquote>
 
 <form id="cfgform" method="POST">
@@ -28,71 +28,71 @@ if($mod || ($netsvc == 'enable')) {
 <textarea id="editcfg" name="ipmicfg" placeholder="Copy &amp; Paste IPMI Configuration Here." autofocus><?= htmlspecialchars($ipmi_config); ?></textarea>
 <input type="hidden" name="commit" value="1" />
 <dl>
-	<dt><input type="button" value="Revert" id="btnRevert" title="reset the stored IPMI config file to the existing BMC config" /></dt>
-	<dd><input type="button" value="Save" id="btnSubmit" title="save IPMI configuration changes to the BMC" />
-	<input type="button" value="Cancel" id="btnCancel" />
-	<span><i class="fa fa-warning icon warning"></i> Edit Carefully!</span>
-	</dd>
+    <dt><input type="button" value="Revert" id="btnRevert" title="reset the stored IPMI config file to the existing BMC config" /></dt>
+    <dd><input type="button" value="Save" id="btnSubmit" title="save IPMI configuration changes to the BMC" />
+    <input type="button" value="Cancel" id="btnCancel" />
+    <span><i class="fa fa-warning icon warning"></i> Edit Carefully!</span>
+    </dd>
 </form>
 </dl>
 
 <blockquote class="inline_help">
-	<p>The Revert button resets the stored IPMI configuration file to the existing configuration loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.  
-	</p>
+    <p>The Revert button resets the stored IPMI configuration file to the existing configuration loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.
+    </p>
 </blockquote>
 
 <script>
 $(function(){
-	$('#btnCancel').click(function() {
-		$.cookie('one', 'tab1', { expires:null, path: '/'});
-		location = '/Settings/IPMI';
-	});
+    $('#btnCancel').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Settings/IPMI';
+    });
 
-	var editor = CodeMirror.fromTextArea($('#editcfg')[0], {
-		mode: 'properties',
-		lineNumbers: true,
-		gutters: ['CodeMirror-linenumbers'],
-		extraKeys: {
-			'Ctrl-Space': 'autocomplete'
-		},
-		hintOptions: {}
-	});
+    var editor = CodeMirror.fromTextArea($('#editcfg')[0], {
+        mode: 'properties',
+        lineNumbers: true,
+        gutters: ['CodeMirror-linenumbers'],
+        extraKeys: {
+            'Ctrl-Space': 'autocomplete'
+        },
+        hintOptions: {}
+    });
 
-	$('#tab3').click(function () {
-		editor.refresh();
-	});
+    $('#tab3').click(function () {
+        editor.refresh();
+    });
 
-	// save config and commit to bmc
-	$('#btnSubmit').click(function () {
-		editor.save();
-		$.post('/plugins/ipmi/include/ipmi_config.php', $('#cfgform').serializeArray(),function (data) {
-			var Title = 'IPMI Configuration';
+    // save config and commit to bmc
+    $('#btnSubmit').click(function () {
+        editor.save();
+        $.post('/plugins/ipmi/include/ipmi_config.php', $('#cfgform').serializeArray(),function (data) {
+            var Title = 'IPMI Configuration';
 
-			if(data.success)
-				swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
-					location = '/Settings/IPMI';
-				});
+            if(data.success)
+                swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
+                    location = '/Settings/IPMI';
+                });
 
-			if(data.error)
-				swal({title:Title,text:data.error,type:'error'});
+            if(data.error)
+                swal({title:Title,text:data.error,type:'error'});
 
-		}, 'json');
-	});
+        }, 'json');
+    });
 
-	// revert saved config file to bmc stored config
-	$('#btnRevert').click(function () {
-		$.post('/plugins/ipmi/include/ipmi_config.php', {ipmicfg:null}, function (data) {
-			var Title = 'IPMI Configuration';
-	
-			if(data.success)
-				swal({title:Title,text:'reloaded from bmc',type:'success',closeOnConfirm: true,},function() {
-					location.reload(true);
-				});
+    // revert saved config file to bmc stored config
+    $('#btnRevert').click(function () {
+        $.post('/plugins/ipmi/include/ipmi_config.php', {ipmicfg:null}, function (data) {
+            var Title = 'IPMI Configuration';
 
-			if(data.error)
-				swal({title:Title,text:data.error,type:'error'});
+            if(data.success)
+                swal({title:Title,text:'reloaded from bmc',type:'success',closeOnConfirm: true,},function() {
+                    location.reload(true);
+                });
 
-		}, 'json');
-	});
+            if(data.error)
+                swal({title:Title,text:data.error,type:'error'});
+
+        }, 'json');
+    });
 });
 </script>
