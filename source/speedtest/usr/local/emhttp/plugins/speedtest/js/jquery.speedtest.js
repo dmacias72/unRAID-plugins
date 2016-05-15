@@ -1,7 +1,7 @@
 $(function(){
 	// append tabs for settings and scheduler and chart switch
 	$('.tabs')
-		.append('<div class="tab"><input type="radio" name="tabs2" id="tab3"><label for="tab3"><img class="icon" src="/plugins/ipmi/icons/settings.png">Settings</label></div>')
+		.append('<div class="tab"><input type="radio" name="tabs2" id="tab3"><label for="tab3"><img class="icon" src="/plugins/speedtest/icons/settings.png">Settings</label></div>')
 		.append('<div class="tab"><input type="radio" name="tabs2" id="tab4"><label for="tab4"><img class="icon" src="/plugins/speedtest/icons/scheduler.png">Scheduler</label></div>')
 		.append("<span class='status'><input id='chartSelect' class='hidden' type='checkbox'></span>");
 
