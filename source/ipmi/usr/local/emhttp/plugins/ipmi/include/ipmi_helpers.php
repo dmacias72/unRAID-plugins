@@ -59,13 +59,13 @@ function get_temp_range($range, $selected=null){
 function ipmi_sensors($all=false) {
     global $ipmi, $netopts, $hdd_temp, $ignore;
 
-    // return empty array if no ipmi detected or network options
-    if(!$ipmi && empty($netopts))
+    // return empty array if no ipmi detected and no network options
+    if(!($ipmi || !empty($netopts)))
         return [];
 
-    if(!$ignore) $all=true;
-    $ignored = ($all) ? '' : "-R $ignore";
-    $cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null"; // --non-abbreviated-units
+    $ignored = ($all || empty($ignore)) ? '' : "-R $ignore";
+    $cmd = '/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output '.
+        "--output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null";
     exec($cmd, $output, $return_var=null);
 
     if ($return_var)
@@ -114,14 +114,15 @@ function ipmi_events($archive=null){
     global $ipmi, $netopts;
 
     // return empty array if no ipmi detected or network options
-    if(!$ipmi && empty($netopts))
+    if(!($ipmi || !empty($netopts)))
         return [];
 
     if($archive) {
         $filename = "/boot/config/plugins/ipmi/archived_events.log";
         $output = is_file($filename) ? file($filename, FILE_IGNORE_NEW_LINES) : [] ;
     } else {
-        $cmd = "/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output --interpret-oem-data $netopts 2>/dev/null";
+        $cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output '.
+            "--interpret-oem-data $netopts 2>/dev/null";
         exec($cmd, $output, $return_var=null);
     }
 
@@ -203,7 +204,7 @@ function ipmi_get_enabled(){
     global $ipmi, $netopts, $ignore;
 
     // return empty array if no ipmi detected or network options
-    if(!$ipmi && empty($netopts))
+    if(!($ipmi || !empty($netopts)))
         return [];
 
     $sensors = ipmi_sensors(true);
