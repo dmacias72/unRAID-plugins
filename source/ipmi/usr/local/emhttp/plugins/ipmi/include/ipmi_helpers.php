@@ -63,6 +63,7 @@ function ipmi_sensors($all=false) {
     if(!$ipmi && empty($netopts))
         return [];
 
+    if(!$ignore) $all=true;
     $ignored = ($all) ? '' : "-R $ignore";
     $cmd= "/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output --output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null"; // --non-abbreviated-units
     exec($cmd, $output, $return_var=null);
