@@ -24,14 +24,14 @@ $(function(){
         labels_placement: 'left',
         on_label: 'On',
         off_label: 'Off',
-        checked: ($.cookie('ipmi_dash_switch') == 1)
+        checked: ($.cookie('ipmi_dash_switch') == 1  || $.cookie('ipmi_dash_switch') == undefined)
     })
     .change(function () {
         $.cookie('ipmi_dash_switch', $('#dash-ipmi')[0].checked ? 1 : 0, { expires: 3650 });
         $('#tblIPMIDash').toggle();
     });
 
-    if($.cookie('ipmi_dash_switch') == 1)
+    if($.cookie('ipmi_dash_switch') == 1  || $.cookie('ipmi_dash_switch') == undefined )
         $('#tblIPMIDash').show();
     else
         $('#tblIPMIDash').hide();
@@ -68,60 +68,60 @@ function sensorArray(Refresh){
             var Units   = '';
             var Type    = sensor.Type;
 
-            if (data.DashTypes.indexOf(Type) >= 0){
+            if (data.DashTypes.indexOf(Type) >= 0 || sensor.State !== 'Nominal'){
 
-            // only process sensor if reading is valid
-            if (sensor.Reading != 'N/A'){
-                var Reading = parseFloat(sensor.Reading);
-                if (Type == 'Voltage'){
-                    Units += ' ';
+               // only process sensor if reading is valid
+                if (sensor.Reading != 'N/A'){
+                    var Reading = parseFloat(sensor.Reading);
+                    if (Type == 'Voltage'){
+                        Units += ' ';
 
-                    // if voltage is less than lower non-critical
-                    // or voltage is greater than upper non-critical show critical
-                    if (Reading < LowerNC && Reading > UpperNC)
-                        Color = 'orange';
+                        // if voltage is less than lower non-critical
+                        // or voltage is greater than upper non-critical show critical
+                        if (Reading < LowerNC && Reading > UpperNC)
+                            Color = 'orange';
 
-                    // if voltage is less than lower critical
-                    // or voltage is greater than upper critical show non-recoverable
-                    if (Reading < LowerC || Reading > UpperC)
-                        Color = 'red';
+                        // if voltage is less than lower critical
+                        // or voltage is greater than upper critical show non-recoverable
+                        if (Reading < LowerC || Reading > UpperC)
+                            Color = 'red';
 
-                } else if (Type == 'Fan'){
-                    Units += ' ';
+                    } else if (Type == 'Fan'){
+                        Units += ' ';
 
-                    // if Fan RPMs are less than lower non-critical
-                    if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
-                        Color = "red";
+                        // if Fan RPMs are less than lower non-critical
+                        if (Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
+                            Color = "red";
 
-                } else if(Type == 'Temperature'){
-                    Units += '&deg;';
+                    } else if(Type == 'Temperature'){
+                        Units += '&deg;';
 
-                    // if temperature is greater than upper non-critical show critical
-                    if (Reading > UpperNC)
-                        Color = 'orange';
+                        // if temperature is greater than upper non-critical show critical
+                        if (Reading > UpperNC)
+                            Color = 'orange';
 
-                    // if temperature is greater than upper critical show non-recoverable
-                    if (Reading > UpperC)
-                        Color = 'red';
+                        // if temperature is greater than upper critical show non-recoverable
+                        if (Reading > UpperC)
+                            Color = 'red';
+                    }
+                    Units += sensor.Units;
+                }else {
+                    var Reading = sensor.Reading;
+                    Color = 'blue'; // reading equals N/A
                 }
-                Units += sensor.Units;
-            }else {
-                var Reading = sensor.Reading;
-                Color = 'blue'; // reading equals N/A
-            }
 
-            if(Refresh) {
-                $('#'+i+' td.reading').html('<font color="'+ Color + '">'+ Reading + Units +'</font>');
-            } else {
-                Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP; // check if network connection was used
-                $('#tblIPMIDash tbody')
-                .append("<tr id='"+i+"'>"+
-                '<td title="'+sensor.State+'"><img src="/plugins/dynamix/images/'+ data.State[sensor.State] +'-on.png"/></td>'+ //state
-                '<td class="network">'+Host+'</td>'+ // sensor host ip address
-                '<td>'+sensor.Name+'</td>'+ //sensor name
-                '<td class="reading">'+ '<font color="'+ Color + '">'+ Reading + Units +'</font></td>'+ //sensor reading
-                '</tr>');
-            }
+                if(Refresh) {
+                    $('#'+i+' td.reading').html('<font color="'+ Color + '">'+ Reading + Units +'</font>');
+                } else {
+                    Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP; // check for ip
+                    $('#tblIPMIDash tbody')
+                    .append("<tr id='"+i+"'>"+
+                    '<td title="'+sensor.State+'"><img src="/plugins/dynamix/images/'+ data.State[sensor.State] +'-on.png"/></td>'+ //state
+                    '<td class="network">'+Host+'</td>'+ // sensor host ip address
+                    '<td>'+sensor.Name+'</td>'+ //sensor name
+                    '<td class="reading">'+ '<font color="'+ Color + '">'+ Reading + Units +'</font></td>'+ //sensor reading
+                    '</tr>');
+                }
             }
         });
         if (!Refresh) {
