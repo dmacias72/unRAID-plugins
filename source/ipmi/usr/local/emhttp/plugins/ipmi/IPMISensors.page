@@ -180,7 +180,7 @@ function sensorArray(Refresh){
             if(Refresh) {
                 $('#'+i+' td.reading').html('<font color="'+ Color + '">'+ Reading + Units +'</font>');
             } else {
-                var Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP; // check if network connection was used
+                var Host = (typeof sensor.IP == 'undefined') ? '' : sensor.IP; // check for ip
                 $('#tblSensor tbody')
                 .append('<tr id="'+i+'">'+
                 '<td title="'+sensor.State+'"><img src="/plugins/dynamix/images/'+ data.State[sensor.State] +'-on.png"/></td>'+ //state
