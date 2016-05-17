@@ -12,7 +12,7 @@ $user      = isset($cfg['USER'])      ? $cfg['USER']      : '';
 $password  = isset($cfg['PASSWORD'])  ? $cfg['PASSWORD']  : '';
 
 $ignore    = isset($cfg['IGNORE'])    ? $cfg['IGNORE']    : '';
-$dashtypes = isset($cfg['DASHTYPES']) ? $cfg['DASHTYPES'] : '';
+$dignore   = isset($cfg['DIGNORE'])   ? $cfg['DIGNORE']   : '';
 
 /* check if local ipmi driver is loaded */
 $ipmi = (file_exists('/dev/ipmi0') || file_exists('/dev/ipmi/0') || file_exists('/dev/ipmidev/0')); // Thanks to ljm42
