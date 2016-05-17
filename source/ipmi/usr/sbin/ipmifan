@@ -312,7 +312,7 @@ while(TRUE){ while(TRUE){
             //add fan, value, temp sensor name and reading
             if(!empty($msg))
                 $msg .= ',';
-            $pct = $pct*100;
+            $pct = round($pct*100);
             $msg .= " $fan($pct%):$name(${reading}°C)";
 
        }else
