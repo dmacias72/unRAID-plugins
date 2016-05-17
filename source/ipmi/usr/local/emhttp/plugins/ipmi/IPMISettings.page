@@ -93,27 +93,36 @@ Enable Network Connection(s):
 <form markdown="1" name="ignore_settings" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/ipmi.cfg" />
 
-<input type="hidden" id="IGNORE" name="IGNORE" value="<?=$ignore;?>" />
-
-Available Sensors:
-: <select multiple id="select">
-        <?=ipmi_get_enabled();?>
+Global Available Sensors:
+: <select multiple id="select" title="Check sensors to show in all dropdown menus, readings page and footer.">
+    <option value="">Select All</option>
+    <?=ipmi_get_enabled($ignore);?>
   </select>
 
-> Check sensors to show in all dropdown menus and readings display.
+<input type="hidden" id="IGNORE" name="IGNORE" value="<?=$ignore;?>" />
+
+<input type="hidden" id="select-svc" value="">
+
+> Check sensors to show in all dropdown menus, fan control, readings and footer.
 >
 > Unchecked sensors will not be displayed.
 
-<input type="hidden" id="DASHTYPES" name="DASHTYPES" value="<?=$dashtypes;?>" />
+&nbsp;
 
-Dashboard Display:
+
+Dashboard Sensors:
 : <select multiple id="select-dash" title="Enable IPMI sensors on the dashboard">
-        <?=ipmi_get_dashtypes();?>
+    <option value="">Select All</option>
+    <?=ipmi_get_enabled($dignore);?>
   </select>
 
-> Check sensor types to show in Dashboard display. Unchecked sensor types will not be displayed.
+<input type="hidden" id="DIGNORE" name="DIGNORE" value="<?=$dignore;?>" />
+
+<input type="hidden" id="select-dash-svc" name="DASH" value="<?=$dash;?>">
+
+> Check sensors to show in Dashboard display. 
 >
-> Uncheck all sensor types to disable IPMI Dashboard summary.
+> Unchecked sensors will not be displayed.
 
 &nbsp;
 
@@ -130,7 +139,7 @@ Dashboard Display:
 
 Sensor #1:
 : <select name="DISP_SENSOR1" class="display">
-        <option value='false'>None</option>
+        <option value=''>None</option>
         <?=ipmi_get_options($disp_sensor1);?>
   </select>
 
@@ -138,7 +147,7 @@ Sensor #1:
 
 Sensor #2:
 : <select name="DISP_SENSOR2" class="display">
-        <option value='false'>None</option>
+        <option value=''>None</option>
         <?=ipmi_get_options($disp_sensor2);?>
     </select>
 
@@ -146,7 +155,7 @@ Sensor #2:
 
 Sensor #3:
 : <select name="DISP_SENSOR3" class="display">
-        <option value='false'>None</option>
+        <option value=''>None</option>
         <?=ipmi_get_options($disp_sensor3);?>
     </select>
 
@@ -154,7 +163,7 @@ Sensor #3:
 
 Sensor #4:
 : <select name="DISP_SENSOR4" class="display">
-        <option value='false'>None</option>
+        <option value=''>None</option>
         <?=ipmi_get_options($disp_sensor4);?>
     </select>
 
@@ -185,47 +194,8 @@ $(function(){
         showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
     <?endif;?>
 
-    // select available sensors
-    $('#select').dropdownchecklist( {
-        emptyText: 'No Sensors Available',
-        icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
-        width: 235,
-        explicitClose: 'close',
-        firstItemChecksAll: true,
-        textFormatFunction: function(options) { return 'Select Sensors (unchecked will be ignored)'; },
-        onComplete: function(selector){
-        var values = '';
-        for( i=0; i < selector.options.length; i++ ) {
-            if ((selector.options[i].selected == false) && (selector.options[i].value != '')){
-                if (values != '')
-                    values += ',';
-                values += selector.options[i].value;
-            }
-        }
-        $('#IGNORE').val(values);
-        }
-    });
-
-    // select sensor types for dashboard
-    $('#select-dash').dropdownchecklist( {
-        emptyText: 'None',
-        icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
-        width: 235,
-        explicitClose: 'close',
-        firstItemChecksAll: true,
-        textFormatFunction: function(options) { return 'Select Sensors Types for Dashboard'; },
-        onComplete: function(selector){
-        var values = '';
-        for( i=0; i < selector.options.length; i++ ) {
-            if ((selector.options[i].selected == true) && (selector.options[i].value != '')){
-                if (values != '')
-                    values += ',';
-                values += selector.options[i].value;
-            }
-        }
-        $('#DASHTYPES').val(values);
-        }
-    });
+    DDCheckList('#select','#IGNORE','Select Sensors (unchecked will be ignored)');
+    DDCheckList('#select-dash','#DIGNORE','Select Sensors (uncheck all will disable)');
 
     // if png is missing, replaced with unknown.png
     $('.board-img')
@@ -243,11 +213,45 @@ $(function(){
         location = '/Settings/IPMITools';
     });
 
+    $('#tab1').click(function() {
+        location.reload();
+    });
+
     checkSELD(document.seld_settings);
     checkNETWORK(document.seld_settings);
     checkLOCAL(document.seld_settings);
     decData(document.seld_settings);
 });
+
+function DDCheckList(Select,Values,Message) {
+    $(Select).dropdownchecklist( {
+        emptyText: 'No Sensors Available',
+        icon: {placement: 'right', toOpen: 'ui-icon-triangle-1-s', toClose: 'ui-icon-triangle-1-n'},
+        width: 235,
+        explicitClose: 'close',
+        firstItemChecksAll: true,
+        textFormatFunction: function(options) { return Message; },
+        onComplete: function(selector){
+            var values = '';
+            var Unchecked = 1;
+            var Size = selector.options.length;
+            for( i=1; i < Size; i++ ) {
+                if ((selector.options[i].selected == false) && (selector.options[i].value != '')){
+                    if (values != '')
+                        values += ',';
+                values += selector.options[i].value;
+                Unchecked++;
+            }
+        }
+        $(Values).val(values);
+
+            if(Size == Unchecked)
+                $(Select+'-svc').val('disable');
+            else
+                $(Select+'-svc').val('enable');
+        }
+    });
+}
 
 function resetDATA(form) {
     form.IPMIPOLL.selectedIndex = 2;
@@ -297,12 +301,20 @@ function decData(form) {
  form.PASSWORD.value = atob(form.PASSWORD.value);
 }
 
+function checkDASH(form) {
+    if (form.DASH.selectedIndex < 1 )
+        $('.dash').hide();
+    else {
+        $('.dash').show();
+   }
+}
+
 function checkNETWORK(form) {
     if (form.NETWORK.selectedIndex < 1 )
         $('.ipmi-lan').hide();
     else {
-    $('.ipmi-lan').show();
-    $('.ipmi-lan').prop('disabled', (form.IPMISELD.value == 'enable'));
+        $('.ipmi-lan').show();
+        $('.ipmi-lan').prop('disabled', (form.IPMISELD.value == 'enable'));
    }
 }
 
