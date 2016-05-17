@@ -8,9 +8,10 @@ require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
 $debug = FALSE;
 
 set_time_limit(0);
-$prog         = pathinfo(__FILE__, PATHINFO_FILENAME);
-$lockfile     = "/var/run/${prog}.pid";
-$service      = __FILE__;
+$prog     = pathinfo(__FILE__, PATHINFO_FILENAME);
+$lockfile = "/var/run/${prog}.pid";
+$log      = '/var/log/ipmifan';
+$service  = __FILE__;
 openlog($prog, LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $usage = <<<EOF
@@ -73,11 +74,12 @@ if(file_exists($lockfile)){
     $pid_running = preg_replace("/\s+/", "", shell_exec("ps -p $lock_pid | grep $lock_pid"));
     if($pid_running){
         if($quit){
+            fanlog('Stopping Fan Control'); 
             syslog(LOG_INFO, "killing daemon with PID [$lock_pid]");
             exec("kill $lock_pid");
             unlink($lockfile);
             autofan();
-                exit(0);
+            exit(0);
         }else{
             echo "$prog is already running [$lock_pid]".PHP_EOL;
             exit(0);
@@ -114,7 +116,8 @@ if(!($force) && ($fanctrl == 'disable' )){
 }
 
 if($daemon){
-    exec("php $service 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
+    $options = ($force) ? '--force' : ''; 
+    exec("php $service $options 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
     syslog(LOG_INFO, "process started. To terminate it, type: $prog --quit");
     exit(0);
 }
@@ -139,6 +142,13 @@ function logger($msg, $quiet = false) {
     }
 }
 
+/* logfile */
+function fanlog($msg) {
+    global $log;
+    $msg = date('Y-m-d h:i:s').' '.$msg.PHP_EOL;
+    file_put_contents($log,$msg,FILE_APPEND);
+}
+
 /* debug */
 function debug($m){
   global $prog, $debug;
@@ -154,7 +164,7 @@ function autofan() {
     global $boards, $board, $netopts;
     syslog(LOG_INFO, 'setting fans to auto');
     $auto = $boards[$board]['auto'];
-    $cmd = "ipmi-raw $auto $netopts 2>&1 >/dev/null";
+    $cmd = "ipmi-raw $auto $netopts 2>&1 >/dev/null &";
     shell_exec($cmd);
     }
 
@@ -163,7 +173,7 @@ function fullfan() {
     global $boards, $board, $netopts;
     syslog(LOG_INFO, 'setting fans to full speed');
     $full = $boards[$board]['full'];
-    $cmd = "ipmi-raw $full $netopts 2>&1 >/dev/null";
+    $cmd = "ipmi-raw $full $netopts 2>&1 >/dev/null &";
     shell_exec($cmd);
     }
 
@@ -203,7 +213,7 @@ function get_all_hdds(){
 }
 
 /* get fan and temp sensors */
-function ipmi_get_fantemp() {
+function ipmi_fan_sensors() {
     global $ipmi, $fanopts;
 
     // return empty array if no ipmi detected or network options
@@ -250,7 +260,7 @@ if(empty($fancfg)){
     exit(1);
 }
 
-$board = $fancfg['IPMIBOARD'];
+$board = $fancfg['BOARD'];
 $boards_file = "$plg_path/boards.json";
 $boards = (file_exists($boards_file)) ? json_decode(file_get_contents($boards_file), true): [];
 if (!array_key_exists($board, $boards)){
@@ -262,51 +272,54 @@ if (!array_key_exists($board, $boards)){
 $raw  = $boards[$board]['raw'];
 $fans = $boards[$board]['fans'];
 $MD5  = md5_file($fancfg_file);
-$log  = '/var/log/ipmifan';
+fanlog('Starting Fan Control');
 
 while(TRUE){ while(TRUE){
 ####  DO YOUR STUFF HERE  ####
 
     /* Get sensor info */
-    $sensors = ipmi_get_fantemp();
+    $sensors = ipmi_fan_sensors();
+    $hex = '';
+    $msg = '';
 
-    for ($i = 0; $i < 7; $i++) {
+    foreach($fans as $fan => $value){
 
-        $fan      = (isset($fancfg["FAN$i"]))     ? $fancfg["FAN$i"]     : 0;
-        $fan_name = $sensors[$fan]['Name'];
-        $fan_temp = (isset($fancfg["FANTEMP$i"])) ? $fancfg["FANTEMP$i"] : 0;
-        $fan_min  = (isset($fancfg["FANMIN$i"]))  ? $fancfg["FANMIN$i"]  : 1;
+        $temp = $fancfg["TEMP_$fan"];
 
-        if($fan_temp != 0) {
-            $temp_lo = (isset($fancfg["TEMPLO$i"])) ? $fancfg["TEMPLO$i"]  : 30;
-            $temp_hi = (isset($fancfg["TEMPHI$i"])) ? $fancfg["TEMPHI$i"]  : 40;
+        if(!empty($temp)) {
+            $templo  = (isset($fancfg["TEMPLO_$fan"])) ? $fancfg["TEMPLO_$fan"]  : 30;
+            $temphi  = (isset($fancfg["TEMPHI_$fan"])) ? $fancfg["TEMPHI_$fan"]  : 40;
+            $fanmin  = (isset($fancfg["MIN_$fan"]))    ? $fancfg["MIN_$fan"]     : 1;
+            $reading = floatval($sensors[$temp]['Reading']);
+            $name    = $sensors[$temp]['Name'];
 
-            $temp    = $sensors[$fan_temp]['Reading'];
-
-            if ($temp <= $temp_lo)
+            if ($reading <= $templo){
+                $pct = 0;
                 $pwm = 1;
-            elseif ($temp >= $temp_hi)
+            }elseif ($reading >= $temphi){
+                $pct = 1;
                 $pwm = 64;
-            else
-                $pwm = round((($temp-$temp_lo)/($temp_hi-$temp_lo))*16)*4;
-
+            }else{
+                $pct = ($reading-$templo)/($temphi-$templo);
+                $pwm = round(($pct)*16)*4;
+            }
             //impose fan lower limit
-            $pwm = ($pwm <= $fan_min) ? $fan_min : $pwm;
-        }else
-            $pwm = 0;
+            $pwm = ($pwm <= $fanmin) ? $fanmin : $pwm;
 
-    //pad pwm to 2 places
-    $pwm = str_pad($pwm, 2, '0', STR_PAD_LEFT);
+            //pad pwm to 2 places
+            $pwm = str_pad($pwm, 2, '0', STR_PAD_LEFT);
 
-    //check array for fan name
-    if(array_key_exists($fan_name, $fans))
-        $fans[$fan_name] = $pwm;
-    }
+            //add fan, value, temp sensor name and reading
+            if(!empty($msg))
+                $msg .= ',';
+            $pct = $pct*100;
+            $msg .= " $fan($pct%):$name(${reading}°C)";
 
-    //get values for all fans
-    $hex = "";
-    foreach($fans as $value){
-        $hex .= " $value";
+       }else
+            $pwm = '00';
+
+    //add value to hex
+    $hex .= " $pwm";
     }
 
     //compare last value to new value
@@ -315,9 +328,7 @@ while(TRUE){ while(TRUE){
         shell_exec($cmd);
 
         //log changes
-        $timestamp = date('Y-m-d h:i:s');
-        $msg = "$timestamp adjusting fans to $hex".PHP_EOL;
-            file_put_contents($log,$msg,FILE_APPEND);
+        fanlog($msg);
         $current_hex = $hex;
     }
 
@@ -346,9 +357,7 @@ while(TRUE){ while(TRUE){
             $fancfg = parse_ini_file($fancfg_file);
             logger($msg, $argq);
             $MD5 = $MD5_new;
-            $timestamp = date('Y-m-d h:i:s');
-            $msg = "$timestamp $msg".PHP_EOL;
-            file_put_contents($log,$msg,FILE_APPEND);
+            fanlog($msg);
             break;
         }
     }

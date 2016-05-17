@@ -44,7 +44,7 @@ Markdown="false"
     <p>Specify how long between checking the temperature sensors and executing fan speed changes.  Default is 3 minutes.</p>
 </blockquote>
 
-<input type="hidden" name="IPMIBOARD" value="<?=$board;?>">
+<input type="hidden" name="BOARD" value="<?=$board;?>">
 
 <?if ($netsvc == 'enable'):?>
 
@@ -76,6 +76,7 @@ Markdown="false"
 <span class="status" style="margin-top: 30px;"><input type="checkbox" id="advancedview"></span></div>
 <form name="fanctrl_options" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
+
 <blockquote class="inline_help">
     <p>List all fans available for control with current speed and corresponding temperature sensor with its current value.</p>
     <p>Fan speed minimum (1-64):  Select the lowest value for which a fan can be set. Useful to prevent fan from stopping or going below a certain rpm. A value of 64 is full on.</p>
