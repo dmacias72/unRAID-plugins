@@ -1,4 +1,4 @@
 <?
-$log = "/var/log/ipmifan";
+$log = '/var/log/ipmifan';
 file_put_contents($log, '');
 ?>
