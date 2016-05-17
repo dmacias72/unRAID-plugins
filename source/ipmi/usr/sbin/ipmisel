@@ -6,8 +6,6 @@ OPTIONS=""
 # read our configuration
 [ -e "$CONFIG" ] && source "$CONFIG"
 
-if [ $NETWORK == "enable" ]; then
-		OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
-fi
+[ $NETWORK == "enable" ] && OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
 
-/usr/sbin/ipmi-sel $OPTIONS
+/usr/sbin/ipmi-sel $OPTIONS $@

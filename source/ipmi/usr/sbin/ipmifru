@@ -2,13 +2,10 @@
 
 CONFIG="/boot/config/plugins/ipmi/ipmi.cfg"
 OPTIONS=""
-IGNORED=""
 
 # read our configuration
 [ -e "$CONFIG" ] && source "$CONFIG"
 
 [ $NETWORK == "enable" ] && OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
 
-[ $IGNORE != "" ] && IGNORED=" -R $IGNORE "
-
-/usr/sbin/ipmi-sensors $OPTIONS $IGNORED $@
+/usr/sbin/ipmi-fru $OPTIONS $@
