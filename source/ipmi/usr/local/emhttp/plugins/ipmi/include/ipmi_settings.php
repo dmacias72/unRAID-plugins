@@ -27,7 +27,7 @@ $board       = ($ipmi || !empty($netopts)) ? trim(shell_exec("ipmi-fru $netopts 
 $boards_repo = 'https://raw.githubusercontent.com/dmacias72/unRAID-plugins/master/plugins/boards.json';
 $boards_file = "$plg_path/boards.json";
 
-if (!file_exists($boards_file) || (filemtime($boards_file) < (time() - 3600)))
+if (!file_exists($boards_file))
 	get_content_from_github($boards_repo, $boards_file);
 
 $boards       = json_decode(file_get_contents($boards_file), true);
