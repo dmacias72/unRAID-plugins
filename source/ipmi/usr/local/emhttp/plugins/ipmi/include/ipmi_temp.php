@@ -9,10 +9,10 @@ function format_ipmi_temp($reading, $unit, $dot) {
 $disp_sensors = [$disp_sensor1, $disp_sensor2, $disp_sensor3, $disp_sensor4];
 
 if (!empty($disp_sensors)){
-    $readings = ipmi_sensors();
+    $readings = ipmi_sensors($ignore);
     $displays = [];
     foreach($disp_sensors as $disp_sensor){
-        if ($readings[$disp_sensor]){
+        if (!empty($readings[$disp_sensor])){
             $disp_name    = $readings[$disp_sensor]['Name'];
             $disp_id      = $readings[$disp_sensor]['ID'];
             $disp_reading = $readings[$disp_sensor]['Reading'];
