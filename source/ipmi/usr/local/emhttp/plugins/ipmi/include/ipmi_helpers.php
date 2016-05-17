@@ -8,7 +8,7 @@ $hdd_temp = get_highest_temp();
 if (!empty($action)) {
     $state = ['Critical' => 'red', 'Warning' => 'yellow', 'Nominal' => 'green', 'N/A' => 'blue'];
     if ($action == 'ipmisensors'){
-        $return  = ['Sensors' => ipmi_sensors(),'Network' => ($netsvc == 'enable'),'State' => $state];
+        $return  = ['Sensors' => ipmi_sensors($ignore),'Network' => ($netsvc == 'enable'),'State' => $state];
         echo json_encode($return);
     }
     elseif($action == 'ipmievents'){
@@ -20,7 +20,7 @@ if (!empty($action)) {
         echo json_encode($return);
     }
     elseif($action == 'ipmidash') {
-        $return  = ['Sensors' => ipmi_sensors(),'DashTypes' => $dashtypes,'Network' => ($netsvc == 'enable'),'State' => $state];
+        $return  = ['Sensors' => ipmi_sensors($dignore), 'Network' => ($netsvc == 'enable'),'State' => $state];
         echo json_encode($return);
     }
 }
@@ -56,14 +56,14 @@ function get_temp_range($range, $selected=null){
 }
 
 /* get an array of all sensors and their values */
-function ipmi_sensors($all=false) {
-    global $ipmi, $netopts, $hdd_temp, $ignore;
+function ipmi_sensors($ignore=null) {
+    global $ipmi, $netopts, $hdd_temp;
 
     // return empty array if no ipmi detected and no network options
     if(!($ipmi || !empty($netopts)))
         return [];
 
-    $ignored = ($all || empty($ignore)) ? '' : "-R $ignore";
+    $ignored = (empty($ignore)) ? '' : "-R $ignore";
     $cmd = '/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output '.
         "--output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null";
     exec($cmd, $output, $return_var=null);
@@ -200,18 +200,15 @@ function ipmi_get_options($selected=null){
 }
 
 /* get select options for enabled sensors */
-function ipmi_get_enabled(){
-    global $ipmi, $netopts, $ignore;
+function ipmi_get_enabled($ignore){
+    global $ipmi, $netopts, $allsensors;
 
     // return empty array if no ipmi detected or network options
     if(!($ipmi || !empty($netopts)))
         return [];
 
-    $sensors = ipmi_sensors(true);
     $ignored = array_flip(explode(',', $ignore)); // create array of keyed ignored sensors
-    $options = (!empty($sensors)) ? '<option value="">Select All</option>' :
-        '<option value="" disabled>No Sensors Available</option>';
-    foreach($sensors as $sensor){
+    foreach($allsensors as $sensor){
         $id       = $sensor['ID'];
         $reading  = $sensor['Reading'];
         $units    = ($reading == 'N/A') ? '' : " ${sensor['Units']}";
@@ -223,18 +220,6 @@ function ipmi_get_enabled(){
 
         $options .= ">${sensor['Name']}$ip - $reading$units</option>";
 
-    }
-    return $options;
-}
-
-// get options for dashboard types
-function ipmi_get_dashtypes() {
-    global $dashtypes;
-    $sensors = array_flip(explode(',', $dashtypes)); // create array of keyed dash sensors
-    $types   = ['Temperature','Fan','Voltage'];
-    $options = '<option value="">Select All</option>';
-    foreach($types as $type){
-        $options .="<option value='$type'".(array_key_exists($type, $sensors) ? ' selected':'').">$type</option>";
     }
     return $options;
 }
