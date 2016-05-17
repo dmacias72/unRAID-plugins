@@ -65,9 +65,14 @@ Markdown="false"
 &nbsp;
 
 <dl>
-    <dt><input id="updates" type="button" value="Check for Updates" title="update fan control system in"><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
+    <dt><input id="updates" type="button" value="Check for Updates" title="update fan control systems json data file"><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
     <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
+<blockquote class="inline_help">
+    <p>Check for Updates button downloads the latest systems information file for fan control to the plugin folder.</p>
+    <p>Default loads the default values for fan control.</p>
+</blockquote>
+
 </form>
 
 <!-- Fan Settings -->
@@ -77,6 +82,8 @@ Markdown="false"
 <form name="fanctrl_options" method="POST" action="/update.php" target="progressFrame">
 <input type="hidden" name="#file" value="ipmi/fan.cfg" />
 
+<div id="fanctrl-options">
+
 <blockquote class="inline_help">
     <p>List all fans available for control with current speed and corresponding temperature sensor with its current value.</p>
     <p>Fan speed minimum (1-64):  Select the lowest value for which a fan can be set. Useful to prevent fan from stopping or going below a certain rpm. A value of 64 is full on.</p>
@@ -84,7 +91,7 @@ Markdown="false"
     <p>Low temperature threshold (°C):  Lowest temperature in the linear range to determine fan speed.  Below this temperature the fan will turn off unless minimum is set. </p>
     <p>High temperature threshold (°C):  Highest temperature in the linear range to determine fan speed. Above this temperature fan with run at full speed.</p>
 </blockquote>
-<div id="fanctrl-options">
+
 <?if (($netsvc == 'disable') || (($netsvc == 'enable') && ($fanip != 'None')) ):?>
     <?get_fanctrl_options();?>
 <?endif;?>
