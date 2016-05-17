@@ -192,7 +192,11 @@ $(function(){
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
         showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
     <?endif;?>
+
 
     DDCheckList('#select','#IGNORE','Select Sensors (unchecked will be ignored)');
     DDCheckList('#select-dash','#DIGNORE','Select Sensors (uncheck all will disable)');

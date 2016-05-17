@@ -50,8 +50,9 @@ $(function(){
         .append('<div class="tab"><input type="radio" name="tabs2" id="tab5"><label for="tab5"><img class="icon" src="/plugins/ipmi/icons/settings.png">Settings</label></div>');
 
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
-        $(function() {
-            showNotice('IPMI <?=$version?> available. <a>Install</a>','ipmi');
+        showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
         });
     <?endif;?>
 
