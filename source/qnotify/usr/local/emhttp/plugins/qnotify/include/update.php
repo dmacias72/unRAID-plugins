@@ -1,5 +1,5 @@
 <?
-$pfg      = '/boot/config/plugins/qnotify/config.py';
+$pcfg      = '/boot/config/plugins/qnotify/config.py';
 $cfg      = '/boot/config/plugins/qnotify/qnotify.cfg';
 $data     = '';
 $port     = $_POST['port'];
