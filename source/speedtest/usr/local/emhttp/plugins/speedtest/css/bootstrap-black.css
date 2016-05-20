@@ -5,10 +5,10 @@
   text-decoration: none;
 }
 .btn-default {
-	background:-webkit-radial-gradient(#505050,#181818);
-	background:linear-gradient(#505050,#181818);
-	color: inherit;
-	border-color: #101010;
+    background:-webkit-radial-gradient(#505050,#181818);
+    background:linear-gradient(#505050,#181818);
+    color: inherit;
+    border-color: #101010;
 }
 .btn-default:focus,
 .btn-default.focus {
@@ -100,5 +100,5 @@ i.clickable:hover {
   color: #ffffff;
 }
 .shareRow {
-	background-color:rgba(0,0,0,0.1);
+    background-color:rgba(0,0,0,0.1);
 }

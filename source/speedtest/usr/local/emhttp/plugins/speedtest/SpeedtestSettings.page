@@ -59,7 +59,7 @@ Select Speedtest Server:
 
 &nbsp;
 : <select class="serverlist" id="SERVER" name="SERVER" size="1">
-		<option value=""> ...loading speedtest.net server list </option>
+        <option value=""> ...loading speedtest.net server list </option>
   </select>
 
 <input id="DEFAULT" type="submit" value="Default" onClick="resetDATA(this.form)">
@@ -76,30 +76,30 @@ Select Speedtest Server:
 
 <script type="text/javascript">
 $(function(){
-	// append tabs for History and Scheduler
-	$('.tabs')
-		.append('<div class="tab"><input type="radio" name="tabs2" id="tab3"><label for="tab3"><img class="icon" src="/plugins/speedtest/icons/history.png">History</label></div>')
-		.append('<div class="tab"><input type="radio" name="tabs2" id="tab4"><label for="tab4"><img class="icon" src="/plugins/speedtest/icons/scheduler.png">Scheduler</label></div>');
+    // append tabs for History and Scheduler
+    $('.tabs')
+        .append('<div class="tab"><input type="radio" name="tabs2" id="tab3"><label for="tab3"><img class="icon" src="/plugins/speedtest/icons/history.png">History</label></div>')
+        .append('<div class="tab"><input type="radio" name="tabs2" id="tab4"><label for="tab4"><img class="icon" src="/plugins/speedtest/icons/scheduler.png">Scheduler</label></div>');
 
-	// dynamix plugin update api
-	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('speedtest')):?>
-		showNotice('Speedtest <?=$version?> available. <a>Download</a>','speedtest');
-	<?endif;?>
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('speedtest')):?>
+        showNotice('Speedtest <?=$version?> available. <a>Download</a>','speedtest');
+    <?endif;?>
 
-	// hide dummy tab
+    // hide dummy tab
    $('#tab2').parent().hide();
 
-	// goto Speedtest Tools Menu
-	$('#tab3').click(function() {
-		$.cookie('one', 'tab1', { expires:null, path: '/'});
-		location = '/Tools/SpeedtestTools';
-	});
+    // goto Speedtest Tools Menu
+    $('#tab3').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Tools/SpeedtestTools';
+    });
 
-	// goto scheduler tab
-	$('#tab4').click(function() {
-		$.cookie('one', "<?='tab'.$scheduler_tab?>", { expires:null, path: '/'});
-		location = '/Settings/Scheduler';
-	});
+    // goto scheduler tab
+    $('#tab4').click(function() {
+        $.cookie('one', "<?='tab'.$scheduler_tab?>", { expires:null, path: '/'});
+        location = '/Settings/Scheduler';
+    });
 });
 
 var Selected = "<?=$speedtest_server?>";

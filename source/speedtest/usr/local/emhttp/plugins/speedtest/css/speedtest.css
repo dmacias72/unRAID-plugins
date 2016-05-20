@@ -1,19 +1,19 @@
 #wait, #shareImage, #begin {
-	text-align:center;
-	margin-bottom: 20px;
-	margin-top: 20px;
+    text-align:center;
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 #chart-container {
-	text-align:center;
-	margin-top: -20px;
+    text-align:center;
+    margin-top: -20px;
 }
 
 .tdShare, #settings {
-	cursor:pointer;
+    cursor:pointer;
 }
 
 .switch-button-label.off {
-	color: inherit;
+    color: inherit;
 }
 
 #pager div,
@@ -69,18 +69,7 @@ div#chart {
 /* filters */
 select .tablesorter input.tablesorter-filter,
 .tablesorter select.tablesorter-filter {
-	width: 50%;
-	min-width: 90px;
-	max-width: 150px;
+    width: 50%;
+    min-width: 90px;
+    max-width: 150px;
 }
-/*table.tablesorter.tbltests th:nth-child(3){width:5%;text-align:left;}
-table.tablesorter.tbltests td:nth-child(3){width:5%;text-align:left;}
-table.tablesorter.tbltests th:nth-child(4){width:5%;text-align:left;}
-table.tablesorter.tbltests td:nth-child(4){width:5%;text-align:left;}
-table.tablesorter.tbltests th:nth-child(5){width:5%;text-align:left;}
-table.tablesorter.tbltests td:nth-child(5){width:5%;text-align:left;}
-table.tablesorter.tbltests th:nth-child(6){width:5%;text-align:left;}
-table.tablesorter.tbltests td:nth-child(6){width:5%;text-align:left;}
-table.tablesorter.tbltests th:nth-child(7){width:5%;text-align:left;}
-table.tablesorter.tbltests td:nth-child(7){width:5%;text-align:left;}
-*/
