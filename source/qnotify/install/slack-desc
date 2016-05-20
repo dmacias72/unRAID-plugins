@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+       |-----handy-ruler------------------------------------------------------|
+qnotify: Quassel Notify unRAID 6.1+ Plugin
+qnotify:
+qnotify: Pure python implementation of QuasselClient, a Quassel Core
+qnotify: notifications script. Doesn't depend on any PySide/PyQt libraries.
+qnotify: 
+qnotify: Zren/PyQuassel
+qnotify: https://github.com/Zren/PyQuassel
+qnotify: 
+qnotify: dmacias72/unRAID
+qnotify: https://github.com/dmacias72/unRAID-plugins
+qnotify:

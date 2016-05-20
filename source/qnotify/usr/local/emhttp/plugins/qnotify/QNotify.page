@@ -1,0 +1,141 @@
+Icon="qnotify.png"
+Menu="NetworkServices"
+Title="Quassel Notify"
+---
+<? require_once '/usr/local/emhttp/plugins/qnotify/include/settings.php';?>
+
+<form markdown="1" id="qform" name="q_settings" method="POST" target="progressFrame">
+
+Enable Quassel Notifications:
+: <select id="DAEMON" name="DAEMON" size="1" onChange="checkRUNNING(this.form);">
+  <?=mk_option($qdaemon, "disable", "No");?>
+  <?=mk_option($qdaemon, "enable", "Yes");?>
+  </select>
+
+> Choose to enable Quassel Core Notifications.
+>
+> Select Yes to enable, No to disable.
+
+&nbsp;
+
+Host Address:
+: <input id="HOST" name="host" type="text" disabled="" style="width:85px" maxlength="15" value="localhost" title="Only works with localhost" placeholder="" ><label class='q-run'></label>
+
+> Only works if Quassel Core Server Docker is set to Network Type: Host
+
+Port:
+: <input id="PORT" name="port" type="text" class="q-run" style="width:25px" maxlength="4" value="<?=$qport;?>" title="port must be 0-65535, default is 4242" placeholder="Port" >
+
+> Enter Port number of your Quassel Core Server
+
+User Name:
+: <input id="USERNAME" name="username" type="text" class="q-run" style="width:140px" maxlength="40" value="<?=$qusername;?>" title="Quassel Core Username" placeholder="Quassel Core Username" >
+
+> Enter username to login to Quassel Core
+
+Password:
+: <input id="PASSWORD" name="password" type="password" class="q-run" style="width:140px" maxlength="40" value="<?=$qpassword;?>" title="Quassel Core Password" placeholder="Quassel Core Password">
+
+> Enter password for username to login to Quassel Core
+
+Pushbullet access token:
+: <input id="TOKEN" name="pushbulletAccessToken" onChange="get_device_options();" type="text" class="q-run" style="width:260px" maxlength="80" value="<?=$qtoken;?>" title="Pushbullet access token" placeholder="Pushbullet access token" > <i><a href="https://www.pushbullet.com/#settings/account" title="Link to pushbullet account" target="_blank">Create Access Token</a></i>
+
+> Enter Pushbullet access token.
+>
+> Automatically imports token from Notification Settings
+
+Pushbullet Device Name:
+: <select  id="DEVICE" name="pushbulletDeviceName" class="q-run" style="width:275px" title="Pushbullet Device Name" placeholder="Pushbullet Device Name"></select>
+
+> Select Pushbullet device name to send notifications to.
+
+Notification Keywords:
+: <input id="KEYWORDS" name="pushIfKeyword" type="text" class="q-run" style="width:260px" maxlength="80" value="<?=$qkeywords;?>" title="Notification Keywords separated by comma or space" placeholder="Notification Keywords separated by comma or space" >
+
+> Enter notification keywords to look for in Quassel Core feed separated by comma or space.
+
+<input id="DEFAULT" class="q-run" type="submit" value="Default" onClick="resetDATA(this.form)">
+: <input id="btnApply" type="button" value="Apply"><input type="button" value="Done" onClick="done()">
+</form>
+
+<script type="text/javascript" src="/plugins/qnotify/js/jquery.mask.js"></script>
+
+<script type="text/javascript">
+$(function(){
+    $('.tabs')
+        .append("<span class='status'>Status: <?=$qstatus;?> </span>");
+
+    // ip address mask
+    //$('#HOST').mask('0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
+    $('#PORT').mask('0000#');
+
+    // save config and commit to bmc
+    $('#btnApply').click(function () {
+        form = document.q_settings;
+        if (form.PORT.value < 0 || form.PORT.value > 65535){
+            form.PORT.value = 4242;
+        }
+        if (form.TOKEN.value == '') {
+            form.TOKEN.value = "<?=$token;?>";
+        }
+        if (form.DEVICE.value == '') {
+            form.DEVICE.value = 'None';
+            $qdevice = 'None';
+        }
+        form.USERNAME.value = form.USERNAME.value.replace(/ /g,'');
+
+        $.post('/plugins/qnotify/include/update.php', $('#qform').serializeArray(),function (data) {
+            location.reload(true);
+        });
+    });
+    checkRUNNING(document.q_settings);
+    get_device_options();
+});
+
+function get_device_options() {
+    var token = $('#TOKEN').val();
+    $('#DEVICE').empty();
+    $.getJSON('/plugins/qnotify/include/helpers.php', {action: 'devices', token: token}, function (devices) {
+        var Options = '';
+        if(devices.length === 0)
+            Options = '<option value="None">Devices</option>';
+        else
+            Options = '<option value="None">All Devices</option>';
+        $('#DEVICE')[0].selectedIndex = 0;
+
+        $.each(devices, function (i, device) {
+            var iden     = device.iden;
+            var nickname = (device.nickname == '') ? 'No Name' : device.nickname;
+            Options += '<option value="'+ iden+'"';
+
+            // set saved option as selected
+            if(iden == "<?=$qdevice;?>")
+                Options += ' selected';
+
+            Options += '>'+ nickname +' ('+ iden +')</option>';
+        });
+        $('#DEVICE').append(Options);
+    });
+}
+
+
+function resetDATA(form) {
+    form.HOST.value = 'localhost';
+    form.PORT.value   = 4242;
+    form.USERNAME.value = '';
+    form.PASSWORD.value = '';
+    form.TOKEN.value = "<?=$token;?>";
+    form.DEVICE.value = 'None';
+}
+
+function checkRUNNING(form) {
+    if ("<?=$qrunning;?>" == true){
+        $('.q-run').prop('disabled', true);
+        form.btnApply.disabled = true;
+    }else{
+        $('.q-run').prop('disabled', false);
+    }
+}
+
+</script>

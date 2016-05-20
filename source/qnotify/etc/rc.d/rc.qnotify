@@ -1,0 +1,73 @@
+#!/bin/sh
+# start/stop/restart qnotify daemon:
+PLG="qnotify"
+EMHTTP="/usr/local/emhttp/plugins/$PLG"
+PROG="$EMHTTP/PyQuassel/quasselbot.py"
+LOCKFILE="/var/lock/$PLG"
+PIDFILE="/var/run/$PLG.pid"
+CONFIG="/boot/config/plugins/$PLG/$PLG.cfg"
+
+# read our configuration
+[ -e "$CONFIG" ] && source "$CONFIG"
+
+# Start qnotify:
+qnotify_start() {
+	# no-op if already running
+	if [ ! -r "$PIDFILE" ]; then
+		if [ "$DAEMON" == "enable" ]; then
+			echo "starting $PLG..."
+  			sleep 1
+  			cd $EMHTTP/PyQuassel
+			nohup /usr/bin/python3 $PROG >/dev/null 2>&1 | echo $! > $PIDFILE &
+			touch $LOCKFILE
+  			TIMER=0
+			while [ ! -e $PIDFILE ]; do
+				sleep 1
+  				let TIMER=$TIMER+1
+  				if [ $TIMER -gt 5 ]; then
+ 		 			echo -n "$PIDFILE not created"
+  			   	break
+				fi
+			done
+		else
+			echo "$PLG is not enabled   "
+		fi
+	else
+		echo "$PLG is running   "
+	fi
+}
+
+# Stop qnotify:
+qnotify_stop() {
+	# no-op if not running
+	if [ -r $PIDFILE ]; then
+		#stop qnotify
+		echo "stopping $PLG..."
+        sleep 1
+        kill $(cat $PIDFILE)
+		rm -f $LOCKFILE && rm -f $PIDFILE
+	else
+		echo "$PLG is stopped   "
+	fi
+}
+
+# Restart qnotify:
+qnotify_restart() {
+	qnotify_stop
+	sleep 1
+	qnotify_start
+}
+
+case "$1" in
+'start')
+  qnotify_start
+  ;;
+'stop')
+  qnotify_stop
+  ;;
+'restart')
+  qnotify_restart
+  ;;
+*)
+  echo "usage rc.qnotify: start|stop|restart"
+esac
