@@ -10,7 +10,7 @@
  */
 ?>
 <?
-require_once("/usr/local/emhttp/webGui/include/Wrappers.php");
+require_once '/usr/local/emhttp/webGui/include/Wrappers.php';
 
 if ($_POST['mode']>0) {
   $hour = isset($_POST['hour']) ? $_POST['hour'] : '*';
