@@ -1,4 +1,4 @@
-<?php
+<?
 $file = '/boot/config/plugins/speedtest/speedtest.xml';
 if (file_exists($file)) {
     if ($_GET['id'] == 'all'){

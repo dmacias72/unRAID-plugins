@@ -1,4 +1,4 @@
-<?php
+<?
 $command = '/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest.py --list 2>/dev/null';
 exec($command, $output);
 $array = array();

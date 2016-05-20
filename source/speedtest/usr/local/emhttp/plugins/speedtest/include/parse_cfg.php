@@ -1,4 +1,4 @@
-<?php
+<?
 $speedtest_cfg_file = '/boot/config/plugins/speedtest/speedtest.cfg';
 $speedtest_cfg      = file_exists($speedtest_cfg_file) ?parse_ini_file($speedtest_cfg_file) : [];
 $speedtest_filename = '/boot/config/plugins/speedtest/speedtest.xml';

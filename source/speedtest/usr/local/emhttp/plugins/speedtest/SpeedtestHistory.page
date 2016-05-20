@@ -2,9 +2,7 @@ Menu="SpeedtestTools:1"
 Title="History"
 Markdown="false"
 ---
-<?php
-require_once("/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php");
-?>
+<? require_once '/usr/local/emhttp/plugins/speedtest/include/parse_cfg.php';?>
 <script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
 <script type="text/javascript">
 //var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
@@ -129,7 +127,10 @@ var Units = ( <?=($speedtest_units == 'bits')?> ) ? "Mbit/s" : "Mbytes";
 $(function(){
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('speedtest')):?>
-        showNotice('Speedtest <?=$version?> available. <a>Download</a>','speedtest');
+        showNotice('Speedtest <?=$version?> available. <a>Update</a>','speedtest');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
     <?endif;?>
 
     // hide dummy tab
