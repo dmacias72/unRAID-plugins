@@ -326,7 +326,7 @@ function parseDataXML(){
             });
 
             // add class to last test
-            $('#tblTests tr:last').addClass('lastRow');
+            $('#tblTests tr:last:not(.tablesorter-filter-row)').addClass('lastRow');
             $('#tblTests').trigger('update');
 
             // enable chart or image
@@ -380,7 +380,7 @@ function Delete(Row) {
         $.get(deleteNode, {id: Row}, function() {
             var tRow = $('#'+Row);
             // add class lastrow and show image of next row
-            tRow.next('tr').addClass('lastRow');
+            tRow.next('tr:not(.tablesorter-filter-row)').addClass('lastRow');
 
             shareImage(tRow.next('tr').children("td:nth-child(7)").html());
 
