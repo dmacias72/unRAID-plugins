@@ -66,6 +66,14 @@ $(function(){
     $('.tabs')
         .append("<span class='status'>Status: <?=$qstatus;?> </span>");
 
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('qnotify')):?>
+        showNotice('Quassel Notify <?=$version?> available. <a>Update</a>','qnotify');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
+    <?endif;?>
+
     // ip address mask
     //$('#HOST').mask('0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
     $('#PORT').mask('0000#');
