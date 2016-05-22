@@ -69,10 +69,7 @@ Select Speedtest Server:
 
 </form>
 
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.speedtest-settings.js"></script>
-
-
-<script type="text/javascript">
+<script>
 $(function(){
     // append tabs for History and Scheduler
     $('.tabs')
@@ -101,8 +98,45 @@ $(function(){
         $.cookie('one', "<?='tab'.$scheduler_tab?>", { expires:null, path: '/'});
         location = '/Settings/Scheduler';
     });
+
+    var Selected = "<?=$speedtest_server?>";
+
+    $('#LIST').change(function () {
+        if ($('#LIST')[0].selectedIndex){
+            $('.serverlist').css('visibility','visible')
+            getServerList(Selected);
+        }else
+            $('.serverlist').css('visibility','hidden')
+    });
+
+    if ($('#LIST')[0].selectedIndex){
+        $('.serverlist').css('visibility','visible')
+            getServerList(Selected);
+    }else
+        $('.serverlist').css('visibility','hidden')
+
 });
 
-var Selected = "<?=$speedtest_server?>";
+function resetDATA(form) {
+    form.SECURE.value = '';
+    form.SHARE.value = '--share';
+    form.UNITS.value = '';
+    form.LIST.value = 'auto';
+    form.SERVER.value = '';
+}
 
+// list all available servers
+function getServerList(Select){
+    $.getJSON('/plugins/speedtest/include/speedtest-list.php', function(List) {
+        var serverList= '';
+        var Length = List.length;
+        for (var i = 0; i < Length; i++){
+            serverList += '<option ';
+            if (List[i][0] === Select)
+                serverList += 'selected="" ';
+            serverList+= 'value="' + List[i][0] +'">'+ List[i][1] +'</option>';
+        }
+        $('#SERVER').html(serverList);
+    });
+}
 </script>
