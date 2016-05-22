@@ -5,6 +5,7 @@ Title="Quassel Notify"
 <? require_once '/usr/local/emhttp/plugins/qnotify/include/settings.php';?>
 
 <form markdown="1" id="qform" name="q_settings" method="POST" target="progressFrame">
+<input type="hidden" id="RUNNING" name="RUNNING" value="<?=$qrunning;?>" />
 
 Enable Quassel Notifications:
 : <select id="DAEMON" name="DAEMON" size="1" onChange="checkRUNNING(this.form);">
@@ -93,7 +94,7 @@ $(function(){
         }
         form.USERNAME.value = form.USERNAME.value.replace(/ /g,'');
 
-        $.post('/plugins/qnotify/include/update.php', $('#qform').serializeArray(),function (data) {
+        $.post('/plugins/qnotify/include/update.php', $('#qform').serialize(),function (data) {
             location.reload(true);
         });
     });
