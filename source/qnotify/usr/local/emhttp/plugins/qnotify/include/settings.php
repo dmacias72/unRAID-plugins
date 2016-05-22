@@ -29,7 +29,7 @@ if(file_exists($qservice_file)) {
     }
     $token = trim(trim($token), '"');
 }
-$qtoken = isset($pcfg['pushbulletAccessToken']) ? $pcfg['pushbulletAccessToken'] : '';//$token;
+$qtoken = (empty($pcfg['pushbulletAccessToken'])) ? $token : $pcfg['pushbulletAccessToken'];
 
 //check running status
 $qrunning = (trim(shell_exec( "[ -f /proc/`cat /var/run/qnotify.pid 2> /dev/null`/exe ] && echo 1 || echo 0 2> /dev/null" )) == 1);
