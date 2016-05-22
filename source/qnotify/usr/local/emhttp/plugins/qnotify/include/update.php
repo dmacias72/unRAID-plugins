@@ -7,7 +7,7 @@ if(!$_POST['RUNNING']) {
     $password = trim($_POST['password']);
     $token    = trim($_POST['pushbulletAccessToken']);
     $device   = trim($_POST['pushbulletDeviceName']);
-    $keyword  = implode(',', preg_split('/[\ \,]+/', $_POST['pushIfKeyword'], -1, PREG_SPLIT_NO_EMPTY));
+    $keyword  = implode('","', preg_split('/[\ \,]+/', $_POST['pushIfKeyword'], -1, PREG_SPLIT_NO_EMPTY));
 
     $data = "host = \"localhost\"\n".
             "port = $port\n".
