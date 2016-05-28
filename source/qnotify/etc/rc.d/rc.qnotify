@@ -18,7 +18,7 @@ qnotify_start() {
 			echo "starting $PLG..."
   			sleep 1
   			cd $EMHTTP/PyQuassel
-			nohup /usr/bin/python3 $PROG >/dev/null 2>&1 | echo $! > $PIDFILE &
+			nohup /usr/bin/python3 -u $PROG >/var/log/$PLG 2>&1 | echo $! > $PIDFILE &
 			touch $LOCKFILE
   			TIMER=0
 			while [ ! -e $PIDFILE ]; do
