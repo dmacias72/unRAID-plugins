@@ -60,6 +60,23 @@ Notification Keywords:
 : <input id="btnApply" type="button" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
+<div id="title" ><span class="left"><img class="icon" src="/webGui/icons/log.png"> Quassel Notify Log </span></div>
+<table class="tablesorter" style="margin-top: -22px;">
+    <thead>
+        <th>Logfile</th>
+        <th>Size</th>
+    </thead>
+    <tbody>
+<?
+$log = '/var/log/qnotify';
+if(file_exists($log)){
+    echo "<tr><td style='cursor:pointer;'><a title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=qnotify','Quassel Notification Log',600,900);\">$log</a></td><td>"
+    .filesize($log).'</td></tr>';	
+}
+?>
+    </tbody>
+</table>
+
 <script type="text/javascript" src="/plugins/qnotify/js/jquery.mask.js"></script>
 
 <script type="text/javascript">
@@ -145,6 +162,13 @@ function checkRUNNING(form) {
     }else{
         $('.q-run').prop('disabled', false);
     }
+}
+
+/* empty fan log */
+function clearFanLOG(){
+    $.get('/plugins/qnotify/include/fanlog_clear.php', {},function() {
+        $('#fanlog-size').html('0');
+    });
 }
 
 </script>
