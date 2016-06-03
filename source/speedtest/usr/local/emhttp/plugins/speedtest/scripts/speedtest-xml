@@ -15,7 +15,7 @@ if ($speedtest_share == 'share')
 if ($speedtest_units == 'bytes')
         $options .= ' --bytes';
 
-$command = "/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest.py  $options 2>/dev/null";
+$command = "/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest_cli-${speedtest_version}.py  $options --timeout ${speedtest_timeout} 2>/dev/null";
 $handle = popen($command, 'r');
 
 $xml = simplexml_load_file($speedtest_filename);
