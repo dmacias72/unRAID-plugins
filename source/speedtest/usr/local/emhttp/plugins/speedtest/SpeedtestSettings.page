@@ -22,7 +22,7 @@ Speedtest Script Version:
 
 > Choose a version of speedtest script to use.
 
-Speedtest Timeout:
+Speedtest Timeout in Seconds:
 : <select id="TIMEOUT" name="TIMEOUT" size="1" >
   <?=mk_option($speedtest_timeout, "10", "10");?>
   <?=mk_option($speedtest_timeout, "20", "20");?>
