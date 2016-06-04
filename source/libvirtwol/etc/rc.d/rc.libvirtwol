@@ -46,6 +46,7 @@ sleep 1
 	rm -f $LOCKFILE && rm -f $PIDFILE
 else
 echo "$prog is stopped   "
+fi
 }
 
 # Restart libvirtwol:
