@@ -1,13 +1,2 @@
 #!/bin/sh
-prog="libvirtwol"
-LOCKFILE="/var/lock/$prog"
-PIDFILE="/var/run/$prog.pid"
-
-# no-op if not running
-if [ -r $PIDFILE ]; then
-	kill -TERM $(<"$PIDFILE") > /dev/null 2>&1
-	sleep 1
-	rm -f $LOCKFILE && rm -f $PIDFILE
-else
-echo "$prog is stopped"
-fi
+/etc/rc.d/rc.libvirtwol stop
