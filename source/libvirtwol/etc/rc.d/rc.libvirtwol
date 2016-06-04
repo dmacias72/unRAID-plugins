@@ -1,0 +1,70 @@
+#!/bin/sh
+# start/stop/restart libvirtwol daemon:
+prog="libvirtwol"
+LIBVIRTWOL="/usr/local/emhttp/plugins/$prog/scripts/$prog.py"
+LOCKFILE="/var/lock/$prog"
+PIDFILE="/var/run/$prog.pid"
+CONFIG="/boot/config/domain.cfg"
+
+# read our configuration
+[ -e $CONFIG ] &&	source $CONFIG
+
+# Start libvirtwol:
+libvirtwol_start() {
+if [ $WOL == "enable" ]; then
+	# no-op if already running
+	if [ ! -r $PIDFILE ]; then
+	  echo "starting $prog..."
+		sleep 1
+		nohup /usr/bin/python $LIBVIRTWOL $BRNAME > /dev/null 2>&1 & echo $! > $PIDFILE &
+		touch $LOCKFILE
+		TIMER=0
+		while [ ! -e $PIDFILE ]; do
+			sleep 1
+			let TIMER=$TIMER+1
+      		if [ $TIMER -gt 5 ]; then
+	         	  echo -n "$PIDFILE not created"
+		           break
+   		  	fi
+		done
+	else
+	echo "$prog is already running   "
+	fi
+else
+echo "$prog is not enabled   "
+fi
+}
+
+# Stop libvirtwol:
+libvirtwol_stop() {
+# no-op if not running
+if [ -r $PIDFILE ]; then
+echo "stopping $prog..."
+sleep 1
+	kill -TERM $(<"$PIDFILE") > /dev/null 2>&1
+	sleep 1
+	rm -f $LOCKFILE && rm -f $PIDFILE
+else
+echo "$prog is stopped   "
+}
+
+# Restart libvirtwol:
+libvirtwol_restart() {
+	libvirtwol_stop
+	sleep 1
+	libvirtwol_start
+}
+
+case "$1" in
+'start')
+  libvirtwol_start
+  ;;
+'stop')
+  libvirtwol_stop
+  ;;
+'restart')
+  libvirtwol_restart
+  ;;
+*)
+  echo "usage rc.libvirtwol: start|stop|restart"
+esac
