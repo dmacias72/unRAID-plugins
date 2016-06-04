@@ -14,5 +14,4 @@ if (!file_exists($speedtest_filename)) {
     $xml = new SimpleXMLElement("<tests></tests>");
     $xml->asXML($speedtest_filename);
 }
-
 ?>
