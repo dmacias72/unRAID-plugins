@@ -1,5 +1,4 @@
-
-<?php
+<?
 $config_file = "/boot/config/domain.cfg";
 $libvirtwol_cfg = parse_ini_file($config_file);
 $libvirtwol_service = isset($libvirtwol_cfg['WOL']) ? $libvirtwol_cfg['WOL'] 	: "disable";
