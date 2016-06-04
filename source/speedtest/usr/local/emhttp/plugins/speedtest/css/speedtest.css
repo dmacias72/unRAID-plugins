@@ -73,3 +73,8 @@ select .tablesorter input.tablesorter-filter,
     min-width: 90px;
     max-width: 150px;
 }
+
+table.tablesorter.tbltests th:first-child{width:12%;}
+table.tablesorter.tbltests td:first-child{width:12%;}
+table.tablesorter.tbltests th:nth-child(2){width:20%;}
+table.tablesorter.tbltests td:nth-child(2){width:20%;}
