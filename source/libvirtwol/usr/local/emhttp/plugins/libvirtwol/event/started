@@ -1,11 +1,2 @@
 #!/bin/bash
-CONFIG="/boot/config/domain.cfg"
-
-echo "starting kvm wake on lan monitor... "
-
-# read our configuration
-[ -e "$CONFIG" ] && source $CONFIG
-
-if [ "$WOL" = "enable" ]; then
-	/usr/local/emhttp/plugins/libvirtwol/scripts/start
-fi
+/etc/rc.d/rc.libvirtwol start

@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/local/emhttp/plugins/libvirtwol/scripts/stop
+/etc/rc.d/rc.libvirtwol stop
