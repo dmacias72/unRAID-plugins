@@ -34,10 +34,15 @@ $libvirtwol_status = ($libvirtwol_running) ? $status_running : $status_stopped;
 </div>
 <script type="text/javascript">
 $(function(){
-	<?if (function_exists('plugin_update_available') && $version = plugin_update_available('libvirtwol')):?>
-		showNotice('Wake On Lan <?=$version?> is available. <a>Download Now</a>','libvirtwol');
-	<?endif;?>
-	checkRUNNING(document.libvirtwol_settings);
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('libvirtwol')):?>
+        showNotice('Wake on Lan <?=$version?> available. <a>Update</a>','libvirtwol');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
+    <?endif;?>
+
+    checkRUNNING(document.libvirtwol_settings);
 });
 
 function checkRUNNING(form) {
