@@ -34,7 +34,7 @@ function presetSpeedtest(form) {
   form.hour2.disabled = mode==0;
   form.day.value = form.day.disabled ? '*' : (form.day.value=='*' ? 0 : form.day.value);
   form.dotm.value = form.dotm.disabled ? '*' : (form.dotm.value=='*' ? 1 : form.dotm.value);
-  if (mode==1) {$('#hour1').hide(); $('#hour2').show();} else {$('#hour2').hide(); $('#hour1').show();}
+  if (mode==1) {$('#speedtest_hour1').hide(); $('#speedtest_hour2').show();} else {$('#speedtest_hour2').hide(); $('#speedtest_hour1').show();}
 }
 
 function prepareSpeedtest(form) {
@@ -81,7 +81,7 @@ Day of the month:
 > Choose a date when the monthly schedule is selected. Otherwise disabled.
 
 Time of the day:
-: <span id="hour1" style="display:none"><select name="hour1" size="1" class="narrow">
+: <span id="speedtest_hour1" style="display:none"><select name="hour1" size="1" class="narrow">
   <?for ($d=0; $d<=23; $d++):?>
   <?=mk_option($speedtest_cron['hour'], strval($d), sprintf("%02d", $d))?>
   <?endfor;?>
@@ -91,7 +91,7 @@ Time of the day:
   <?=mk_option($speedtest_cron['min'], strval($d), sprintf("%02d", $d))?>
   <?endfor;?>
   </select>&nbsp;&nbsp;HH:MM</span>
-: <span id="hour2" style="display:none"><select name="hour2" size="1">
+: <span id="speedtest_hour2" style="display:none"><select name="hour2" size="1">
   <?=mk_option($speedtest_cron['hour'], "*/1", "Every hour")?>
   <?=mk_option($speedtest_cron['hour'], "*/2", "Every 2 hours")?>
   <?=mk_option($speedtest_cron['hour'], "*/3", "Every 3 hours")?>
@@ -105,5 +105,5 @@ Time of the day:
 > For the other schedules choose here the time of the day speedtest should run.
 
 &nbsp;
-: <input type="submit" name="#apply" value="Apply"><input type="button" value="Done" onclick="done()">
+: <input type="submit" name="#BtnApply" value="Apply"><input type="button" value="Done" onclick="done()">
 </form>
