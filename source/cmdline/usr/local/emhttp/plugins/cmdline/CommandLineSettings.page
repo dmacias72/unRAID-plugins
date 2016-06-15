@@ -15,8 +15,18 @@ Enable Shellinabox Server <?=$shellinabox_version;?>:
   <?=mk_option($shellinabox_service, "enable", "Yes");?>
   </select>
 
+> Enable Shellinabox Server.
+>
+> You can access the server with YourServerName:port, YourServerIPAddress:port,
+> by clicking on the hyperlink below next to port, clicking on Connect button or
+> from the unRAID webgui at /Tools/CommandLine.
+
 Port (<?=$shellinabox_port_status;?>):
 : <input id="PORT" type="text" class="shellinabox-run" name="PORT" maxlength="40" value="<?=$shellinabox_port;?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
+
+> Port to access Shellinabox Server.
+>
+> Default port is 4200.
 
 Run as User:
 : <select id="USERS" class="shellinabox-run" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$shellinabox_runas;?>');">
@@ -27,11 +37,20 @@ Run as User:
   </select>
   <input type="hidden" id="RUNAS" name="RUNAS" maxlength="40" value=<?=$shellinabox_runas;?> >
 
+> Select username you want to run Shellinabox Server.
+
 Connect by IP Address:
 : <select id="IPADDR" name="IPADDR" size="1" class="shellinabox-run">
   <?=mk_option($shellinabox_ipaddr, "disable", "No");?>
   <?=mk_option($shellinabox_ipaddr, "enable", "Yes");?>
   </select>
+
+> Select to connect by IP address.
+>
+> Yes to make Settings page hyperlink, Connect button and Tools/CommandLine menu connect by IP address.
+>
+> No to connect by hostname.
+
 
 Enable SSL connection:
 : <select id="SSL" name="SSL" size="1" class="shellinabox-run">
@@ -39,17 +58,34 @@ Enable SSL connection:
   <?=mk_option($shellinabox_ssl, "enable", "Yes");?>
   </select>
 
+> This will enable a secure connection by a self signed certificate.
+> This is mainly only useful with Firefox.
+> You will have to create an exception for the self signed certificate.
+
 Enable Command Line Screenshot:
 : <select id="SCREEN" name="SCREEN" size="1" title="shows screenshot when you log in">
   <?=mk_option($cmdline_screen, "disable", "No");?>
   <?=mk_option($cmdline_screen, "enable", "Yes");?>
   </select>
 
+> The Command Line Screenshot uses a modified version of screenfetch.
+>
+> At terminal login you will be presented with a lovely ascii lime and
+>
+> unRAID stats: Login user, OS, Kernel, Uptime, Array status, Disks, CPU and RAM.
+
 Enable Root Home Directory Backup:
 : <select id="BACKUP" name="BACKUP" size="1" title="shows screenshot when you log in">
   <?=mk_option($cmdline_backup, "disable", "No");?>
   <?=mk_option($cmdline_backup, "enable", "Yes");?>
   </select>
+
+> This will create a backup of /root during shutdown
+>
+> Upon restart it will restore your / root contents
+>
+> This is useful for ssh authorized_keys, bash history, midnight commander settings, htop config and whatever else you keep in /root.
+
 
 <input id="DEFAULT" class="shellinabox-run" type="submit" value="Default" onClick="resetDATA(this.form)"><input id="btnConnect" type="button" value="Connect" onClick="javascript:location.href='/Tools/CommandLine'">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()"><!--<button id="btnCert" type="button" onclick="window.location.href='http://<?=$shellinabox_host;?>/boot/config/plugins/cmdline/<?=$shellinabox_cert;?>'"> Download Cert </button>-->
@@ -59,6 +95,14 @@ Enable Root Home Directory Backup:
 $(function(){
 	$('.tabs')
 		.append("<span class='status'>Status: <?=$shellinabox_status;?> </span>");
+
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
+        showNotice('Command Line <?=$version?> available. <a>Update</a>','cmdline');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
+    <?endif;?>
 
 	checkRUNNING(document.cmdline_settings);
 	checkUSER(document.cmdline_settings,'<?=$shellinabox_runas;?>');

@@ -16,6 +16,14 @@ $(function(){
 		.append("<span class='status'><label id='settings'><i class='fa fa-gear'></i> Settings </label></span>")
 		.append("<span class='status'>Status: <?=$shellinabox_status;?> </span>");
 
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
+        showNotice('Command Line <?=$version?> available. <a>Update</a>','cmdline');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
+    <?endif;?>
+
 	$('#settings').click(function() {
 		location = '/Settings/CommandLineSettings';
 	});
