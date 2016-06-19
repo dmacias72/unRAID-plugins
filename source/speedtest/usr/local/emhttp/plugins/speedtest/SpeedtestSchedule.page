@@ -46,7 +46,7 @@ function prepareSpeedtest(form) {
 }
 </script>
 <form markdown="1" name="speedtest_schedule" method="POST" action="/update.php" target="progressFrame" onsubmit="prepareSpeedtest(this)">
-<input type="hidden" name="#file" value="<?=$plugin?>/<?=$plugin?>.cfg">
+<input type="hidden" name="#file" value="speedtest/speedtest.cfg">
 <input type="hidden" name="#include" value="/plugins/speedtest/include/update.speedtest.php">
 <input type="hidden" name="hour" value="">
 Speedtest schedule:
