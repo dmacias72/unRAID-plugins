@@ -67,7 +67,24 @@ $argq   = (array_key_exists('q', $args) || array_key_exists('quiet', $args));
 $argv   = (array_key_exists('v', $args) || array_key_exists('verbose', $args));
 $debug  = (array_key_exists('debug', $args));
 $daemon = (array_key_exists('d', $args) || array_key_exists('daemon', $args));
-$quit   =  (array_key_exists('quit', $args));
+$quit   = (array_key_exists('quit', $args));
+
+if(empty($fancfg)){
+    $msg = "Fan control settings file $fancfg_file is missing or empty";
+    logger($msg, $argq);
+    exit(1);
+}
+
+$board = $fancfg['BOARD'];
+$boards_file = "$plg_path/boards.json";
+$boards = (file_exists($boards_file)) ? json_decode(file_get_contents($boards_file), true): [];
+if (!array_key_exists($board, $boards)){
+    $msg = 'Your motherboard is not supported yet';
+    logger($msg, $argq);
+    exit(1);
+}
+
+$raw  = $boards[$board]['raw'];
 
 if(file_exists($lockfile)){
     $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
@@ -161,19 +178,20 @@ function debug($m){
 
 /* auto fan */
 function autofan() {
-    global $boards, $board, $netopts;
+    global $boards, $board, $raw, $netopts;
     syslog(LOG_INFO, 'setting fans to auto');
     $auto = $boards[$board]['auto'];
-    $cmd = "ipmi-raw $auto $netopts 2>&1 >/dev/null &";
+    $raw  = $boards[$board]['raw'];
+    $cmd  = "ipmi-raw $raw $auto $netopts 2>&1 >/dev/null &";
     shell_exec($cmd);
     }
 
 /* full speed fan */
 function fullfan() {
-    global $boards, $board, $netopts;
+    global $boards, $board, $raw, $netopts;
     syslog(LOG_INFO, 'setting fans to full speed');
     $full = $boards[$board]['full'];
-    $cmd = "ipmi-raw $full $netopts 2>&1 >/dev/null &";
+    $cmd = "ipmi-raw $raw $full $netopts 2>&1 >/dev/null &";
     shell_exec($cmd);
     }
 
@@ -254,22 +272,6 @@ function ipmi_fan_sensors() {
 #####  PROGRAM SECTION  ######
 ##############################
 
-if(empty($fancfg)){
-    $msg = "Fan control settings file $fancfg_file is missing or empty";
-    logger($msg, $argq);
-    exit(1);
-}
-
-$board = $fancfg['BOARD'];
-$boards_file = "$plg_path/boards.json";
-$boards = (file_exists($boards_file)) ? json_decode(file_get_contents($boards_file), true): [];
-if (!array_key_exists($board, $boards)){
-    $msg = 'Your motherboard is not supported yet';
-    logger($msg, $argq);
-    exit(1);
-}
-
-$raw  = $boards[$board]['raw'];
 $fans = $boards[$board]['fans'];
 $MD5  = md5_file($fancfg_file);
 fanlog('Starting Fan Control');
@@ -289,7 +291,7 @@ while(TRUE){ while(TRUE){
         if(!empty($temp)) {
             $templo  = (isset($fancfg["TEMPLO_$fan"])) ? $fancfg["TEMPLO_$fan"]  : 30;
             $temphi  = (isset($fancfg["TEMPHI_$fan"])) ? $fancfg["TEMPHI_$fan"]  : 40;
-            $fanmin  = (isset($fancfg["MIN_$fan"]))    ? $fancfg["MIN_$fan"]     : 1;
+            $fanmin  = (isset($fancfg["FANMIN_$fan"])) ? $fancfg["FANMIN_$fan"]  : 1;
             $reading = floatval($sensors[$temp]['Reading']);
             $name    = $sensors[$temp]['Name'];
 
@@ -304,7 +306,10 @@ while(TRUE){ while(TRUE){
                 $pwm = round(($pct)*16)*4;
             }
             //impose fan lower limit
-            $pwm = ($pwm <= $fanmin) ? $fanmin : $pwm;
+            if ($pwm <= $fanmin){
+                $pwm  = $fanmin;
+                $pct  = $fanmin/64;
+            }
 
             //pad pwm to 2 places
             $pwm = str_pad($pwm, 2, '0', STR_PAD_LEFT);
@@ -312,7 +317,7 @@ while(TRUE){ while(TRUE){
             //add fan, value, temp sensor name and reading
             if(!empty($msg))
                 $msg .= ',';
-            $pct = round($pct*100);
+            $pct  = round($pct*100);
             $msg .= " $fan($pct%):$name(${reading}°C)";
 
        }else
