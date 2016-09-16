@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                  |-----handy-ruler------------------------------------------------------|
+apache: Apache Http Server unRAID 6.2+ Plugin
+apache:
+apache: The Apache HTTP Server Project is an effort to develop and maintain an
+apache: open-source HTTP server for modern operating systems including UNIX and
+apache: Windows NT. The goal of this project is to provide a secure, efficient and
+apache: extensible server that provides HTTP services in sync with the current HTTP
+apache: standards.
+apache: 
+apache: dmacias72/unRAID
+apache: https://github.com/dmacias72/unRAID-plugins
+apache:

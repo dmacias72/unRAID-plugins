@@ -1,0 +1,5 @@
+#!/bin/bash
+source /boot/config/plugins/apache/apache.cfg
+if [ $SERVICE = enable ]; then
+    /usr/local/emhttp/plugins/apache/scripts/start
+fi

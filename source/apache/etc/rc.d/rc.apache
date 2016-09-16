@@ -1,0 +1,78 @@
+#!/bin/sh
+# start/stop/restart apache daemon:
+
+PROG="apache"
+PIDFILE="/var/run/httpd.pid"
+PLGPATH="/boot/config/plugins/apache"
+CONFIG="$PLGPATH/apache.cfg"
+
+# read our configuration
+[ -e "$CONFIG" ] && source $CONFIG
+
+# Start apache:
+apache_start() {
+# no-op if already running
+if [ ! -r $PIDFILE ]; then
+
+    # if directory doesn't exist or apache is not found, create it
+    if [ ! -e "$DOCROOT" ]; then
+        mkdir -p $DOCROOT
+        chmod -R 0775 $DOCROOT
+    fi
+
+    if [ -d "$DOCROOT" ]; then
+        OWNER=$(stat -c %U "$DOCROOT")
+        if [ "$OWNER" != "$RUNAS" ]; then
+            chown -R "$RUNAS":users "$DOCROOT"
+        fi
+    fi
+
+    ln -sfT $DOCROOT /srv/httpd/htdocs
+
+    SERVERNAME=$(hostname)
+
+    sleep 1
+    nohup apachectl -k start -c "Listen $PORT" -c "ServerName $SERVERNAME" -c "User $RUNAS" -c "Group users" 2>&1  | logger -tapache &
+
+    TIMER=0
+    while [ ! -e $PIDFILE ]; do
+        sleep 1
+        let TIMER=$TIMER+1
+        if [ $TIMER -gt 5 ]; then
+            echo -n "Apache httpd.pid not created"
+            break
+        fi
+    done
+fi
+}
+
+# Stop apache:
+apache_stop() {
+# no-op if not running
+if [ -r /var/run/httpd.pid ]; then
+   sleep 1
+   apachectl -k stop > /dev/null 2>&1 &
+   sleep 1
+fi
+}
+
+# Restart apache:
+apache_restart() {
+    apache_stop
+    sleep 1
+    apache_start
+}
+
+case "$1" in
+'start')
+  apache_start
+  ;;
+'stop')
+  apache_stop
+  ;;
+'restart')
+  apache_restart
+  ;;
+*)
+  echo "usage rc.apache: start|stop|restart"
+esac

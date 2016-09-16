@@ -1,0 +1,173 @@
+Icon="apache.png"
+Menu="NetworkServices"
+Title="Web Server"
+---
+<?php
+$sName = "httpd";
+$errorMsg = "";
+$apache_datasize = 0;
+$apache_cfg = parse_plugin_cfg("apache");
+$apache_service = isset($apache_cfg['SERVICE']) ? $apache_cfg['SERVICE'] : "disable";
+$apache_docroot = isset($apache_cfg['DOCROOT']) ? $apache_cfg['DOCROOT'] : "/var/www/html";
+$apache_runas = isset($apache_cfg['RUNAS'])     ? $apache_cfg['RUNAS']   : "nobody";
+$apache_port = (isset($apache_cfg['PORT']) && is_numeric($apache_cfg['PORT']) && $apache_cfg['PORT'] > 0 && $apache_cfg['PORT'] < 65535 ) ? $apache_cfg['PORT'] : "8088";
+$apache_running = trim(shell_exec( "[ -f /proc/`cat /var/run/httpd.pid 2> /dev/null`/exe ] && echo 'yes' || echo 'no' 2> /dev/null" ));
+$apache_version = shell_exec( "/usr/sbin/httpd -v | grep version | sed -e 's/^Server version: Apache\///'" );
+if (is_dir($apache_docroot)) {
+    $apache_datasize = trim(shell_exec("du -shm '$apache_docroot' | cut -f1 | sed 's/[^0-9]*//g'"));
+    if (trim(shell_exec("stat -f -c '%T' '$apache_docroot'")) == "tmpfs" ){
+        $errorMsg = "Your directory WILL NOT survive reboot!";
+    };
+} else
+    $errorMsg = "Your directory does not exist.";
+$apache_version = ($apache_running == "yes") ?
+    "<a style='color:green;' href='http://{$var['NAME']}:$apache_port' title='http://{$var['NAME']}:$apache_port' target='_blank'><b>$apache_version</b></a>":
+    "<b><font style='color:orange;'>$apache_version</font></b>";
+?>
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.filetree.css">
+<style type="text/css">
+    .errortext{color: #EF3D47;display: none;}
+    .fileTree{width:305px;max-height:150px;overflow:scroll;position:absolute;z-index:100;display:none;}
+</style>
+<form markdown="1" name="apache_settings" method="POST" action="/update.php" target="progressFrame">
+<input type="hidden" name="#file" value="apache/apache.cfg" />
+<input type="hidden" id="command" name="#command" value="" />
+
+Enable Apache Server <?=$apache_version;?>:
+:	<select id="SERVICE" name="SERVICE" size="1" onChange="checkRUNNING(this.form);">
+        <?=mk_option($apache_service, "disable", "No");?>
+        <?=mk_option($apache_service, "enable", "Yes");?>
+    </select>
+
+Document Root directory (<?=$apache_datasize;?>MB):
+: <input id="docroot" type="text" name="DOCROOT" maxlength="60" value="<?=$apache_docroot;?>" data-pickcloseonfile="true" data-pickfilter="." data-pickroot="/mnt/" data-pickfolders="true" required="required" title="must be on cache, array or other drive to survive reboot" placeholder="e.g. /mnt/cache/www for persistent data"><label class="errortext"><?=$errorMsg?></label>
+
+Port:
+: <input type="text" name="PORT" maxlength="40" value="<?=$apache_port;?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
+
+Run as User:
+: <select id="USERS" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$apache_runas;?>');">
+    <?=mk_option($apache_runas, "nobody", "nobody");?>
+    <option value='other' <?=($apache_runas != "root" && $apache_runas != "nobody")?"selected=yes":"";?>>other</option>
+    </select>
+    <input type="hidden" name="RUNAS" style="width:222px" maxlength="40" value=<?=$apache_runas;?> >
+
+&nbsp;
+: <input id="btnApply" type="submit" value="Apply" style="margin-bottom:8px" onClick="verifyDATA(this.form);"><button type="button" style="margin-bottom:20px" onClick="done()">Done</button>
+</form>
+
+<table class="tablesorter">
+    <thead>
+        <th>Logfile</th>
+        <th>Size</th>
+        <th>Delete</th>
+    </thead>
+    <tbody>
+<?php
+    foreach (glob("/var/log/httpd/*log") as $log) {
+        echo "<tr>
+            <td>
+            <a id='openlog' title='$log' href='#'
+            onclick=\"openWindow('/webGui/scripts/tail_log&arg1=".str_replace("/var/log/", "", $log)."','Log Information',600,900);\">$log</a>
+            </td>
+            <td>".filesize($log)."</td><td>";
+        if ($apache_running == "no")
+            echo "<a class='btnDelete' title='delete'><img src='/webGui/images/close.png' height='24' width='24'></a>";
+        else
+            echo "n/a";
+        echo "</td></tr>";
+    }
+?>
+    </tbody>
+</table>
+
+<script type="text/javascript" src="/webGui/javascript/jquery.filetree.js"></script>
+<script type="text/javascript">
+$(function(){
+    if ("<?=$errorMsg;?>")
+        $('.errortext').show();
+    showStatus('<?=$sName;?>');
+    checkRUNNING(document.apache_settings);
+    checkUSER(document.apache_settings,'<?=$apache_runas;?>');
+    $(".btnDelete").bind("click", Delete);
+   $("#docroot").fileTreeAttach(null, null, function(folder) {
+      $("#docroot").val(folder).change();
+   });
+});
+
+function checkRUNNING(form) {
+    if ("<?=$apache_running;?>" == "yes")
+    {
+        form.RUNAS.disabled = "disabled";
+        form.PORT.disabled = "disabled";
+        form.DOCROOT.disabled = "disabled";
+        form.USERS.disabled = "disabled";
+        form.btnApply.disabled = "disabled";
+   }
+   else
+   {
+        form.RUNAS.disabled = (form.SERVICE.value == "enable");
+        form.PORT.disabled = (form.SERVICE.value == "enable");
+        form.DOCROOT.disabled = (form.SERVICE.value == "enable");
+        form.USERS.disabled = (form.SERVICE.value == "enable");
+    }
+    if (form.SERVICE.value == "enable"){
+        form.command.value = "/usr/local/emhttp/plugins/apache/scripts/start";
+    } else {
+        form.command.value = "/usr/local/emhttp/plugins/apache/scripts/stop";
+        form.btnApply.disabled = (form.SERVICE.value == "enable");
+    }
+}
+
+function checkUSER(form, currentUSER) {
+    if (form.USERS.selectedIndex < 1 ) {
+        form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
+        form.RUNAS.type = "hidden";
+    }
+    else
+    {
+        form.RUNAS.value = currentUSER;
+        if (form.RUNAS.value == "root")
+            form.RUNAS.value = "nobody";
+        form.RUNAS.type = "text";
+        form.RUNAS.title = "Run As User Cannot be Root";
+    }
+}
+
+function verifyDATA(form) {
+    if (form.DOCROOT.value == null || !(/\S/.test(form.DOCROOT.value))){
+        form.DOCROOT.value = "/var/www/html";
+    }
+    if (isNumber(form.PORT.value)){
+        if (form.PORT.value < 0 || form.PORT.value > 65535){
+            form.PORT.value = "8088";
+        }
+    } else {
+        form.PORT.value = "8088";
+    }
+    if (form.RUNAS.value == null || form.RUNAS.value == "" || form.RUNAS.value == "root" ){
+        form.RUNAS.value = "nobody";
+        $apache_runas = "nobody";
+    }
+    if (form.docroot.value == ""){
+        form.docroot.value = "/mnt/";
+    }
+    form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
+    form.DOCROOT.value = form.DOCROOT.value.replace(/ /g,"_");
+    form.PORT.value = form.PORT.value.replace(/ /g,"_");
+    form.RUNAS.value = form.RUNAS.value.replace(/ /g,"_");
+}
+
+function Delete(){
+    var par = $(this).parent().parent();
+    var id = par.children("td:nth-child(1)").text().trim();
+    par.remove();
+        $.ajax({
+          type : "GET",
+        url: '/webGui/include/DeleteLogFile.php',
+        data : "log="+id,
+        success: function() {
+        }
+    });
+};
+</script>

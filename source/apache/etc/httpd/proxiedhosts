@@ -1,0 +1,120 @@
+<Location /couchpotato>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:5050/couchpotato
+ProxyPassReverse http://localhost:5050/couchpotato
+</Location>
+
+<Location /headphones>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:8181/headphones
+ProxyPassReverse http://localhost:8181/headphones
+</Location>
+
+<Location /nzbdrone>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:8989/nzbdrone
+ProxyPassReverse http://localhost:8989/nzbdrone
+</Location>
+
+<Location /htpc>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:8085/htpc
+ProxyPassReverse http://localhost:8085/htpc
+</Location>
+
+<Location /maraschino>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:7000/maraschino
+ProxyPassReverse http://localhost:7000/maraschino
+</Location>
+
+<Location /sabnzbd>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:8080/sabnzbd
+ProxyPassReverse http://localhost:8080/sabnzbd
+</Location>
+
+<Location /sickbeard>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:8081/sickbeard
+ProxyPassReverse http://localhost:8081/sickbeard
+</Location>
+
+<Location /transmission>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:9091/transmission
+ProxyPassReverse http://localhost:9091/transmission
+</Location>
+
+<Location /deluge>
+order deny,allow
+deny from all
+allow from all
+ProxyPass http://localhost:8112
+ProxyPassReverse http://localhost:8112
+</Location>
+
+<Location /unraid>
+       	ProxyPass http://localhost:8088/Main
+       	ProxyPassReverse http://localhost:8088/Main
+</Location>
+<Location /Dashboard>
+       	ProxyPass http://localhost:8088/Dashboard
+       	ProxyPassReverse http://localhost:8088/Dashboard
+</Location>
+<Location /Main>
+       	ProxyPass http://localhost:8088/Main
+       	ProxyPassReverse http://localhost:8088/Main
+</Location>
+<Location /Shares>
+	ProxyPass http://localhost:8088/Shares
+       	ProxyPassReverse http://localhost:8088/Shares
+</Location>
+<Location /Users>
+       	ProxyPass http://localhost:8088/Users
+       	ProxyPassReverse http://localhost:8088/Users
+</Location>
+<Location /Settings>
+       	ProxyPass http://localhost:8088/Settings
+       	ProxyPassReverse http://localhost:8088/Settings
+</Location>
+<Location /Plugins>
+       	ProxyPass http://localhost:8088/Plugins
+       	ProxyPassReverse http://localhost:8088/Plugins
+</Location>
+<Location /Docker>
+       	ProxyPass http://localhost:8088/Docker
+       	ProxyPassReverse http://localhost:8088/Docker
+</Location>
+<Location /VMs>
+       	ProxyPass http://localhost:8088/VMs
+       	ProxyPassReverse http://localhost:8088/VMs
+</Location>
+<Location /Stats>
+       	ProxyPass http://localhost:8088/Stats
+       	ProxyPassReverse http://localhost:8088/Stats
+</Location>
+<Location /Tools>
+       	ProxyPass http://localhost:8088/Tools
+       	ProxyPassReverse http://localhost:8088/Tools
+</Location>
+<Location /plugins>
+       	ProxyPass http://localhost:8088/plugins
+       	ProxyPassReverse http://localhost:8088/plugins
+</Location>
