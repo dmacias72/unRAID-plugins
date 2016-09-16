@@ -6,16 +6,16 @@
 	} else {
 		factory(jQuery);
 	}
-}(function($) {
+}(function(jQuery) {
 
-/*! TableSorter (FORK) v2.25.3 *//*
+/*! TableSorter (FORK) v2.27.6 *//*
 * Client-side table sorting with ease!
 * @requires jQuery v1.2.6+
 *
 * Copyright (c) 2007 Christian Bach
 * fork maintained by Rob Garrison
 *
-* Examples and docs at: http://tablesorter.com
+* Examples and original docs at: http://tablesorter.com
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
@@ -25,13 +25,14 @@
 * @cat Plugins/Tablesorter
 * @author Christian Bach - christian.bach@polyester.se
 * @contributor Rob Garrison - https://github.com/Mottie/tablesorter
+* @docs (fork) - https://mottie.github.io/tablesorter/docs/
 */
 /*jshint browser:true, jquery:true, unused:false, expr: true */
 ;( function( $ ) {
 	'use strict';
 	var ts = $.tablesorter = {
 
-		version : '2.25.3',
+		version : '2.27.6',
 
 		parsers : [],
 		widgets : [],
@@ -79,12 +80,12 @@
 			numberSorter     : null,       // choose overall numeric sorter function( a, b, direction, maxColumnValue )
 
 			// *** widget options
-			widgets: [],                   // method to add widgets, e.g. widgets: ['zebra']
+			initWidgets      : true,       // apply widgets on tablesorter initialization
+			widgetClass      : 'widget-{name}', // table class name template to match to include a widget
+			widgets          : [],         // method to add widgets, e.g. widgets: ['zebra']
 			widgetOptions    : {
 				zebra : [ 'even', 'odd' ]    // zebra widget alternating row class names
 			},
-			initWidgets      : true,       // apply widgets on tablesorter initialization
-			widgetClass      : 'widget-{name}', // table class name template to match to include a widget
 
 			// *** callbacks
 			initialized      : null,       // function( table ){},
@@ -98,7 +99,7 @@
 			cssHeaderRow     : '',
 			cssProcessing    : '', // processing icon applied to header during sort/filter
 
-			cssChildRow      : 'tablesorter-childRow', // class name indiciating that a row is to be attached to the its parent
+			cssChildRow      : 'tablesorter-childRow', // class name indiciating that a row is to be attached to its parent
 			cssInfoBlock     : 'tablesorter-infoOnly', // don't sort tbody with this class name (only one class name allowed here!)
 			cssNoSort        : 'tablesorter-noSort',      // class name added to element inside header; clicking on it won't cause a sort
 			cssIgnoreRow     : 'tablesorter-ignoreRow',   // header row to ignore; cells within this row will not be added to c.$headers
@@ -187,7 +188,7 @@
 
 		},
 
-		// digit sort text location; keeping max+/- for backwards compatibility
+		// digit sort, text location
 		string : {
 			max      : 1,
 			min      : -1,
@@ -572,19 +573,19 @@
 				}
 				column = parseInt( $elem.attr( 'data-column' ), 10 );
 				elem.column = column;
-				tmp = ts.getData( $elem, configHeaders, 'sortInitialOrder' ) || c.sortInitialOrder;
+				tmp = ts.getOrder( ts.getData( $elem, configHeaders, 'sortInitialOrder' ) || c.sortInitialOrder );
 				// this may get updated numerous times if there are multiple rows
 				c.sortVars[ column ] = {
 					count : -1, // set to -1 because clicking on the header automatically adds one
-					order: ts.getOrder( tmp ) ?
-						[ 1, 0, 2 ] : // desc, asc, unsorted
-						[ 0, 1, 2 ],  // asc, desc, unsorted
+					order:  tmp ?
+						( c.sortReset ? [ 1, 0, 2 ] : [ 1, 0 ] ) : // desc, asc, unsorted
+						( c.sortReset ? [ 0, 1, 2 ] : [ 0, 1 ] ),  // asc, desc, unsorted
 					lockedOrder : false
 				};
 				tmp = ts.getData( $elem, configHeaders, 'lockedOrder' ) || false;
 				if ( typeof tmp !== 'undefined' && tmp !== false ) {
 					c.sortVars[ column ].lockedOrder = true;
-					c.sortVars[ column ].order = ts.getOrder( tmp ) ? [ 1, 1, 1 ] : [ 0, 0, 0 ];
+					c.sortVars[ column ].order = ts.getOrder( tmp ) ? [ 1, 1 ] : [ 0, 0 ];
 				}
 				// add cell to headerList
 				c.headerList[ index ] = elem;
@@ -743,7 +744,7 @@
 				}
 			}
 			if ( add ) {
-				ts.parsers.push( parser );
+				ts.parsers[ ts.parsers.length ] = parser;
 			}
 		},
 
@@ -892,6 +893,10 @@
 					/** Add the table data to main data array */
 					$row = $( $tbody[ tbodyIndex ].rows[ rowIndex ] );
 					cols = [];
+					// ignore "remove-me" rows
+					if ( $row.hasClass( c.selectorRemove.slice(1) ) ) {
+						continue;
+					}
 					// if this is a child row, add it to the last row's children and continue to the next row
 					// ignore child row class, if it is the first row
 					if ( $row.hasClass( c.cssChildRow ) && rowIndex !== 0 ) {
@@ -951,8 +956,15 @@
 								index = 0;
 								while ( index <= span ) {
 									// duplicate text (or not) to spanned columns
-									rowData.raw[ cacheIndex + index ] = c.duplicateSpan || index === 0 ? val : '';
-									cols[ cacheIndex + index ] = c.duplicateSpan || index === 0 ? val : '';
+									// instead of setting duplicate span to empty string, use textExtraction to try to get a value
+									// see http://stackoverflow.com/q/36449711/145346
+									txt = c.duplicateSpan || index === 0 ?
+										val :
+										typeof c.textExtraction !== 'string' ?
+											ts.getElementText( c, cell, cacheIndex + index ) || '' :
+											'';
+									rowData.raw[ cacheIndex + index ] = txt;
+									cols[ cacheIndex + index ] = txt;
 									index++;
 								}
 								cacheIndex += span;
@@ -963,7 +975,7 @@
 					}
 					// ensure rowData is always in the same location (after the last column)
 					cols[ c.columns ] = rowData;
-					cache.normalized.push( cols );
+					cache.normalized[ cache.normalized.length ] = cols;
 				}
 				cache.colMax = colMax;
 				// total up rows, not including child rows
@@ -976,7 +988,8 @@
 			if ( c.debug ) {
 				len = Math.min( 5, c.cache[ 0 ].normalized.length );
 				console[ console.group ? 'group' : 'log' ]( 'Building cache for ' + c.totalRows +
-					' rows (showing ' + len + ' rows in log)' + ts.benchmark( cacheTime ) );
+					' rows (showing ' + len + ' rows in log) and ' + c.columns + ' columns' +
+					ts.benchmark( cacheTime ) );
 				val = {};
 				for ( colIndex = 0; colIndex < c.columns; colIndex++ ) {
 					for ( cacheIndex = 0; cacheIndex < len; cacheIndex++ ) {
@@ -1032,9 +1045,9 @@
 							});
 						}
 						if ( result !== false ) {
-							data.parsed.push( parsed );
-							data.raw.push( raw );
-							data.$cell.push( $cell );
+							data.parsed[ data.parsed.length ] = parsed;
+							data.raw[ data.raw.length ] = raw;
+							data.$cell[ data.$cell.length ] = $cell;
 						}
 					}
 				}
@@ -1127,6 +1140,7 @@
 		setColumnAriaLabel : function( c, $header, nextSort ) {
 			if ( $header.length ) {
 				var column = parseInt( $header.attr( 'data-column' ), 10 ),
+					vars = c.sortVars[ column ],
 					tmp = $header.hasClass( ts.css.sortAsc ) ?
 						'sortAsc' :
 						$header.hasClass( ts.css.sortDesc ) ? 'sortDesc' : 'sortNone',
@@ -1134,7 +1148,8 @@
 				if ( $header.hasClass( 'sorter-false' ) || nextSort === false ) {
 					txt += ts.language.sortDisabled;
 				} else {
-					nextSort = c.sortVars[ column ].order[ ( c.sortVars[ column ].count + 1 ) % ( c.sortReset ? 3 : 2 ) ];
+					tmp = ( vars.count + 1 ) % vars.order.length;
+					nextSort = vars.order[ tmp ];
 					// if nextSort
 					txt += ts.language[ nextSort === 0 ? 'nextAsc' : nextSort === 1 ? 'nextDesc' : 'nextNone' ];
 				}
@@ -1193,7 +1208,12 @@
 					// set order if not already defined - due to colspan header without associated header cell
 					// adding this check prevents a javascript error
 					if ( !c.sortVars[ col ].order ) {
-						order = c.sortVars[ col ].order = ts.getOrder( c.sortInitialOrder ) ? [ 1, 0, 2 ] : [ 0, 1, 2 ];
+						if ( ts.getOrder( c.sortInitialOrder ) ) {
+							order = c.sortReset ? [ 1, 0, 2 ] : [ 1, 0 ];
+						} else {
+							order = c.sortReset ? [ 0, 1, 2 ] : [ 0, 1 ];
+						}
+						c.sortVars[ col ].order = order;
 						c.sortVars[ col ].count = 0;
 					}
 
@@ -1210,12 +1230,12 @@
 							dir = primary || 0;
 							break;
 						case 'o' :
-							temp = order[ ( primary || 0 ) % ( c.sortReset ? 3 : 2 ) ];
+							temp = order[ ( primary || 0 ) % order.length ];
 							// opposite of primary column; but resets if primary resets
 							dir = temp === 0 ? 1 : temp === 1 ? 0 : 2;
 							break;
 						case 'n' :
-							dir = order[ ( ++c.sortVars[ col ].count ) % ( c.sortReset ? 3 : 2 ) ];
+							dir = order[ ( ++c.sortVars[ col ].count ) % order.length ];
 							break;
 						default : // ascending
 							dir = 0;
@@ -1223,9 +1243,9 @@
 					}
 					primary = indx === 0 ? dir : primary;
 					group = [ col, parseInt( dir, 10 ) || 0 ];
-					c.sortList.push( group );
+					c.sortList[ c.sortList.length ] = group;
 					dir = $.inArray( group[ 1 ], order ); // fixes issue #167
-					c.sortVars[ col ].count = dir >= 0 ? dir : group[ 1 ] % ( c.sortReset ? 3 : 2 );
+					c.sortVars[ col ].count = dir >= 0 ? dir : group[ 1 ] % order.length;
 				}
 			}
 		},
@@ -1322,7 +1342,7 @@
 		},
 
 		addRows : function( c, $row, resort, callback ) {
-			var txt, val, tbodyIndex, rowIndex, rows, cellIndex, len,
+			var txt, val, tbodyIndex, rowIndex, rows, cellIndex, len, order,
 				cacheIndex, rowData, cells, cell, span,
 				// allow passing a row string if only one non-info tbody exists in the table
 				valid = typeof $row === 'string' && c.$tbodies.length === 1 && /<tr/.test( $row || '' ),
@@ -1357,12 +1377,13 @@
 				for ( rowIndex = 0; rowIndex < rows; rowIndex++ ) {
 					cacheIndex = 0;
 					len = $row[ rowIndex ].cells.length;
+					order = c.cache[ tbodyIndex ].normalized.length;
 					cells = [];
 					rowData = {
 						child : [],
 						raw : [],
 						$row : $row.eq( rowIndex ),
-						order : c.cache[ tbodyIndex ].normalized.length
+						order : order
 					};
 					// add each cell
 					for ( cellIndex = 0; cellIndex < len; cellIndex++ ) {
@@ -1385,7 +1406,7 @@
 					// add the row data to the end
 					cells[ c.columns ] = rowData;
 					// update cache
-					c.cache[ tbodyIndex ].normalized.push( cells );
+					c.cache[ tbodyIndex ].normalized[ order ] = cells;
 				}
 				// resort using current settings
 				ts.checkResort( c, resort, callback );
@@ -1427,7 +1448,7 @@
 					parsed = cache[ tbodyIndex ].normalized;
 					totalRows = parsed.length;
 					for ( rowIndex = 0; rowIndex < totalRows; rowIndex++ ) {
-						rows.push( parsed[ rowIndex ][ c.columns ].$row );
+						rows[rows.length] = parsed[ rowIndex ][ c.columns ].$row;
 						// removeRows used by the pager plugin; don't render if using ajax - fixes #411
 						if ( !c.appender || ( c.pager && ( !c.pager.removeRows || !wo.pager_removeRows ) && !c.pager.ajax ) ) {
 							$curTbody.append( parsed[ rowIndex ][ c.columns ].$row );
@@ -1487,8 +1508,8 @@
 			// Only call sortStart if sorting is enabled
 			c.$table.triggerHandler( 'sortStart', table );
 			// get current column sort order
-			c.sortVars[ col ].count =
-				event[ c.sortResetKey ] ? 2 : ( c.sortVars[ col ].count + 1 ) % ( c.sortReset ? 3 : 2 );
+			tmp = ( c.sortVars[ col ].count + 1 ) % order.length;
+			c.sortVars[ col ].count = event[ c.sortResetKey ] ? 2 : tmp;
 			// reset all sorts on non-current column - issue #30
 			if ( c.sortRestart ) {
 				for ( headerIndx = 0; headerIndx < len; headerIndx++ ) {
@@ -1509,18 +1530,18 @@
 					arry = c.sortForce;
 					for ( indx = 0; indx < arry.length; indx++ ) {
 						if ( arry[ indx ][ 0 ] !== col ) {
-							c.sortList.push( arry[ indx ] );
+							c.sortList[ c.sortList.length ] = arry[ indx ];
 						}
 					}
 				}
 				// add column to sort list
 				dir = order[ c.sortVars[ col ].count ];
 				if ( dir < 2 ) {
-					c.sortList.push( [ col, dir ] );
+					c.sortList[ c.sortList.length ] = [ col, dir ];
 					// add other columns if header spans across multiple
 					if ( cell.colSpan > 1 ) {
 						for ( indx = 1; indx < cell.colSpan; indx++ ) {
-							c.sortList.push( [ col + indx, dir ] );
+							c.sortList[ c.sortList.length ] = [ col + indx, dir ];
 							// update count on columns in colSpan
 							c.sortVars[ col + indx ].count = $.inArray( dir, order );
 						}
@@ -1549,11 +1570,11 @@
 					// add column to sort list array
 					dir = order[ c.sortVars[ col ].count ];
 					if ( dir < 2 ) {
-						c.sortList.push( [ col, dir ] );
+						c.sortList[ c.sortList.length ] = [ col, dir ];
 						// add other columns if header spans across multiple
 						if ( cell.colSpan > 1 ) {
 							for ( indx = 1; indx < cell.colSpan; indx++ ) {
-								c.sortList.push( [ col + indx, dir ] );
+								c.sortList[ c.sortList.length ] = [ col + indx, dir ];
 								// update count on columns in colSpan
 								c.sortVars[ col + indx ].count = $.inArray( dir, order );
 							}
@@ -1583,14 +1604,14 @@
 										dir = tmp === 0 ? 1 : 0;
 										break;
 									case 'n' :
-										dir = ( tmp + 1 ) % ( c.sortReset ? 3 : 2 );
+										dir = ( tmp + 1 ) % order.length;
 										break;
 									default:
 										dir = 0;
 										break;
 								}
 							}
-							c.sortList.push( [ arry[ indx ][ 0 ], dir ] );
+							c.sortList[ c.sortList.length ] = [ arry[ indx ][ 0 ], dir ];
 						}
 					}
 				}
@@ -1610,8 +1631,9 @@
 
 		// sort multiple columns
 		multisort : function( c ) { /*jshint loopfunc:true */
-			var tbodyIndex, sortTime, colMax, rows,
+			var tbodyIndex, sortTime, colMax, rows, tmp,
 				table = c.table,
+				sorter = [],
 				dir = 0,
 				textSorter = c.textSorter || '',
 				sortList = c.sortList,
@@ -1622,6 +1644,16 @@
 				return;
 			}
 			if ( c.debug ) { sortTime = new Date(); }
+			// cache textSorter to optimize speed
+			if ( typeof textSorter === 'object' ) {
+				colMax = c.columns;
+				while ( colMax-- ) {
+					tmp = ts.getColumnData( table, textSorter, colMax );
+					if ( typeof tmp === 'function' ) {
+						sorter[ colMax ] = tmp;
+					}
+				}
+			}
 			for ( tbodyIndex = 0; tbodyIndex < len; tbodyIndex++ ) {
 				colMax = c.cache[ tbodyIndex ].colMax;
 				rows = c.cache[ tbodyIndex ].normalized;
@@ -1660,9 +1692,9 @@
 							if ( typeof textSorter === 'function' ) {
 								// custom OVERALL text sorter
 								sort = textSorter( x[ col ], y[ col ], dir, col, table );
-							} else if ( typeof textSorter === 'object' && textSorter.hasOwnProperty( col ) ) {
+							} else if ( typeof sorter[ col ] === 'function' ) {
 								// custom text sorter for a SPECIFIC COLUMN
-								sort = textSorter[ col ]( x[ col ], y[ col ], dir, col, table );
+								sort = sorter[ col ]( x[ col ], y[ col ], dir, col, table );
 							} else {
 								// fall back to natural sort
 								sort = ts[ 'sortNatural' + ( dir ? 'Asc' : 'Desc' ) ]( a[ col ], b[ col ], col, c );
@@ -1761,14 +1793,14 @@
 				regex = ts.regex;
 			// first try and sort Hex codes
 			if ( regex.hex.test( b ) ) {
-				aNum = parseInt( a.match( regex.hex ), 16 );
-				bNum = parseInt( b.match( regex.hex ), 16 );
+				aNum = parseInt( ( a || '' ).match( regex.hex ), 16 );
+				bNum = parseInt( ( b || '' ).match( regex.hex ), 16 );
 				if ( aNum < bNum ) { return -1; }
 				if ( aNum > bNum ) { return 1; }
 			}
 			// chunk/tokenize
-			aNum = a.replace( regex.chunk, '\\0$1\\0' ).replace( regex.chunks, '' ).split( '\\0' );
-			bNum = b.replace( regex.chunk, '\\0$1\\0' ).replace( regex.chunks, '' ).split( '\\0' );
+			aNum = ( a || '' ).replace( regex.chunk, '\\0$1\\0' ).replace( regex.chunks, '' ).split( '\\0' );
+			bNum = ( b || '' ).replace( regex.chunk, '\\0$1\\0' ).replace( regex.chunks, '' ).split( '\\0' );
 			max = Math.max( aNum.length, bNum.length );
 			// natural sorting through split numeric strings and default strings
 			for ( indx = 0; indx < max; indx++ ) {
@@ -1857,7 +1889,10 @@
 		███████▀ ██ █████▀ ▀████▀ ██████   ██   █████▀
 		*/
 		addWidget : function( widget ) {
-			ts.widgets.push( widget );
+			if ( widget.id && !ts.isEmptyObject( ts.getWidgetById( widget.id ) ) ) {
+				console.warn( '"' + widget.id + '" widget was loaded more than once!' );
+			}
+			ts.widgets[ ts.widgets.length ] = widget;
 		},
 
 		hasWidget : function( $table, name ) {
@@ -1905,13 +1940,14 @@
 				len = widgets.length;
 				for ( indx = 0; indx < len; indx++ ) {
 					if ( widgets[ indx ].match( widgetClass ) ) {
-						c.widgets.push( widgets[ indx ].replace( widgetClass, '$1' ) );
+						c.widgets[ c.widgets.length ] = widgets[ indx ].replace( widgetClass, '$1' );
 					}
 				}
 			}
 		},
 
 		applyWidgetId : function( table, id, init ) {
+			table = $(table)[0];
 			var applied, time, name,
 				c = table.config,
 				wo = c.widgetOptions,
@@ -1921,7 +1957,7 @@
 				applied = false;
 				// add widget name to option list so it gets reapplied after sorting, filtering, etc
 				if ( $.inArray( name, c.widgets ) < 0 ) {
-					c.widgets.push( name );
+					c.widgets[ c.widgets.length ] = name;
 				}
 				if ( c.debug ) { time = new Date(); }
 
@@ -1984,6 +2020,8 @@
 						// set priority to 10 if not defined
 						if ( !widget.priority ) { widget.priority = 10; }
 						widgets[ indx ] = widget;
+					} else if ( c.debug ) {
+						console.warn( '"' + names[ indx ] + '" widget code does not exist!' );
 					}
 				}
 				// sort widgets by priority
@@ -2031,7 +2069,7 @@
 				for ( indx = 0; indx < len; indx++ ) {
 					widget = ts.widgets[ indx ];
 					if ( widget && widget.id ) {
-						name.push( widget.id );
+						name[ name.length ] = widget.id;
 					}
 				}
 			} else {
@@ -2043,16 +2081,16 @@
 			for ( index = 0; index < len; index++ ) {
 				widget = ts.getWidgetById( name[ index ] );
 				indx = $.inArray( name[ index ], c.widgets );
+				// don't remove the widget from config.widget if refreshing
+				if ( indx >= 0 && refreshing !== true ) {
+					c.widgets.splice( indx, 1 );
+				}
 				if ( widget && widget.remove ) {
 					if ( c.debug ) {
 						console.log( ( refreshing ? 'Refreshing' : 'Removing' ) + ' "' + name[ index ] + '" widget' );
 					}
 					widget.remove( table, c, c.widgetOptions, refreshing );
 					c.widgetInit[ name[ index ] ] = false;
-				}
-				// don't remove the widget from config.widget if refreshing
-				if ( indx >= 0 && refreshing !== true ) {
-					c.widgets.splice( indx, 1 );
 				}
 			}
 		},
@@ -2072,7 +2110,7 @@
 			for ( indx = 0; indx < len; indx++ ) {
 				widget = widgets[ indx ];
 				if ( widget && widget.id && ( doAll || $.inArray( widget.id, curWidgets ) < 0 ) ) {
-					list.push( widget.id );
+					list[ list.length ] = widget.id;
 				}
 			}
 			ts.removeWidget( table, list.join( ',' ), true );
@@ -2095,7 +2133,7 @@
 		▀████▀   ██   ██ ██████ ██   ██   ██ ██████ █████▀
 		*/
 		benchmark : function( diff ) {
-			return ( ' ( ' + ( new Date().getTime() - diff.getTime() ) + 'ms )' );
+			return ( ' (' + ( new Date().getTime() - diff.getTime() ) + ' ms)' );
 		},
 		// deprecated ts.log
 		log : function() {
@@ -2262,7 +2300,7 @@
 				// c.$headerIndexed is not defined initially
 				$cell = c.$headerIndexed && c.$headerIndexed[ indx ] ||
 					$cells.filter( '[data-column="' + indx + '"]:last' );
-			if ( obj[ indx ] ) {
+			if ( typeof obj[ indx ] !== 'undefined' ) {
 				return getCell ? obj[ indx ] : obj[ $cells.index( $cell ) ];
 			}
 			for ( key in obj ) {
@@ -2459,7 +2497,7 @@
 		console = {};
 		console.log = console.warn = console.error = console.table = function() {
 			var arg = arguments.length > 1 ? arguments : arguments[0];
-			ts.logs.push({ date: Date.now(), log: arg });
+			ts.logs[ ts.logs.length ] = { date: Date.now(), log: arg };
 		};
 	}
 
@@ -2524,8 +2562,8 @@
 
 	// too many protocols to add them all https://en.wikipedia.org/wiki/URI_scheme
 	// now, this regex can be updated before initialization
-	ts.regex.urlProtocolTest =   /^(https?|ftp|file):\/\//;
-	ts.regex.urlProtocolReplace = /(https?|ftp|file):\/\//;
+	ts.regex.urlProtocolTest = /^(https?|ftp|file):\/\//;
+	ts.regex.urlProtocolReplace = /(https?|ftp|file):\/\/(www\.)?/;
 	ts.addParser({
 		id : 'url',
 		is : function( str ) {
@@ -2534,7 +2572,6 @@
 		format : function( str ) {
 			return str ? $.trim( str.replace( ts.regex.urlProtocolReplace, '' ) ) : str;
 		},
-		parsed : true, // filter widget flag
 		type : 'text'
 	});
 
@@ -2642,8 +2679,8 @@
 	});
 
 	// match 24 hour time & 12 hours time + am/pm - see http://regexr.com/3c3tk
-	ts.regex.timeTest = /^([1-9]|1[0-2]):([0-5]\d)(\s[AP]M)$|^((?:[01]\d|[2][0-4]):[0-5]\d)$/i;
-	ts.regex.timeMatch = /([1-9]|1[0-2]):([0-5]\d)(\s[AP]M)|((?:[01]\d|[2][0-4]):[0-5]\d)/i;
+	ts.regex.timeTest = /^(0?[1-9]|1[0-2]):([0-5]\d)(\s[AP]M)$|^((?:[01]\d|[2][0-4]):[0-5]\d)$/i;
+	ts.regex.timeMatch = /(0?[1-9]|1[0-2]):([0-5]\d)(\s[AP]M)|((?:[01]\d|[2][0-4]):[0-5]\d)/i;
 	ts.addParser({
 		id : 'time',
 		is : function( str ) {
@@ -2726,5 +2763,5 @@
 
 })( jQuery );
 
-return $.tablesorter;
+return jQuery.tablesorter;
 }));
