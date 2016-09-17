@@ -2,6 +2,7 @@
 
 # Update file permissions of scripts
 chmod +0755 /usr/local/emhttp/plugins/apache/scripts/* \
+	/usr/local/emhttp/plugins/apache/event/* \
 	/etc/rc.d/rc.apache
 
 if [ ! -L /var/www/htdocs ]; then
@@ -9,6 +10,6 @@ if [ ! -L /var/www/htdocs ]; then
 fi
 ln -sfT /var/www/html /srv/httpd/htdocs
 
-cp -nr /etc/httpd /boot/config/plugins/apache
+cp -nr /usr/local/emhttp/plugins/apache/httpd /boot/config/plugins/apache
 rm -rf /etc/httpd
 ln -sfT /boot/config/plugins/apache/httpd /etc/httpd
