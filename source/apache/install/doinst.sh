@@ -13,3 +13,4 @@ ln -sfT /var/www/html /srv/httpd/htdocs
 cp -nr /usr/local/emhttp/plugins/apache/httpd /boot/config/plugins/apache
 rm -rf /etc/httpd
 ln -sfT /boot/config/plugins/apache/httpd /etc/httpd
+ln -sfT /boot/config/plugins/apache/httpd/php.ini /etc/php.d/php.ini
