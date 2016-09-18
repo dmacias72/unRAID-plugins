@@ -134,7 +134,7 @@ if(!($force) && ($fanctrl == 'disable' )){
 
 if($daemon){
     $options = ($force) ? '--force' : ''; 
-    exec("php $service $options 1>/dev/null ".($DEBUG ? "":"2>&1 ")."&");
+    exec("php $service $options 1>/dev/null ".($debug ? "":"2>&1 ")."&");
     syslog(LOG_INFO, "process started. To terminate it, type: $prog --quit");
     exit(0);
 }
