@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CONFIG="/boot/config/plugins/ipmi/ipmi.cfg"
+OPTIONS=""
+IGNORED=""
+
+# read our configuration
+[ -e "$CONFIG" ] && source "$CONFIG"
+
+[ $NETWORK == "enable" ] && OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
+
+/usr/sbin/ipmi-raw $OPTIONS $@
