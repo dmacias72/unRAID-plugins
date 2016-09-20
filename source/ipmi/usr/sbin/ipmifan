@@ -69,22 +69,6 @@ $debug  = (array_key_exists('debug', $args));
 $daemon = (array_key_exists('d', $args) || array_key_exists('daemon', $args));
 $quit   = (array_key_exists('quit', $args));
 
-if(!($force) && ($fanctrl == 'disable' )){
-        exit(0);
-}
-
-$board = $fancfg['BOARD'];
-$boards_file = "$plg_path/boards.json";
-$boards = (file_exists($boards_file)) ? json_decode(file_get_contents($boards_file), true): [];
-
-if (!array_key_exists($board, $boards)){
-    $msg = 'Your motherboard is not supported yet';
-    logger($msg, $argq);
-    exit(1);
-}
-
-$raw  = $boards[$board]['raw'];
-
 if(file_exists($lockfile)){
     $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
     $pid_running = preg_replace("/\s+/", "", shell_exec("ps -p $lock_pid | grep $lock_pid"));
@@ -125,6 +109,22 @@ if($argf){
         fullfan();
         exit(0);
 }
+
+if(!($force) && ($fanctrl == 'disable' )){
+        echo "$prog is not enabled in $fancfg_file\ntype: $prog -f to force start".PHP_EOL;
+        exit(0);
+}
+
+$board = $fancfg['BOARD'];
+$boards_file = "$plg_path/boards.json";
+$boards = (file_exists($boards_file)) ? json_decode(file_get_contents($boards_file), true): [];
+if (!array_key_exists($board, $boards)){
+    $msg = 'Your motherboard is not supported yet';
+    logger($msg, $argq);
+    exit(1);
+}
+
+$raw  = $boards[$board]['raw'];
 
 if($daemon){
     $options = ($force) ? '--force' : ''; 
