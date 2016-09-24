@@ -31,6 +31,7 @@ if [ ! -r $PIDFILE ]; then
 
     SERVERNAME=$(hostname)
 
+    echo "starting Apache Web Server..."
     sleep 1
     nohup apachectl -k start -c "Listen $PORT" -c "ServerName $SERVERNAME" -c "User $RUNAS" -c "Group users" 2>&1  | logger -tapache &
 
@@ -50,9 +51,10 @@ fi
 apache_stop() {
 # no-op if not running
 if [ -r /var/run/httpd.pid ]; then
-   sleep 1
-   apachectl -k stop > /dev/null 2>&1 &
-   sleep 1
+    echo "stopping Apache Web Server..."
+    sleep 1
+    apachectl -k stop > /dev/null 2>&1 &
+    sleep 1
 fi
 }
 
