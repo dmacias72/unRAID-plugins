@@ -88,7 +88,7 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('apache')):?>
-        showNotice('Command Line <?=$version?> available. <a>Update</a>','apache');
+        showNotice('Apache <?=$version?> available. <a>Update</a>','apache');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });
@@ -98,7 +98,7 @@ $(function(){
     checkUSER(document.apache_settings,'<?=$apache_runas;?>');
 
     $('.btnClear').on('click', Clear);
-    
+
     $("#docroot").fileTreeAttach(null, null, function(folder) {
         $("#docroot").val(folder).change();
     });
@@ -107,11 +107,11 @@ $(function(){
 function checkRUNNING(form) {
     if ("<?=$apache_running;?>" == 'yes'){
         $('.apache-run').prop('disabled', true);
-		form.btnApply.disabled = true;	
-		form.btnRestart.disabled = false;
+        form.btnApply.disabled = true;
+        form.btnRestart.disabled = false;
     }else{
-       	$('.apache-run').prop('disabled', false);
-       	form.btnRestart.disabled = true;
+        $('.apache-run').prop('disabled', false);
+        form.btnRestart.disabled = true;
     }
     if (form.SERVICE.value == 'enable'){
         form.command.value = '/usr/local/emhttp/plugins/apache/scripts/start';
