@@ -28,13 +28,14 @@ if (!empty($action)) {
 /* get highest temp of hard drives */
 function get_highest_temp(){
     $hdds = parse_ini_file('/var/local/emhttp/disks.ini',true);
-    $highest_temp = '0';
+    $highest_temp = 0;
     foreach ($hdds as $hdd) {
         $temp = $hdd['temp'];
         if(is_numeric($temp))
             $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
     }
-    return $highest_temp;
+    $return = ($highest_temp == 0) ? 'N/A': $highest_temp;
+    return $return;
 }
 
 /* get options for high or low temp thresholds */
