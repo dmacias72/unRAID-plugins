@@ -86,8 +86,18 @@ function sensorArray(Refresh){
                 }
                 Units += sensor.Units;
             }else {
-                var Reading = sensor.Reading;
                 Color = 'blue'; // reading equals N/A
+                if(sensor.Type == 'OEM Reserved'){
+                    var Reading = sensor.Event;
+                    if(Reading == 'Low')
+                        Color = 'green';
+                    if(Reading == 'Medium')
+                        Color = 'orange';
+                    if(Reading == 'High')
+                        Color = 'red';
+                }else{
+                    var Reading = sensor.Reading;
+                }
             }
 
             if(Refresh) {

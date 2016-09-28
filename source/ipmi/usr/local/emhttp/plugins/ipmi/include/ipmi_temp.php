@@ -15,7 +15,7 @@ if (!empty($disp_sensors)){
         if (!empty($readings[$disp_sensor])){
             $disp_name    = $readings[$disp_sensor]['Name'];
             $disp_id      = $readings[$disp_sensor]['ID'];
-            $disp_reading = $readings[$disp_sensor]['Reading'];
+            $disp_reading = ($readings[$disp_sensor]['Type'] == 'OEM Reserved') ? $readings[$disp_sensor]['Event'] : $readings[$disp_sensor]['Reading'];
             $LowerNR = floatval($readings[$disp_sensor]['LowerNR']);
             $LowerC  = floatval($readings[$disp_sensor]['LowerC']);
             $LowerNC = floatval($readings[$disp_sensor]['LowerNC']);
@@ -42,6 +42,12 @@ if (!empty($disp_sensors)){
 
                 $displays[] = "<img src='/plugins/ipmi/icons/fan.png' title='$disp_name ($disp_id)' class='icon'><font color='$Color'>".
                     floatval($disp_reading)."</font><small>&thinsp;rpm</small>";
+            }elseif($readings[$disp_sensor]['Type'] == 'OEM Reserved'){
+                if($disp_reading == 'Medium')
+                    $Color = 'orange';
+                if($disp_reading == 'High')
+                    $Color = 'Red';
+                $displays[] = "<img src='/plugins/ipmi/icons/cpu.png' title='$disp_name ($disp_id)' class='icon'><font color='$Color'>$disp_reading</font>";
             }
         }
     }
