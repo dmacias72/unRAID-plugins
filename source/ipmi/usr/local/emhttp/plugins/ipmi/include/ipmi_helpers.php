@@ -80,13 +80,15 @@ function ipmi_sensors($ignore=null) {
             $hdd = '127.0.0.1:'.$hdd;
         $output[] = $hdd;
     }
+    // test sensor
+    // $output[] = "98,CPU Temp,OEM Reserved,Nominal,N/A,N/A,N/A,N/A,N/A,45.00,50.00,N/A,'Medium'";
     // key names for ipmi sensors output
     $keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
     $sensors = [];
 
     foreach($output as $line){
 
-        $sensor_raw = explode(",", $line);
+        $sensor_raw = explode(",", str_replace("'",'',$line));
         $size_raw = sizeof($sensor_raw);
 
         // add sensor keys as keys to ipmi sensor output
