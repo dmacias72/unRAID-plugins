@@ -69,6 +69,12 @@ $debug  = (array_key_exists('debug', $args));
 $daemon = (array_key_exists('d', $args) || array_key_exists('daemon', $args));
 $quit   = (array_key_exists('quit', $args));
 
+
+if (file_exists($board_file)) {
+        $board_json = json_decode(file_get_contents($board_file), true);
+        $raw  = $board_json[$board]['raw'];
+}
+
 if(file_exists($lockfile)){
     $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
     $pid_running = preg_replace("/\s+/", "", shell_exec("ps -p $lock_pid | grep $lock_pid"));
@@ -86,7 +92,7 @@ if(file_exists($lockfile)){
         }
     }else{
         if($quit){
-            echo "$lock_pid is not currently running";
+            echo "$lock_pid is not currently running".PHP_EOL;
             unlink($lockfile);
             exit(0);
         }else
@@ -115,16 +121,11 @@ if(!($force) && ($fanctrl == 'disable' )){
         exit(0);
 }
 
-$board = $fancfg['BOARD'];
-$boards_file = "$plg_path/boards.json";
-$boards = (file_exists($boards_file)) ? json_decode(file_get_contents($boards_file), true): [];
-if (!array_key_exists($board, $boards)){
-    $msg = 'Your motherboard is not supported yet';
+if (!file_exists($board_file)) {
+    $msg = "Your $board motherboard is not supported or setup yet";
     logger($msg, $argq);
     exit(1);
 }
-
-$raw  = $boards[$board]['raw'];
 
 if($daemon){
     $options = ($force) ? '--force' : ''; 
@@ -148,9 +149,8 @@ if($daemon){
 /* logger*/
 function logger($msg, $quiet = false) {
     syslog(LOG_INFO, $msg);
-    if (!$quiet) {
+    if (!$quiet)
         echo PHP_EOL.$msg.PHP_EOL;
-    }
 }
 
 /* logfile */
@@ -172,20 +172,19 @@ function debug($m){
 
 /* auto fan */
 function autofan() {
-    global $boards, $board, $raw, $netopts;
-    syslog(LOG_INFO, 'setting fans to auto');
-    $auto = $boards[$board]['auto'];
-    $raw  = $boards[$board]['raw'];
-    $cmd  = "ipmi-raw $raw $auto $netopts 2>&1 >/dev/null &";
+    global $board_json, $board, $raw, $fanopts;
+    fanlog('setting fans to auto');
+    $auto = $board_json[$board]['auto'];
+    $cmd  = "ipmi-raw $raw $auto $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
     }
 
 /* full speed fan */
 function fullfan() {
-    global $boards, $board, $raw, $netopts;
-    syslog(LOG_INFO, 'setting fans to full speed');
-    $full = $boards[$board]['full'];
-    $cmd = "ipmi-raw $raw $full $netopts 2>&1 >/dev/null &";
+    global $board_json, $board, $raw, $fanopts;
+    fanlog('setting fans to full speed');
+    $full = $board_json[$board]['full'];
+    $cmd = "ipmi-raw $raw $full $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
     }
 
@@ -266,7 +265,7 @@ function ipmi_fan_sensors() {
 #####  PROGRAM SECTION  ######
 ##############################
 
-$fans = $boards[$board]['fans'];
+$fans = $board_json[$board]['fans'];
 $MD5  = md5_file($fancfg_file);
 fanlog('Starting Fan Control');
 
@@ -323,7 +322,7 @@ while(TRUE){ while(TRUE){
 
     //compare last value to new value
     if($current_hex != $hex){
-        $cmd = "ipmi-raw $raw$hex $netopts 2>&1";
+        $cmd = "ipmi-raw $raw$hex $fanopts 2>&1";
         shell_exec($cmd);
 
         //log changes
