@@ -65,13 +65,12 @@ Markdown="false"
 &nbsp;
 
 <dl>
-    <dt><input id="updates" type="button" value="Check for Updates" title="update fan control systems json data file"><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
-    <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"><input id="btnConfig" class="fanctrl fanctrl-run" type="button" value="Configure"></dd>
+    <dt><input id="FAN_DEFAULT" class="fanctrl" title="Revert to default fan control settings" type="button" value="Default" onClick="resetFANDATA(this.form);"><input id="btnConfig" class="fanctrl fanctrl-run" type="button" value="Configure" title="test board fan locations and create json config"></dt>
+    <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 <blockquote class="inline_help">
-    <p>'Check for Updates' button downloads the latest systems information file for fan control to the plugin folder.</p>
     <p>'Default' loads the default values for fan control.</p>
-    <p>'Configure' button tests motherboard fan configuration and creates settings for fan control </p>
+    <p>'Configure' button tests motherboard fan locations. This will spin up all fans to full speed, then test locations using one third speed and create a board.json config for fan control.</p>
 </blockquote>
 
 </form>
@@ -160,8 +159,6 @@ $(function(){
         });
 
     $('#fanlog-clear').on('click', clearFanLOG);
-    
-    $('#updates').on('click', checkUpdates);
 
     $('#readings').click(function() {
         $.cookie('one', 'tab1', { expires:null, path: '/'});
@@ -220,12 +217,6 @@ function verifyFANDATA(form) {
 function clearFanLOG(){
     $.get('/plugins/ipmi/include/fanlog_clear.php', {},function() {
         $('#fanlog-size').html('0');
-    });
-}
-
-function checkUpdates(){
-    $.get('/plugins/ipmi/include/boards_clear.php', {},function() {
-        location.reload();
     });
 }
 

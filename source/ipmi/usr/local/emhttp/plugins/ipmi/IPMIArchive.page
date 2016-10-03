@@ -100,13 +100,13 @@ function archiveArray(){
             var Host = (typeof archive.IP == 'undefined') ? '' : archive.IP; // check if network was connection used
             $('#tblArchive tbody')
             .append('<tr id="'+i+'">'+
-            '<td title="'+ archive.State +'"><img src="/plugins/dynamix/images/'+ data.State[archive.State] +'-on.png"/></td>'+ //state
-            '<td class="network">'+ Host +'</td>'+ //archive host ip address
-            '<td>'+ archive.Date  +'</td>'+ //time stamp
-            '<td>'+ archive.Name  +'</td>'+ //sensor name
-            '<td>'+ archive.Type  +'</td>'+ //archive type
-            '<td>'+ archive.Event +'</td>'+ //archive description
-            '<td></td>'+//<a class="delete-archive"><i class="fa fa-trash" title="delete"></i></a></td>'+ //delete icon
+            '<td title="'+ archive.State +'"><img src="/plugins/dynamix/images/'+ data.State[archive.State] +'-on.png"/></td>'+ // state
+            '<td class="network">'+ Host +'</td>'+ // archive host ip address
+            '<td>'+ archive.Date  +'</td>'+ // time stamp
+            '<td>'+ archive.Name  +'</td>'+ // sensor name
+            '<td>'+ archive.Type  +'</td>'+ // archive type
+            '<td>'+ archive.Event +'</td>'+ // archive description
+            '<td></td>'+ // delete icon
             '</tr>');
         });
 
