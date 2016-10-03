@@ -279,7 +279,7 @@ while(TRUE){ while(TRUE){
 
     foreach($fans as $fan => $value){
 
-        $temp = $fancfg["TEMP_$fan"];
+        $temp = isset($fancfg["TEMP_$fan"]) ? $fancfg["TEMP_$fan"] : '';
 
         if(!empty($temp)) {
             $templo  = (isset($fancfg["TEMPLO_$fan"])) ? $fancfg["TEMPLO_$fan"]  : 30;
