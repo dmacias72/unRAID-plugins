@@ -7,6 +7,12 @@ $fanctrl = isset($fancfg['FANCONTROL']) ? $fancfg['FANCONTROL'] :'disable';
 $fanpoll = isset($fancfg['FANPOLL'])    ? $fancfg['FANPOLL']    : 3;
 $fanip   = (isset($fancfg['FANIP']) && ($netsvc == 'enable')) ? $fancfg['FANIP'] : '';
 
+/* board info */
+$board = isset($fancfg['BOARD']) ? $fancfg['BOARD'] : '';
+$board_file = "$plg_path/board.json";
+$board_file_status = (file_exists($board_file));
+$boards = ['ASrock'=>'','ASRockRack'=>''];
+
 // fan network options
 $fanopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".
     base64_decode($password)." --session-timeout=5000 --retransmission-timeout=1000" : '';

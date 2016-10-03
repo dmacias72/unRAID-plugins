@@ -1,0 +1,238 @@
+#!/usr/bin/php
+<?php
+##############################
+######  DEAMON SECTION  ######
+##############################
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
+require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_settings_fan.php';
+$debug = FALSE;
+
+set_time_limit(0);
+$prog     = pathinfo(__FILE__, PATHINFO_FILENAME);
+$prog2    = "ipmifan";
+$lockfile = "/var/run/${prog2}.pid";
+$log      = "/var/log/${prog2}";
+
+$usage = <<<EOF
+
+Check ASRock IPMI fan locations using ipmi-raw command and
+create a json array for ipmifan script.
+
+Usage: $prog [options]
+
+  -a, --auto       set fans to auto
+      --full       set fans to full speed
+  -f, --force      force start
+  -q, --quiet      suppress all messages
+  -v, --verbose    print all messages
+      --debug      turn on debugging
+      --help       display this help and exit
+      --version    output version information and exit
+
+
+EOF;
+
+$shortopts = 'adfqv';
+$longopts = [
+    'auto',
+    'debug',
+    'force',
+    'full',
+    'help',
+    'quiet',
+    'verbose',
+    'version'
+];
+$args = getopt($shortopts, $longopts);
+
+if (array_key_exists('help', $args)) {
+    echo $usage.PHP_EOL;
+    exit(0);
+}
+
+if (array_key_exists('version', $args)) {
+    echo 'IPMI Fan Check: 1.0'.PHP_EOL;
+    exit(0);
+}
+
+$arga   = (array_key_exists('a', $args) || array_key_exists('auto', $args));
+$argf   = (array_key_exists('full', $args));
+$force  = (array_key_exists('f', $args) || array_key_exists('force', $args));
+$argq   = (array_key_exists('q', $args) || array_key_exists('quiet', $args));
+$argv   = (array_key_exists('v', $args) || array_key_exists('verbose', $args));
+$debug  = (array_key_exists('debug', $args));
+
+if(file_exists($lockfile)){
+    $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
+    fanlog("Please stop ${prog2} [$lock_pid] then try again.");
+    exit(0);
+}
+
+if($arga){
+        autofan();
+        exit(0);
+}
+
+if($argf){
+        fullfan();
+        exit(0);
+}
+
+if (!array_key_exists($board, $boards)){
+    $msg = "Your $board motherboard is not supported yet";
+    logger($msg, $argq);
+    exit(1);
+}
+
+#############################################
+# ASRock                                    #
+# ipmi-raw 00 3a 01 00 00 00 00 00 00 00 00 #
+# ipmi-raw 00 3a 01 AA BB CC DD EE FF GG HH #
+# 00 = smartfan mode                        #
+# 01 - 64  = 1% - 100%                      #
+#############################################
+
+##############################
+###### FUNCTION SECTION ######
+##############################
+
+/* logfile */
+function fanlog($msg) {
+    global $log;
+
+    if (!$quiet)
+        echo PHP_EOL.$msg.PHP_EOL;
+    
+    $msg = date('Y-m-d h:i:s').' '.$msg.PHP_EOL;
+    file_put_contents($log,$msg,FILE_APPEND);
+}
+
+/* debug */
+function debug($m){
+  global $prog, $debug;
+  if($debug){
+    $STDERR = fopen('php://stderr', 'w+');
+    fwrite($STDERR, $m.PHP_EOL);
+    fclose($STDERR);
+  }
+}
+
+/* auto fan */
+function autofan() {
+    global $auto, $raw, $fanopts;
+    fanlog('setting fans to auto');
+    $cmd  = "ipmi-raw $raw $auto $fanopts 2>&1 >/dev/null &";
+    shell_exec($cmd);
+}
+
+/* full speed fan */
+function fullfan() {
+    global $full, $raw, $fanopts;
+    fanlog('setting fans to full speed');
+    $cmd = "ipmi-raw $raw $full $fanopts 2>&1 >/dev/null &";
+    shell_exec($cmd);
+}
+
+/* get fan sensors */
+function ipmi_sensors_fans() {
+    global $ipmi, $fanopts;
+
+    // return empty array if no ipmi detected or network options
+    if(!$ipmi && empty($fanopts))
+        return [];
+
+    $cmd = "/usr/sbin/ipmi-sensors --comma-separated-output --no-header-output $fanopts 2>/dev/null";
+    exec($cmd, $output, $return_var=null);
+
+    // return empty array if error
+    if($return_var)
+        return [];
+
+    // key names for ipmi sensors output
+    $keys = ['ID', 'Name', 'Type', 'Reading', 'Units', 'Event'];
+    $sensors = [];
+
+    foreach($output as $line){
+
+    /// add sensor keys as keys to ipmi sensor output
+        $sensor_raw = explode(",", $line);
+        $size_raw = sizeof($sensor_raw);
+        $sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
+
+        if ($sensor['Type'] == 'Fan')
+            $sensors[$sensor['ID']] = $sensor;
+    }
+    return $sensors; // sensor readings
+    unset($sensors);
+}
+
+##############################
+#####  PROGRAM SECTION  ######
+##############################
+
+
+####  DO YOUR STUFF HERE  ####
+
+$raw  = '00 3a 01';
+$auto = '00 00 00 00 00 00 00 00';
+$full = '64 64 64 64 64 64 64 64';
+$fans = [];
+
+fanlog('Checking IPMI fan Locations...');
+
+// set fans to full speed and get readings
+$cmd = "ipmi-raw $raw $full $fanopts 2>&1";
+shell_exec($cmd);
+sleep(5);
+$fans_full = ipmi_sensors_fans();
+
+// step through each raw command position
+for($i = 0; $i <= 7; $i++){
+    $msg  = 'none';
+    $name = 'FAN_POS'.($i+1);
+
+    // set postition in raw command to 1/3 and get readings
+    $hexpos = substr_replace($full,'21',$i*3,2);
+    
+    $cmd = "ipmi-raw $raw $hexpos $fanopts 2>&1";
+    shell_exec($cmd);
+    sleep(5);
+    $fans_1third = ipmi_sensors_fans();
+
+    // check for fan speed changes
+    foreach($fans_full as $fan){
+        if($fan['Reading'] != 'N/A') {
+            if(($fan['Reading']-$fans_1third[$fan['ID']]['Reading']) > 300) {
+                $name = $fan['Name'];
+                $msg  = $name.' 100%:'.$fan['Reading'].' 33%:'.$fans_1third[$fan['ID']]['Reading'];
+            }
+        }
+    }
+    unset($fans_1third);
+    $fans[$name] = '00'; 
+    fanlog('Location '.($i+1).': '.$msg);
+}
+$cmd = "ipmi-raw $raw $auto $fanopts 2>&1";
+shell_exec($cmd);
+
+$board_json = [ $board =>
+        [ 'raw'  => $raw,
+          'auto' => $auto,
+          'full' => $full,
+          'fans' => $fans
+    ]
+];
+fanlog('Saving board configuration...');
+file_put_contents($board_file, json_encode($board_json,JSON_PRETTY_PRINT));
+
+/* print variable */
+$defined_vars = get_defined_vars();
+
+foreach (array("_GET","_POST","_COOKIE","_FILES","argv","argc","_SERVER") as $i)
+    unset($defined_vars[$i]);
+
+debug("\nDECLARED VARIABLES:\n".print_r($defined_vars, true));
+unset($defined_vars);
+
+######  END OF SECTION  ######
+?>

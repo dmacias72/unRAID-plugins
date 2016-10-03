@@ -23,14 +23,14 @@ $allsensors  = ipmi_sensors();
 $fansensors  = ipmi_fan_sensors($ignore);
 
 /* get board info */
-$board       = ($ipmi || !empty($netopts)) ? trim(shell_exec("ipmi-fru $netopts | grep 'Manufacturer' | awk -F 'r:' '{print $2}'")) : 'unknown';
-$boards_repo = 'https://raw.githubusercontent.com/dmacias72/unRAID-plugins/master/plugins/boards.json';
-$boards_file = "$plg_path/boards.json";
+$board_log = '/var/log/ipmiboard';
+if (file_exists($board_log))
+    $board = file_get_contents($board_log);
+else{
+    $board = ($ipmi || !empty($netopts)) ? trim(shell_exec("ipmi-fru $netopts | grep 'Manufacturer' | awk -F 'r:' '{print $2}'")) : 'unknown';
+    file_put_contents($board_log, $board);
+}
 
-if (!file_exists($boards_file))
-	get_content_from_github($boards_repo, $boards_file);
-
-$boards       = json_decode(file_get_contents($boards_file), true);
 $board_status = array_key_exists($board, $boards);
 
 // create a lockfile for ipmi dashboard

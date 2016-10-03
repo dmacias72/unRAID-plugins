@@ -66,11 +66,12 @@ Markdown="false"
 
 <dl>
     <dt><input id="updates" type="button" value="Check for Updates" title="update fan control systems json data file"><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"></dt>
-    <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
+    <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"><input id="btnConfig" class="fanctrl fanctrl-run" type="button" value="Configure"></dd>
 </dl>
 <blockquote class="inline_help">
-    <p>Check for Updates button downloads the latest systems information file for fan control to the plugin folder.</p>
-    <p>Default loads the default values for fan control.</p>
+    <p>'Check for Updates' button downloads the latest systems information file for fan control to the plugin folder.</p>
+    <p>'Default' loads the default values for fan control.</p>
+    <p>'Configure' button tests motherboard fan configuration and creates settings for fan control </p>
 </blockquote>
 
 </form>
@@ -92,7 +93,7 @@ Markdown="false"
     <p>High temperature threshold (°C):  Highest temperature in the linear range to determine fan speed. Above this temperature fan with run at full speed.</p>
 </blockquote>
 
-<?if (($netsvc == 'disable') || (($netsvc == 'enable') && ($fanip != 'None')) ):?>
+<?if ((($netsvc == 'disable') || (($netsvc == 'enable') && ($fanip != 'None'))) && ($board_status)):?>
     <?get_fanctrl_options();?>
 <?endif;?>
 </div>
@@ -126,9 +127,13 @@ if(is_file($log)){
 <script>
 $(function(){
     // check if board supports ipmi
-    if("<?=$board_status;?>" == false)
-        $('.fanctrl').prop('disabled', true);
+    $('#tab2').click(function() {
+        checkBoard();
+    });
 
+    if($.cookie('one') == 'tab2')
+        checkBoard();
+    
     //advanced view switch set cookie and toggle advanced columns
     $('#advancedview').switchButton({
         labels_placement: 'left',
@@ -163,9 +168,24 @@ $(function(){
         location ='/Tools/IPMITools';
     });
 
+    $('#btnConfig').click(function() {
+                openBox('/plugins/ipmi/scripts/ipmi2json', 'IPMI Fan Config', 600, 900, false);
+    });
+
     checkFANCTRL(document.fanctrl_settings);
 
 });
+
+function checkBoard() {
+	if("<?=$board_status;?>" == true){
+        if ("<?=$board_file_status;?>" == false) {
+            swal({title:'Fan Config JSON File Missing!',text:'You have not configured your fans yet. Stop Fan Control and Click the Configure button below to test your fans and determine their location for fan control. All fans will initially be set to full speed. Each location will be tested at one third speed to determine which fan is present. This will take about 1 min. On completion fans will return to auto and you can start fan control',type:'warning',closeOnConfirm: true,},function() {
+            });
+        }
+    }
+    else
+        $('.fanctrl').prop('disabled', true);
+}
 
 function resetFANDATA(form) {
     form.FANCONTROL.selectedIndex = 0;
