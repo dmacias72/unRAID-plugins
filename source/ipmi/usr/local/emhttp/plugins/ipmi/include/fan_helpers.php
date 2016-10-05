@@ -76,16 +76,14 @@ function get_fanctrl_options(){
                 // low temperature threshold
                 echo '<dl class="fanctrl-settings">'.
                 '<dt><dl><dd>Low temperature threshold (&deg;C):</dd></dl></dt>'.
-                '<dd><select name="'.$templo.'" class="'.$tempid.' fanctrl-settings">'.
-                '<option value="0">Auto</option>';
+                '<dd><select name="'.$templo.'" class="'.$tempid.' fanctrl-settings">';
                 echo get_temp_range('LO', $fancfg[$templo]);
                 echo '</select></dd></dl>';
 
                 // high temperature threshold
                 echo '<dl class="fanctrl-settings">'.
                 '<dt><dl><dd>High temperature threshold (&deg;C):</dd></dl></dt>'.
-                '<dd><select name="'.$temphi.'" class="'.$tempid.' fanctrl-settings">'.
-                '<option value="0">Auto</option>';
+                '<dd><select name="'.$temphi.'" class="'.$tempid.' fanctrl-settings">';
                 echo	get_temp_range('HI', $fancfg[$temphi]);
                 echo '</select></dd></dl>';
 

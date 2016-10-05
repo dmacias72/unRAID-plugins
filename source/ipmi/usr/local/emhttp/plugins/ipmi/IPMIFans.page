@@ -177,7 +177,7 @@ $(function(){
 function checkBoard() {
 	if("<?=$board_status;?>" == true){
         if ("<?=$board_file_status;?>" == false) {
-            swal({title:'Fan Config JSON File Missing!',text:'You have not configured your fans yet. Stop Fan Control and Click the Configure button below to test your fans and determine their location for fan control. All fans will initially be set to full speed. Each location will be tested at one third speed to determine which fan is present. This will take about 1 min. On completion fans will return to auto and you can start fan control',type:'warning',closeOnConfirm: true,},function() {
+            swal({title:'Fan Config JSON File Missing!',text:'You have not configured your fans yet. Stop Fan Control and Click the Configure button below to test your fans and determine their location for fan control. All fans will initially be set to full speed. Each location will be tested at one third speed to determine which fan is present. This will take about 1 min. On completion fans will return to auto and you can start fan control.',type:'warning',closeOnConfirm: true,},function() {
             });
         }
     }
