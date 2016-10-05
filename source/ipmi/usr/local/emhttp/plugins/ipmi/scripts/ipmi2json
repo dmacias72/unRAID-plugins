@@ -192,9 +192,9 @@ for($i = 0; $i <= 7; $i++){
     $name = 'FAN_POS'.($i+1);
 
     // set postition in raw command to 1/3 and get readings
-    $hexpos = substr_replace($full,'21',$i*3,2);
+    $hex = substr_replace($full,'21',$i*3,2);
     
-    $cmd = "ipmi-raw $raw $hexpos $fanopts 2>&1";
+    $cmd = "ipmi-raw $raw $hex $fanopts 2>&1";
     shell_exec($cmd);
     sleep(5);
     $fans_1third = ipmi_sensors_fans();

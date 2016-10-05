@@ -12,6 +12,7 @@ $board = isset($fancfg['BOARD']) ? $fancfg['BOARD'] : '';
 $board_file = "$plg_path/board.json";
 $board_file_status = (file_exists($board_file));
 $boards = ['ASrock'=>'','ASRockRack'=>''];
+$board_json = ($board_file_status) ? json_decode(file_get_contents($board_file), true) : [];
 
 // fan network options
 $fanopts = ($netsvc == 'enable') ? "-h $fanip -u $user -p ".

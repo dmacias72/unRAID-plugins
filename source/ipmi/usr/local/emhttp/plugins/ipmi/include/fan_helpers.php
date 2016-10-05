@@ -37,7 +37,7 @@ function ipmi_fan_sensors($ignore=null) {
 
 /* get all fan options for fan control */
 function get_fanctrl_options(){
-    global $fansensors, $fancfg, $board;
+    global $fansensors, $fancfg, $board, $board_json;
     if($board == 'ASRock' || $board == 'ASRockRack') {
         $i = 0;
         foreach($fansensors as $id => $fan){
@@ -60,7 +60,10 @@ function get_fanctrl_options(){
                     $fancfg[$templo].', '.$fancfg[$temphi].', '.$fancfg[$fanmin];
                 else
                     echo 'Auto';
-                echo '</span><span class="fanctrl-settings">&nbsp;</span></dd></dl>';
+                echo '</span><span class="fanctrl-settings">&nbsp;</span>';
+                if(!array_key_exists($name, $board_json["$board"]["fans"]))
+                echo '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
+                echo '</dd></dl>';
 
                 // temperature sensor
                 echo '<dl class="fanctrl-settings">'.

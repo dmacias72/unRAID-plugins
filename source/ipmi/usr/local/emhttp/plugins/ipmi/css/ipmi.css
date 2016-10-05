@@ -44,27 +44,23 @@ select .tablesorter input.tablesorter-filter,
 .tablesorter select.tablesorter-filter {
 	width: 50%;
 	min-width: 100px;
-	/*max-width: 250px;*/
-}
-/* optional disabled input styling */
-/*table.tablesorter thead tr.tablesorter-filter-row input.disabled {
-	opacity: 0.0;
-	filter: alpha(opacity=0);
-}
-*/
-.tablesorter .tablesorter-header,
-table.tablesorter tr>td {
-	text-align: center;
 }
 
+table.tablesorter.fanlog .tablesorter-header,
 table.tablesorter.fanlog tr>td {
 	text-align: left;
 }
 
+table.tablesorter.ipmi .tablesorter-header,
+table.tablesorter.ipmi tr>td{text-align: center;}
+
+table.tablesorter.sensors .tablesorter-header,
+table.tablesorter.sensors tr>td{text-align: center;}
 table.tablesorter.sensors th:first-child{width:12%;}
 table.tablesorter.sensors td:first-child{width:12%;}
 
-table.tablesorter.events th:first-child{width:10%;}
+table.tablesorter.events .tablesorter-header,
+table.tablesorter.events tr>td{text-align: center;}table.tablesorter.events th:first-child{width:10%;}
 table.tablesorter.events td:first-child{width:10%;}
 table.tablesorter.events th:nth-child(2){width:5%;}
 table.tablesorter.events td:nth-child(2){width:5%;}
@@ -77,6 +73,8 @@ table.tablesorter.events td:nth-child(6){width:5%;}
 table.tablesorter.events th:nth-child(7){width:20%;}
 table.tablesorter.events td:nth-child(7){width:20%;}
 
+table.tablesorter.archive .tablesorter-header,
+table.tablesorter.archive tr>td{text-align: center;}
 table.tablesorter.archive th:first-child{width:12%;}
 table.tablesorter.archive td:first-child{width:12%;}
 table.tablesorter.archive th:nth-child(2){width:12%;}
@@ -121,4 +119,3 @@ table.tablesorter.archive td:nth-child(6){width:22%;}
 /* positioning */
 .ui-icon-triangle-1-n { background-position: 0 -16px; }
 .ui-icon-triangle-1-s { background-position: -64px -16px; }
-
