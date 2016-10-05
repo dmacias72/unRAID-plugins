@@ -65,13 +65,12 @@ Markdown="false"
 &nbsp;
 
 <dl>
-    <dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);"><input id="btnConfig" class="fanctrl fanctrl-run" type="button" value="Configure"></dt>
+    <dt><input id="FAN_DEFAULT" class="fanctrl" type="button" value="Default" onClick="resetFANDATA(this.form);" title="loads the default values for fan control"><input id="btnConfig" class="fanctrl fanctrl-run" type="button" value="Configure" title="tests your fans and determines their location for fan control"></dt>
     <dd><input id="btnFANApply" type="submit" value="Apply" onClick="verifyFANDATA(this.form)"><input type="button" value="Done" onClick="done()"></dd>
 </dl>
 <blockquote class="inline_help">
-    <p>'Check for Updates' button downloads the latest systems information file for fan control to the plugin folder.</p>
     <p>'Default' loads the default values for fan control.</p>
-    <p>'Configure' button tests motherboard fan configuration and creates settings for fan control </p>
+    <p>'Configure' button tests your fans and determines their location for fan control. All fans will initially be set to full speed. Each location will be tested at one third speed to determine which fan is present. This will take about 1 min. On completion fans will return to auto and you can start fan control</p>
 </blockquote>
 
 </form>
