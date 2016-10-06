@@ -62,9 +62,14 @@ function get_fanctrl_options(){
                     echo 'Auto';
                 echo '</span><span class="fanctrl-settings">&nbsp;</span>';
 
-                // check if fan name exists in board.json
-                if(!array_key_exists($name, $board_json[$board]['fans']))
+                // check if board.json exists then if fan name is in board.json
+                if($board_file_status){
+                    if(!array_key_exists($name, $board_json[$board]['fans']))
+                        echo '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
+                }else {
                     echo '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
+                }
+                
                 echo '</dd></dl>';
 
                 // temperature sensor
