@@ -15,7 +15,7 @@ Markdown="false"
 
 <dl>
     <dt>Fan Control:</dt>
-    <dd> 
+    <dd>
         <select name="FANCONTROL" class="fanctrl" size="1" onChange="checkFANCTRL(this.form);" title="Enable fan control based on selected temperature sensors">
         <?=mk_option($fanctrl, 'disable', 'No')?>
         <?=mk_option($fanctrl, 'enable', 'Yes')?>
@@ -49,7 +49,7 @@ Markdown="false"
 <?if ($netsvc == 'enable'):?>
 
 <dl>
-    <dt>Fan Control IP Address:</dt> 
+    <dt>Fan Control IP Address:</dt>
     <dd>
         <select id="FANIP" class="fanctrl fanctrl-run" name="FANIP" size="1" title="ip address of ipmi fan to control">
         <?get_fanip_options();?>
@@ -117,7 +117,7 @@ Markdown="false"
 $log = '/var/log/ipmifan';
 if(is_file($log)){
     echo "<tr><td><a class='fanlog-a' id='fanlog-file' title='$log' onclick=\"openWindow('/webGui/scripts/tail_log&arg1=ipmifan','Fan Control Log Information',600,900);\">$log</a></td><td id='fanlog-size'>"
-    .filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";	
+    .filesize($log)."</td><td><a class='fanlog-a' id='fanlog-clear' ><i class='fa fa-trash' title='clear fan log'></i></a></td></tr>";
 }
 ?>
     </tbody>
@@ -132,7 +132,7 @@ $(function(){
 
     if($.cookie('one') == 'tab2')
         checkBoard();
-    
+
     //advanced view switch set cookie and toggle advanced columns
     $('#advancedview').switchButton({
         labels_placement: 'left',
@@ -159,7 +159,7 @@ $(function(){
         });
 
     $('#fanlog-clear').on('click', clearFanLOG);
-    
+
     $('#readings').click(function() {
         $.cookie('one', 'tab1', { expires:null, path: '/'});
         location ='/Tools/IPMITools';
@@ -174,7 +174,7 @@ $(function(){
 });
 
 function checkBoard() {
-	if("<?=$board_status;?>" == true){
+    if("<?=$board_status;?>" == true){
         if ("<?=$board_file_status;?>" == false) {
             swal({title:'Fan Config JSON File Missing!',text:'You have not configured your fans yet. Stop Fan Control and Click the Configure button below to test your fans and determine their location for fan control. All fans will initially be set to full speed. Each location will be tested at one third speed to determine which fan is present. This will take about 1 min. On completion fans will return to auto and you can start fan control.',type:'warning',closeOnConfirm: true,},function() {
             });

@@ -5,14 +5,14 @@
 # You must make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':' except on otherwise blank lines.
 
-         |-----handy-ruler------------------------------------------------------|
-ipmi: Ipmi unRAID Plugin 
+       |-----handy-ruler------------------------------------------------------|
+ipmi: IPMI unRAID Plugin 
 ipmi:
 ipmi: The ipmi plugin allows you to view your system sensors and
 ipmi: events using your ipmi hardware. Allows for local or remote 
 ipmi: access and event notification.
 ipmi: 
-ipmitool-plugin: https://github.com/dmacias72/unRAID-plugins
+ipmi: https://github.com/dmacias72/unRAID-plugins
 ipmi: 
 ipmi: 
 ipmi: 
