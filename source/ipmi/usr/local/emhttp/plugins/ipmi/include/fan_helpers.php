@@ -37,7 +37,7 @@ function ipmi_fan_sensors($ignore=null) {
 
 /* get all fan options for fan control */
 function get_fanctrl_options(){
-    global $fansensors, $fancfg, $board, $board_json;
+    global $fansensors, $fancfg, $board, $board_json, $board_file_status;
     if($board == 'ASRock' || $board == 'ASRockRack') {
         $i = 0;
         foreach($fansensors as $id => $fan){
