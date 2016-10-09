@@ -14,22 +14,22 @@ fi
 
 # Commit ipmi sensors configuration:
 ipmicfg_commit() {
-		if [ "$LOADCFG" == "enable" ]; then
-			echo "committing ipmi sensors configuration..."
-		  	sleep 1
+        if [ "$LOADCFG" == "enable" ]; then
+            echo "committing ipmi sensors configuration..."
+            sleep 1
 
-			nohup	 $PROG $OPTIONS > /dev/null 2>&1 | logger -tipmi &
-		else
-			echo "auto load config is not enabled "
-		fi
+            nohup $PROG $OPTIONS > /dev/null 2>&1 | logger -tipmi &
+        else
+            echo "auto load config is not enabled "
+        fi
 }
 
 # Checkout ipmi sensors configuration:
 ipmicfg_checkout() {
-			echo "checking out ipmi sensors configuration..."
-		  	sleep 1
+            echo "checking out ipmi sensors configuration..."
+            sleep 1
 
-			nohup	 $PROG --checkout $OPTIONS > /dev/null 2>&1 | logger -tipmi &
+            nohup $PROG --checkout $OPTIONS > /dev/null 2>&1 | logger -tipmi &
 }
 
 case "$1" in

@@ -12,62 +12,62 @@ OPTIONS=""
 
 # Start ipmiseld:
 ipmiseld_start() {
-	# no-op if already running
-	if [ ! -r "$PIDFILE" ]; then
-		if [ "$IPMISELD" == "enable" ]; then
-			if [ $NETWORK == "enable" ]; then
-				OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
-			fi
-			echo "starting $PROG..."
-		  	sleep 1
+    # no-op if already running
+    if [ ! -r "$PIDFILE" ]; then
+        if [ "$IPMISELD" == "enable" ]; then
+            if [ $NETWORK == "enable" ]; then
+                OPTIONS=" -h $IPADDR -u $USER -p $(echo $PASSWORD | base64 --decode)"
+            fi
+            echo "starting $PROG..."
+            sleep 1
 
-			nohup	 $DAEMON --poll-interval=$IPMIPOLL --system-event-format='IPMI Event: %h *%I* %T - %E' --oem-timestamped-event-format='IPMI Event: %h %i - %o' --interpret-oem-data --output-oem-event-strings --entity-sensor-names $OPTIONS > /dev/null 2>&1 | logger -tipmi &
-			touch $LOCKFILE
-		  	TIMER=0
-			while [ ! -e $PIDFILE ]; do
-				sleep 1
-		  		let TIMER=$TIMER+1
-  				if [ $TIMER -gt 5 ]; then
-  					echo -n "$PIDFILE not created"
-  	   			break
-				fi
-			done
-		else
-			echo "$PROG is not enabled "
-		fi
-	else
-		echo "$PROG is running "
-	fi
+            nohup $DAEMON --poll-interval=$IPMIPOLL --system-event-format='IPMI Event: %h *%I* %T - %E' --oem-timestamped-event-format='IPMI Event: %h %i - %o' --interpret-oem-data --output-oem-event-strings --entity-sensor-names $OPTIONS > /dev/null 2>&1 | logger -tipmi &
+            touch $LOCKFILE
+            TIMER=0
+            while [ ! -e $PIDFILE ]; do
+                sleep 1
+                let TIMER=$TIMER+1
+                if [ $TIMER -gt 5 ]; then
+                    echo -n "$PIDFILE not created"
+                break
+                fi
+            done
+        else
+            echo "$PROG is not enabled..."
+        fi
+    else
+        echo "$PROG is running..."
+    fi
 }
 
 # Stop ipmiseld:
 ipmiseld_stop() {
-	# no-op if not running
-	if [ -r $PIDFILE ]; then
-	#stop ipmiseld
-	echo "stopping $PROG..."
+    # no-op if not running
+    if [ -r $PIDFILE ]; then
+    #stop ipmiseld
+    echo "stopping $PROG..."
 
-	TIMER=0
-	while `killall $PROG 2>/dev/null`; do
-		sleep 1
-		TIMER=$((TIMER+1))
-		if [ $TIMER -ge 30 ]; then
-			killall -9 $PROG
-			sleep 1
-			break
-		fi
-	done
-	rm -f $LOCKFILE && rm -f $PIDFILE
-	else
-		echo "$PROG is stopped   "
-	fi
+    TIMER=0
+    while `killall $PROG 2>/dev/null`; do
+        sleep 1
+        TIMER=$((TIMER+1))
+        if [ $TIMER -ge 30 ]; then
+            killall -9 $PROG
+            sleep 1
+            break
+        fi
+    done
+    rm -f $LOCKFILE && rm -f $PIDFILE
+    else
+        echo "$PROG is stopped   "
+    fi
 }
 
 # Restart ipmiseld:
 ipmiseld_restart() {
-	ipmiseld_stop
-	sleep 1
-	ipmiseld_start
+    ipmiseld_stop
+    sleep 1
+    ipmiseld_start
 }
 
 case "$1" in

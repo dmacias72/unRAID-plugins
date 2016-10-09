@@ -69,7 +69,7 @@ function get_fanctrl_options(){
                 }else {
                     echo '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
                 }
-                
+
                 echo '</dd></dl>';
 
                 // temperature sensor

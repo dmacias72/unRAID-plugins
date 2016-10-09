@@ -69,8 +69,9 @@ function ipmi_sensors($ignore=null) {
         "--output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null";
     exec($cmd, $output, $return_var=null);
 
+    // return empty array if error
     if ($return_var)
-        return []; // return empty array if error
+        return [];
 
     // add highest hard drive temp sensor and check if hdd is ignored
     $hdd = ((preg_match('/99/', $ignore)) && !$all) ? '' :
@@ -82,6 +83,7 @@ function ipmi_sensors($ignore=null) {
     }
     // test sensor
     // $output[] = "98,CPU Temp,OEM Reserved,Nominal,N/A,N/A,N/A,N/A,N/A,45.00,50.00,N/A,'Medium'";
+
     // key names for ipmi sensors output
     $keys = ['ID','Name','Type','State','Reading','Units','LowerNR','LowerC','LowerNC','UpperNC','UpperC','UpperNR','Event'];
     $sensors = [];
@@ -125,7 +127,7 @@ function ipmi_events($archive=null){
         $output = is_file($filename) ? file($filename, FILE_IGNORE_NEW_LINES) : [] ;
     } else {
         $cmd = '/usr/sbin/ipmi-sel --comma-separated-output --output-event-state --no-header-output '.
-            "--interpret-oem-data $netopts 2>/dev/null";
+            "--interpret-oem-data --output-oem-event-strings $netopts 2>/dev/null";
         exec($cmd, $output, $return_var=null);
     }
 
@@ -210,7 +212,8 @@ function ipmi_get_enabled($ignore){
     if(!($ipmi || !empty($netopts)))
         return [];
 
-    $ignored = array_flip(explode(',', $ignore)); // create array of keyed ignored sensors
+    // create array of keyed ignored sensors
+    $ignored = array_flip(explode(',', $ignore));
     foreach($allsensors as $sensor){
         $id       = $sensor['ID'];
         $reading  = $sensor['Reading'];

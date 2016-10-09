@@ -17,7 +17,7 @@ $stopped        = "<span class='orange'>Stopped</span>";
 $seld_status    = ($seld_run)    ? $running : $stopped;
 $fanctrl_status = ($fanctrl_run) ? $running : $stopped;
 
-/* get sensor */
+/* get sensors */
 $sensors     = ipmi_sensors($ignore);
 $allsensors  = ipmi_sensors();
 $fansensors  = ipmi_fan_sensors($ignore);
