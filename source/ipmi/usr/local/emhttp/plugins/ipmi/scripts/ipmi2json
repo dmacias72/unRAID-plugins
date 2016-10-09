@@ -103,7 +103,7 @@ function fanlog($msg) {
     if (!$quiet)
         echo PHP_EOL.$msg.PHP_EOL;
     
-    $msg = date('Y-m-d h:i:s').' '.$msg.PHP_EOL;
+    $msg = date('Y-m-d H:i:s').' '.$msg.PHP_EOL;
     file_put_contents($log,$msg,FILE_APPEND);
 }
 
@@ -120,7 +120,7 @@ function debug($m){
 /* auto fan */
 function autofan() {
     global $auto, $raw, $fanopts;
-    fanlog('setting fans to auto');
+    fanlog('Setting fans to auto.');
     $cmd  = "ipmi-raw $raw $auto $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
 }
@@ -128,7 +128,7 @@ function autofan() {
 /* full speed fan */
 function fullfan() {
     global $full, $raw, $fanopts;
-    fanlog('setting fans to full speed');
+    fanlog('Setting fans to full speed.');
     $cmd = "ipmi-raw $raw $full $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
 }
@@ -193,7 +193,7 @@ for($i = 0; $i <= 7; $i++){
 
     // set postition in raw command to 1/3 and get readings
     $hex = substr_replace($full,'21',$i*3,2);
-    
+
     $cmd = "ipmi-raw $raw $hex $fanopts 2>&1";
     shell_exec($cmd);
     sleep(5);
@@ -222,6 +222,7 @@ $board_json = [ $board =>
           'fans' => $fans
     ]
 ];
+
 fanlog('Saving board configuration...');
 file_put_contents($board_file, json_encode($board_json,JSON_PRETTY_PRINT));
 

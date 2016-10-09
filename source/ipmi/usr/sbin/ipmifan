@@ -156,7 +156,7 @@ function logger($msg, $quiet = false) {
 /* logfile */
 function fanlog($msg) {
     global $log;
-    $msg = date('Y-m-d h:i:s').' '.$msg.PHP_EOL;
+    $msg = date('Y-m-d H:i:s').' '.$msg.PHP_EOL;
     file_put_contents($log,$msg,FILE_APPEND);
 }
 
