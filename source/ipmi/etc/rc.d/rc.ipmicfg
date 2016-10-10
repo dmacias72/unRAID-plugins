@@ -19,8 +19,6 @@ ipmicfg_commit() {
             sleep 1
 
             nohup $PROG $OPTIONS > /dev/null 2>&1 | logger -tipmi &
-        else
-            echo "auto load config is not enabled "
         fi
 }
 

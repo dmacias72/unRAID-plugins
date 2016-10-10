@@ -32,8 +32,6 @@ ipmiseld_start() {
                 break
                 fi
             done
-        else
-            echo "$PROG is not enabled..."
         fi
     else
         echo "$PROG is running..."
@@ -58,8 +56,6 @@ ipmiseld_stop() {
         fi
     done
     rm -f $LOCKFILE && rm -f $PIDFILE
-    else
-        echo "$PROG is stopped   "
     fi
 }
 
