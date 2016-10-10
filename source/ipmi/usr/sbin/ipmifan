@@ -173,7 +173,7 @@ function debug($m){
 /* auto fan */
 function autofan() {
     global $board_json, $board, $raw, $fanopts;
-    fanlog('setting fans to auto');
+    fanlog('Setting fans to auto');
     $auto = $board_json[$board]['auto'];
     $cmd  = "ipmi-raw $raw $auto $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
@@ -182,7 +182,7 @@ function autofan() {
 /* full speed fan */
 function fullfan() {
     global $board_json, $board, $raw, $fanopts;
-    fanlog('setting fans to full speed');
+    fanlog('Setting fans to full speed');
     $full = $board_json[$board]['full'];
     $cmd = "ipmi-raw $raw $full $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
@@ -351,7 +351,7 @@ while(TRUE){ while(TRUE){
         sleep(10);
         $MD5_new = md5_file($fancfg_file);
         if((file_exists($fancfg_file)) && ($MD5_new != $MD5)){
-            $msg = 'fan control config file updated, reloading settings.';
+            $msg = 'fan control config file updated, reloading settings';
             $fancfg = parse_ini_file($fancfg_file);
             logger($msg, $argq);
             $MD5 = $MD5_new;

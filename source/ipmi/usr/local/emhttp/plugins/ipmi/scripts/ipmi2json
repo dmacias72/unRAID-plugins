@@ -64,7 +64,7 @@ $debug  = (array_key_exists('debug', $args));
 
 if(file_exists($lockfile)){
     $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
-    fanlog("Please stop ${prog2} [$lock_pid] then try again.");
+    fanlog("Please stop ${prog2} [$lock_pid] then try again");
     exit(0);
 }
 
@@ -120,7 +120,7 @@ function debug($m){
 /* auto fan */
 function autofan() {
     global $auto, $raw, $fanopts;
-    fanlog('Setting fans to auto.');
+    fanlog('Setting fans to auto');
     $cmd  = "ipmi-raw $raw $auto $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
 }
@@ -128,7 +128,7 @@ function autofan() {
 /* full speed fan */
 function fullfan() {
     global $full, $raw, $fanopts;
-    fanlog('Setting fans to full speed.');
+    fanlog('Setting fans to full speed');
     $cmd = "ipmi-raw $raw $full $fanopts 2>&1 >/dev/null &";
     shell_exec($cmd);
 }
