@@ -28,7 +28,8 @@ if (file_exists($board_log))
     $board = file_get_contents($board_log);
 else{
     $board = ($ipmi || !empty($netopts)) ? trim(shell_exec("ipmi-fru $netopts | grep 'Manufacturer' | awk -F 'r:' '{print $2}'")) : 'unknown';
-    file_put_contents($board_log, $board);
+    if ($board != 'unknown')
+        file_put_contents($board_log, $board);
 }
 
 $board_status = array_key_exists($board, $boards);
