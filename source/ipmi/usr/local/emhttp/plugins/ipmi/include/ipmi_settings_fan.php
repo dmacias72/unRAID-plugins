@@ -5,7 +5,7 @@ if (file_exists($fancfg_file))
     $fancfg = parse_ini_file($fancfg_file);
 $fanctrl = isset($fancfg['FANCONTROL']) ? $fancfg['FANCONTROL'] :'disable';
 $fanpoll = isset($fancfg['FANPOLL'])    ? $fancfg['FANPOLL']    : 3;
-$fanip   = (isset($fancfg['FANIP']) && ($netsvc == 'enable')) ? $fancfg['FANIP'] : (empty($ipaddr)) ? '' : $ipaddr ;
+$fanip   = (isset($fancfg['FANIP']) && ($netsvc == 'enable')) ? $fancfg['FANIP'] : $ipaddr ;
 
 /* board info */
 $board = isset($fancfg['BOARD']) ? $fancfg['BOARD'] : '';
