@@ -1,20 +1,29 @@
-Menu="UNRAID-OS"
+Menu="CommandLineTools:1"
 Title="Command Line"
 Type="xmenu"
 ---
-<?php require_once '/usr/local/emhttp/plugins/cmdline/include/cmdline_config.php'; ?>
+<? require_once '/usr/local/emhttp/plugins/cmdline/include/cmdline_config.php'; ?>
 <link type="text/css" rel="stylesheet" href="/plugins/cmdline/css/cmdline.css">
 
 <div>
-	<iframe id="shell" src="<?=$shellinabox_http?>://<?=$shellinabox_host?>:<?=$shellinabox_port;?>">
-	</iframe>
+    <iframe id="shell" src="<?=$shellinabox_http?>://<?=$shellinabox_host?>:<?=$shellinabox_port;?>">
+    </iframe>
 </div>
 
 <script type="text/javascript">
 $(function(){
-	$('.tabs')
-		.append("<span class='status'><label id='settings'><i class='fa fa-gear'></i> Settings </label></span>")
-		.append("<span class='status'>Status: <?=$shellinabox_status;?> </span>");
+    $('.tabs')
+        .append('<div class="tab"><input type="radio" name="tabs2" id="tab2"><label for="tab2"><img class="icon" src="/plugins/cmdline/icons/settings.png">Settings</label></div>')
+        .append('<span class="status">Status: <?=$shellinabox_status;?> </span>');
+
+    // hide dummy tab
+    $('#tab2').parent().hide();
+
+    // goto Command Line Settings Menu
+    $('#tab2').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Settings/CommandLineSettingsTabs';
+    });
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
@@ -24,8 +33,8 @@ $(function(){
         });
     <?endif;?>
 
-	$('#settings').click(function() {
-		location = '/Settings/CommandLineSettings';
-	});
+    $('#settings').click(function() {
+        location = '/Settings/CommandLineSettings';
+    });
 });
 </script>

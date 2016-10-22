@@ -1,8 +1,7 @@
-Icon="cmdline.png"
-Menu="NetworkServices"
+Menu="CommandLineSettingsTabs:1"
 Title="Command Line"
 ---
-<?php require_once '/usr/local/emhttp/plugins/cmdline/include/cmdline_settings.php'; ?>
+<? require_once '/usr/local/emhttp/plugins/cmdline/include/cmdline_settings.php'; ?>
 <link type="text/css" rel="stylesheet" href="/plugins/cmdline/css/cmdline.css">
 
 <form markdown="1" name="cmdline_settings" method="POST" action="/update.php" target="progressFrame">
@@ -19,7 +18,7 @@ Enable Shellinabox Server <?=$shellinabox_version;?>:
 >
 > You can access the server with YourServerName:port, YourServerIPAddress:port,
 > by clicking on the hyperlink below next to port, clicking on Connect button or
-> from the unRAID webgui at /Tools/CommandLine.
+> from the unRAID webgui at /Tools/CommandLineTools.
 
 Port (<?=$shellinabox_port_status;?>):
 : <input id="PORT" type="text" class="shellinabox-run" name="PORT" maxlength="40" value="<?=$shellinabox_port;?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
@@ -47,7 +46,7 @@ Connect by IP Address:
 
 > Select to connect by IP address.
 >
-> Yes to make Settings page hyperlink, Connect button and Tools/CommandLine menu connect by IP address.
+> Yes to make Settings page hyperlink, Terminal button and Tools/CommandLineTools menu connect by IP address.
 >
 > No to connect by hostname.
 
@@ -87,14 +86,25 @@ Enable Root Home Directory Backup:
 > This is useful for ssh authorized_keys, bash history, midnight commander settings, htop config and whatever else you keep in /root.
 
 
-<input id="DEFAULT" class="shellinabox-run" type="submit" value="Default" onClick="resetDATA(this.form)"><input id="btnConnect" type="button" value="Connect" onClick="javascript:location.href='/Tools/CommandLine'">
+<input id="DEFAULT" class="shellinabox-run" type="submit" value="Default" onClick="resetDATA(this.form)">
 : <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()"><!--<button id="btnCert" type="button" onclick="window.location.href='http://<?=$shellinabox_host;?>/boot/config/plugins/cmdline/<?=$shellinabox_cert;?>'"> Download Cert </button>-->
 </form>
 
 <script type="text/javascript">
 $(function(){
-	$('.tabs')
-		.append("<span class='status'>Status: <?=$shellinabox_status;?> </span>");
+    $('.tabs')
+        .append('<div class="tab"><input type="radio" name="tabs2" id="tab2"><label for="tab2"><img class="icon" src="/plugins/cmdline/icons/terminal.png">Terminal</label></div>')
+        .append('<span class="status">Status: <?=$shellinabox_status;?> </span>');
+
+    // hide dummy tab
+    $('#tab2').parent().hide();
+
+    // goto Command Line Tools Menu
+    $('#tab2').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Tools/CommandLineTools';
+    });
+
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
@@ -104,68 +114,66 @@ $(function(){
         });
     <?endif;?>
 
-	checkRUNNING(document.cmdline_settings);
-	checkUSER(document.cmdline_settings,'<?=$shellinabox_runas;?>');
+    checkRUNNING(document.cmdline_settings);
+    checkUSER(document.cmdline_settings,'<?=$shellinabox_runas;?>');
 });
 
 function resetDATA(form) {
-	form.IPADDR.value = "disable";
-	form.SSL.value = "disable";
-	form.SCREEN.value = "disable";
-	form.BACKUP.value = "disable";
-	form.PORT.value = "4200";
-	form.RUNAS.value = "nobody";
-	form.USERS.value = "nobody";
+    form.IPADDR.value = 'disable';
+    form.SSL.value    = 'disable';
+    form.SCREEN.value = 'disable';
+    form.BACKUP.value = 'disable';
+    form.PORT.value   =  4200;
+    form.RUNAS.value  = 'nobody';
+    form.USERS.value  = 'nobody';
 }
 
 function checkRUNNING(form) {
-	if ("<?=$shellinabox_running;?>" == true)
-	{
-		$(".shellinabox-run").prop("disabled", true);
-		form.btnApply.disabled = true;	
-		form.btnConnect.disabled = false;
+    if ("<?=$shellinabox_running;?>" == true)
+    {
+        $('.shellinabox-run').prop('disabled', true);
+        form.btnApply.disabled = true;
    }else{
-   	$(".shellinabox-run").prop("disabled", false);
-   	form.btnConnect.disabled = true;
+    $('.shellinabox-run').prop('disabled', false);
  }
 
-	if (form.SERVICE.value == "enable")
-		form.command.value = "/usr/local/emhttp/plugins/cmdline/scripts/start";
-	else {
-		form.command.value = "/usr/local/emhttp/plugins/cmdline/scripts/stop";
-	 	form.btnApply.disabled = (form.SERVICE.value == "enable");
-	}
+    if (form.SERVICE.value == 'enable')
+        form.command.value = '/usr/local/emhttp/plugins/cmdline/scripts/start';
+    else {
+        form.command.value = '/usr/local/emhttp/plugins/cmdline/scripts/stop';
+        form.btnApply.disabled = (form.SERVICE.value == 'enable');
+    }
 }
 
 function checkUSER(form, currentUSER) {
-	if (form.USERS.value != "other" ) {
-		form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
-		form.RUNAS.type = "hidden";
-	}
-	else
-	{
-		form.RUNAS.value = currentUSER;
-		if (form.RUNAS.value == "root")
-			form.RUNAS.value = "nobody";
-		form.RUNAS.type = "text";
-		form.RUNAS.title = "Run As User Cannot be Root";
-	}
+    if (form.USERS.value != 'other' ) {
+        form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
+        form.RUNAS.type  = 'hidden';
+    }
+    else
+    {
+        form.RUNAS.value = currentUSER;
+        if (form.RUNAS.value == 'root')
+            form.RUNAS.value = 'nobody';
+        form.RUNAS.type = 'text';
+        form.RUNAS.title = 'Run As User Cannot be Root';
+    }
 }
 
 function verifyDATA(form) {
-	if (!isNumber(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
-			form.PORT.value = "4200";
-	}
-	if (form.RUNAS.value == null || form.RUNAS.value == ""){
-		form.RUNAS.value = "nobody";
-		$shellinabox_runas = "nobody";
-	}
-	form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
-	form.IPADDR.value = form.IPADDR.value.replace(/ /g,"_");
-	form.SSL.value = form.SSL.value.replace(/ /g,"_");
-	form.SCREEN.value = form.SCREEN.value.replace(/ /g,"_");
-	form.PORT.value = form.PORT.value.replace(/ /g,"_");
-	form.RUNAS.value = form.RUNAS.value.replace(/ /g,"_");
+    if (!jQuery.isNumeric(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
+            form.PORT.value = 4200;
+    }
+    if (form.RUNAS.value == null || form.RUNAS.value == ''){
+        form.RUNAS.value = 'nobody';
+        $shellinabox_runas = 'nobody';
+    }
+    form.SERVICE.value = form.SERVICE.value.replace(/ /g,'_');
+    form.IPADDR.value = form.IPADDR.value.replace(/ /g,'_');
+    form.SSL.value = form.SSL.value.replace(/ /g,'_');
+    form.SCREEN.value = form.SCREEN.value.replace(/ /g,'_');
+    form.PORT.value = form.PORT.value.replace(/ /g,'_');
+    form.RUNAS.value = form.RUNAS.value.replace(/ /g,'_');
 }
 
 </script>

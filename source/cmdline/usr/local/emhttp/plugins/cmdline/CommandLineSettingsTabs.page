@@ -1,0 +1,6 @@
+Menu="NetworkServices"
+Icon="cmdline.png"
+Title="Command Line"
+Type="xmenu"
+Tabs="true"
+---

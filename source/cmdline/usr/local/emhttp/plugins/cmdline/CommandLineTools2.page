@@ -1,0 +1,7 @@
+Menu="CommandLineTools:2"
+Title="Settings"
+Markdown="false"
+---
+<?
+/* Dummy page to force command line tools tabs */
+?>

@@ -1,0 +1,7 @@
+Menu="CommandLineSettingsTabs:2"
+Title="Terminal"
+Markdown="false"
+---
+<?
+/* Dummy page to force command line settings tabs */
+?>
