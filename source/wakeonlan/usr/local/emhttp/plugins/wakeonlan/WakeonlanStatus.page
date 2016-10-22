@@ -1,8 +1,8 @@
 Menu="Wakeonlan:1"
 Title="Wake On Lan"
 ---
-<?php
-$excludeip = $var['IPADDR'];
+<?
+$excludeip = isset($var['IPADDR']) ? $var['IPADDR'] : $eth0['IPADDR:0'];
 $ifname = exec("ifconfig | awk 'BEGIN { ifname = 0 } /$excludeip/ { ifname = 1 } /^($|[^\t])/ { if(ifname) print buffer; buffer = $1; ifname = 0 } END { if(ifname) print buffer }' |  sed s/\:/\/g");
 $theme = $display["theme"]
 ?>
@@ -13,18 +13,18 @@ $theme = $display["theme"]
 
 <form markdown="1">
 
-<table class="tablesorter" id="tblData">	
-	<thead>
-		<tr>
-			<th> Status </th>
-			<th> Hostname </th>
-			<th> IP Address </th>
-			<th> MAC Address </th>
-			<th><a><i class="fa fa-trash" id='allMac' title='remove all'> remove all </i></a></th>
-		</tr>
-	</thead>
-	<tbody>
-	</tbody>
+<table class="tablesorter" id="tblData">
+    <thead>
+        <tr>
+            <th> Status </th>
+            <th> Hostname </th>
+            <th> IP Address </th>
+            <th> MAC Address </th>
+            <th><a><i class="fa fa-trash" id='allMac' title='remove all'> remove all </i></a></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
 </table>
 
 &nbsp;
@@ -37,7 +37,7 @@ $theme = $display["theme"]
 <script type="text/javascript" src="/plugins/wakeonlan/js/jquery.wakeonlan.js"></script>
 
 <script type="text/javascript">
-var ifName = "<?=$ifname?>";
+var ifName    = "<?=$ifname?>";
 var excludeIP = "<?=$excludeip?>";
 </script>
 
