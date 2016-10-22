@@ -4,15 +4,15 @@ Title="Network Scan"
 <form markdown="1">
 
 <table class="tablesorter hover-highlight" id="tblScan">
-	<thead>
-		<tr>
-  			<th> Hostname </th>
-			<th> IP Address </th>
-			<th> MAC Address </th>
-		</tr>
-	</thead>
-	<tbody>
-	</tbody>
+    <thead>
+        <tr>
+            <th> Hostname </th>
+            <th> IP Address </th>
+            <th> MAC Address </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
 </table>
 
 &nbsp;
