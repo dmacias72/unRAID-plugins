@@ -37,8 +37,6 @@ $(function(){
         }
     });
 */
-    //refresh scan page
-    //$('#tab2').click(Refresh);
 
     //input masks
     $('.ip-address').mask('0ZZ.0ZZ.0ZZ.0ZZ', {translation:  {'Z': {pattern: /[0-9]/, optional: true}}});
