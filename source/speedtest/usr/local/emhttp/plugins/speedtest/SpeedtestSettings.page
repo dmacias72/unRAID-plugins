@@ -15,27 +15,28 @@ require_once '/usr/local/emhttp/plugins/speedtest/include/scheduler_tab.php';
 
 Speedtest Script Version:
 : <select id="VERSION" name="VERSION" size="1" >
-  <?=mk_option($speedtest_version, "0.3.4", "v0.3.4");?>
-  <?=mk_option($speedtest_version, "0.3.1", "v0.3.1");?>
-  <?=mk_option($speedtest_version, "1.0.0", "v1.0.0 (beta)");?>
+    <?=mk_option($speedtest_version, "linux", "$speedtest_linux");?>
+    <?=mk_option($speedtest_version, "0.3.4", "v0.3.4");?>
+    <?=mk_option($speedtest_version, "0.3.1", "v0.3.1");?>
+    <?=mk_option($speedtest_version, "1.0.0", "v1.0.0 (beta)");?>
   </select>
 
 > Choose a version of speedtest script to use.
 
 Speedtest Timeout in Seconds:
-: <select id="TIMEOUT" name="TIMEOUT" size="1" >
-  <?=mk_option($speedtest_timeout, "10", "10");?>
-  <?=mk_option($speedtest_timeout, "20", "20");?>
-  <?=mk_option($speedtest_timeout, "30", "30");?>
-  <?=mk_option($speedtest_timeout, "30", "60");?>
+: <select id="TIMEOUT" name="TIMEOUT" size="1" class="speedtest-cli">
+    <?=mk_option($speedtest_timeout, "10", "10");?>
+    <?=mk_option($speedtest_timeout, "20", "20");?>
+    <?=mk_option($speedtest_timeout, "30", "30");?>
+    <?=mk_option($speedtest_timeout, "30", "60");?>
   </select>
 
 > Choose a HTTP timeout of speedtest in seconds.
 
 Enable Secure Connection:
-: <select id="SECURE" name="SECURE" size="1" >
-  <?=mk_option($speedtest_secure, "no", "No");?>
-  <?=mk_option($speedtest_secure, "secure", "Yes");?>
+: <select id="SECURE" name="SECURE" size="1" class="speedtest-cli">
+      <?=mk_option($speedtest_secure, "no", "No");?>
+      <?=mk_option($speedtest_secure, "secure", "Yes");?>
   </select>
 
 > Choose to use an ssl connection to speedtest server.
@@ -45,8 +46,8 @@ Enable Secure Connection:
 
  Save Speed Values As:
 : <select id="UNITS" name="UNITS" size="1" >
-  <?=mk_option($speedtest_units, "bits", "bits");?>
-  <?=mk_option($speedtest_units, "bytes", "bytes");?>
+      <?=mk_option($speedtest_units, "bits", "bits");?>
+      <?=mk_option($speedtest_units, "bytes", "bytes");?>
   </select>
 
 > Choose the units to use for saved speedtest results.
@@ -55,9 +56,9 @@ Enable Secure Connection:
 
 
 Create Results Image:
-: <select id="SHARE" name="SHARE" size="1" >
-  <?=mk_option($speedtest_share, "no", "No");?>
-  <?=mk_option($speedtest_share, "share", "Yes");?>
+: <select id="SHARE" name="SHARE" size="1" class="speedtest-cli">
+      <?=mk_option($speedtest_share, "no", "No");?>
+      <?=mk_option($speedtest_share, "share", "Yes");?>
   </select>
 
 > Choose to create a speedtest image when running tests.
@@ -130,16 +131,29 @@ $(function(){
             $('.serverlist').css('visibility','hidden')
     });
 
+
     if ($('#LIST')[0].selectedIndex){
         $('.serverlist').css('visibility','visible')
             getServerList(Selected);
     }else
         $('.serverlist').css('visibility','hidden')
 
+    $('#VERSION').change(function () {
+        if ($('#LIST')[0].selectedIndex){
+            $('.speedtest-cli').prop('disabled', false);
+        }else
+            $('.speedtest-cli').prop('disabled', true)
+    });
+
+    if ($('#VERSION')[0].selectedIndex){
+            $('.speedtest-cli').prop('disabled', false);
+    }else
+            $('.speedtest-cli').prop('disabled', true)
+
 });
 
 function resetDATA(form) {
-    form.VERSION.value = '0.3.4';
+    form.VERSION.value = 'linux';
     form.TIMEOUT.value = '10';
     form.SECURE.value  = 'no';
     form.SHARE.value   = '--share';

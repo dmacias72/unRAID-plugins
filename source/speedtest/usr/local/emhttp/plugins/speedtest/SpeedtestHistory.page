@@ -494,7 +494,7 @@ function parseDataXML(){
 // open shadowbox and begin speedtest
 function beginTEST() {
     // open shadowbox window (run in foreground)
-    var run = '/logging.htm?cmd=/plugins/speedtest/scripts/speedtest-xml';
+    var run = '/logging.htm?cmd=/plugins/speedtest/scripts/speedtest-xml&arg1=--verbose';
     var options = {modal:true,onClose:parseDataXML/*function(){parseDataXML();document.location.reload(true)}*/};
     Shadowbox.open({content:run, player:'iframe', title:'Speedtest', height:400, width:600, options:options});
 }
