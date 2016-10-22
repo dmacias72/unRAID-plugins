@@ -291,11 +291,13 @@ function Scan(){
     $('#tblScan tbody').html('<tr id="scanning"><td><img src="/plugins/dynamix/images/loading.gif"></td>'+
         '<td><img src="/plugins/dynamix/images/loading.gif"></td>'+
         '<td><img src="/plugins/dynamix/images/loading.gif"></td></tr>');
+    $('#tblScan').trigger('update');
     $('#countdown').html('<font class="green">Scanning...</font>');
     $.getJSON('/plugins/wakeonlan/include/scan.php',{ip: excludeIP}, function(data) {
             parseScan();
             $('#countdown').empty();
             slideRow($('#scanning'));
+            $('#tblScan').trigger('update');
         }
    );
 };
