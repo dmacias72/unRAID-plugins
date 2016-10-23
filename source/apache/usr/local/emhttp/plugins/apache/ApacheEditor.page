@@ -1,0 +1,89 @@
+Menu="WebServer:2"
+Title="Config Editor"
+Markdown="false"
+---
+<?
+$httpd_path   = '/boot/config/plugins/apache/httpd';
+/*$current = 'httpd.conf';
+$edit_file   = "$httpd_path/$current";
+$config_file = '';
+if(file_exists($current_file))
+    $config_file = file_get_contents($current_file);
+*/
+?>
+<link rel="stylesheet" href="/plugins/apache/js/CodeMirror/lib/codemirror.css">
+<link rel="stylesheet" href="/plugins/apache/js/CodeMirror/addon/hint/show-hint.css">
+
+<blockquote class="inline_help">
+    <p>Apache Config Editor is used to get and set configuration parameters.</p>
+</blockquote>
+
+<form id="editform" method="POST">
+
+<i id="editfolder" style="cursor:pointer;" class="fa fa-folder-open-o fa-2x" data-pickcloseonfile="true" data-pickfilter="conf,ini,magic,types,proxiedhosts" data-pickroot="<?=$httpd_path;?>" data-pickfolders="false" required="required" ></i>
+<input id="editfile" style="" hidden="" readonly="" type="text" name="editfile" maxlength="60" value="<?=$apache_edit;?>" title="" placeholder="">
+
+<textarea id="editarea" name="editarea" placeholder="Copy &amp; Paste Apache Configuration Here." autofocus><?= htmlspecialchars($edit_file); ?></textarea>
+<input type="hidden" name="commit" value="1" />
+<dl>
+    <dt></dt>
+    <dd><input type="button" value="Save" id="btnSubmit" title="save Apache configuration changes" />
+    <input type="button" value="Cancel" id="btnCancel" />
+    </dd>
+</form>
+</dl>
+
+<blockquote class="inline_help">
+    <p>The Save button saves Apache configuration changes.
+    </p>
+</blockquote>
+
+<script src="/plugins/ipmi/js/CodeMirror/lib/codemirror.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/display/placeholder.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/mode/properties/properties.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/hint/anyword-hint.js"></script>
+
+<script>
+$(function(){
+    $('#btnCancel').click(function() {
+        $.cookie('one', 'tab1', { expires:null, path: '/'});
+        location = '/Settings/WebServer';
+    });
+
+    var editor = CodeMirror.fromTextArea($('#editarea')[0], {
+        mode: 'properties',
+        lineNumbers: true,
+        gutters: ['CodeMirror-linenumbers'],
+        extraKeys: {
+            'Ctrl-Space': 'autocomplete'
+        },
+        hintOptions: {}
+    });
+
+    $('#tab2').click(function () {
+        editor.refresh();
+    });
+
+    $("#editfolder").fileTreeAttach(null, null, function(folder) {
+        $("#editfile").val(folder).change(function () {alert();});
+    });
+
+    // save config and commit to bmc
+    $('#btnSubmit').click(function () {
+        editor.save();
+        $.post('/plugins/apache/include/apache_config.php', $('#editform').serializeArray(),function (data) {
+            var Title = 'Apache Configuration';
+
+            if(data.success)
+                swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
+                    location = '/Settings/WebServer';
+                });
+
+            if(data.error)
+                swal({title:Title,text:data.error,type:'error'});
+
+        }, 'json');
+    });
+});
+</script>
