@@ -16,18 +16,12 @@ if [ ! -r $PIDFILE ]; then
 
     # if directory doesn't exist or apache is not found, create it
     if [ ! -e "$DOCROOT" ]; then
-        mkdir -p $DOCROOT
-        chmod -R 0775 $DOCROOT
+        mkdir -p "$DOCROOT"
     fi
 
-    if [ -d "$DOCROOT" ]; then
-        OWNER=$(stat -c %U "$DOCROOT")
-        if [ "$OWNER" != "$RUNAS" ]; then
-            chown -R "$RUNAS":users "$DOCROOT"
-        fi
-    fi
-
-    ln -sfT $DOCROOT /srv/httpd/htdocs
+    chown -R "$RUNAS":users "$DOCROOT"
+    chmod -R 0775 "$DOCROOT"
+    ln -sfT "$DOCROOT" /srv/httpd/htdocs
 
     SERVERNAME=$(hostname)
 
