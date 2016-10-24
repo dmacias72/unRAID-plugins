@@ -27,8 +27,20 @@ if($ipmi || !empty($netopts)) {
 </div>
 
 <blockquote class="inline_help">
-    <p>IPMI Config Editor is used to get and set configuration parameters in IPMI. In can be used to configured usernames, passwords, networking information, security, Serial-over-LAN (SOL), Platform Event Filtering (PEF), boot devices, power restoration policy, and many more configuration options.
-    </p>
+    <p>IPMI Config Editor is used to get and set configuration parameters in IPMI. In can be used to configured usernames, passwords, networking information, security, Serial-over-LAN (SOL), Platform Event Filtering (PEF), boot devices, power restoration policy, and many more configuration options.</p>
+    <p><b>Search Functions:</b></p>
+    <dl>
+    <dt>Ctrl-F / Cmd-F</dt>
+    <dd>Start searching</dd>
+    <dt>Ctrl-G / Cmd-G</dt>
+    <dd>Find next</dd>
+    <dt>Shift-Ctrl-G / Shift-Cmd-G</dt>
+    <dd>Find previous</dd>
+    <dt>Shift-Ctrl-F / Cmd-Option-F</dt>
+    <dd>Replace</dd>
+    <dt>Shift-Ctrl-R / Shift-Cmd-Option-F</dt>
+    <dd>Replace all</dd>
+    </dl>
 </blockquote>
 
 <form id="cfgform" method="POST">
@@ -45,8 +57,7 @@ if($ipmi || !empty($netopts)) {
 </dl>
 
 <blockquote class="inline_help">
-    <p>The Revert button resets the stored IPMI configuration file to the existing configuration loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.
-    </p>
+    <p>The Revert button resets the stored IPMI configuration file to the existing configuration loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.</p>
 </blockquote>
 
 <script src="/plugins/ipmi/js/CodeMirror/lib/codemirror.js"></script>

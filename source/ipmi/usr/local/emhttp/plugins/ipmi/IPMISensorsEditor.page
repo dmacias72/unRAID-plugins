@@ -46,6 +46,19 @@ if($ipmi || !empty($netopts)) {
     The inaccuracies may not be apparent immediately.  It is recommend to verify their changes after configuring new thresholds.
     Some sensor configuration may be stored in volatile memory, so you may wish to veryify that new configurations exist after system reboots.
     If sensor configuration does not survive then check Load Config @ unRAID Start to load config when system reboots.</p>
+    <p><b>Search Functions:</b></p>
+    <dl>
+    <dt>Ctrl-F / Cmd-F</dt>
+    <dd>Start searching</dd>
+    <dt>Ctrl-G / Cmd-G</dt>
+    <dd>Find next</dd>
+    <dt>Shift-Ctrl-G / Shift-Cmd-G</dt>
+    <dd>Find previous</dd>
+    <dt>Shift-Ctrl-F / Cmd-Option-F</dt>
+    <dd>Replace</dd>
+    <dt>Shift-Ctrl-R / Shift-Cmd-Option-F</dt>
+    <dd>Replace all</dd>
+    </dl>
 </blockquote>
 
 <form id="cfgform" method="POST">

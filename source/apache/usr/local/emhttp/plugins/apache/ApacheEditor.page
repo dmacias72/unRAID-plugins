@@ -20,6 +20,19 @@ if(file_exists($httpd_file))
 
 <blockquote class="inline_help">
     <p>Apache Config Editor is used to get and set configuration parameters.</p>
+    <p><b>Search Functions:</b></p>
+    <dl>
+    <dt>Ctrl-F / Cmd-F</dt>
+    <dd>Start searching</dd>
+    <dt>Ctrl-G / Cmd-G</dt>
+    <dd>Find next</dd>
+    <dt>Shift-Ctrl-G / Shift-Cmd-G</dt>
+    <dd>Find previous</dd>
+    <dt>Shift-Ctrl-F / Cmd-Option-F</dt>
+    <dd>Replace</dd>
+    <dt>Shift-Ctrl-R / Shift-Cmd-Option-F</dt>
+    <dd>Replace all</dd>
+    </dl>
 </blockquote>
 
 <form id="editform" method="POST">
