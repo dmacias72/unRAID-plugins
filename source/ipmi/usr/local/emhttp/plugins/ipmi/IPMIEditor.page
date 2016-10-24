@@ -14,6 +14,14 @@ if($ipmi || !empty($netopts)) {
     $ipmi_config = file_get_contents($config_file);
 }
 ?>
+<link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/lib/codemirror.css">
+<link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.css">
+<link rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/addon/dialog/dialog.css">
+<style type="text/css">
+    .CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
+    .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+</style>
+
 <div id="title" style="margin-top: -22px;">
     <span class="left"><img class="icon" src="/plugins/ipmi/icons/configeditor.png"> IPMI Configuration Editor</span>
 </div>
@@ -40,6 +48,15 @@ if($ipmi || !empty($netopts)) {
     <p>The Revert button resets the stored IPMI configuration file to the existing configuration loaded on the BMC.  The Save button saves IPMI configuration changes to the BMC.
     </p>
 </blockquote>
+
+<script src="/plugins/ipmi/js/CodeMirror/lib/codemirror.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/dialog/dialog.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/display/placeholder.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/mode/properties/properties.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/hint/anyword-hint.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/search/searchcursor.js"></script>
+<script src="/plugins/ipmi/js/CodeMirror/addon/search/search.js"></script>
 
 <script>
 $(function(){
