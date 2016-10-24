@@ -2,9 +2,10 @@ Menu="Wakeonlan:1"
 Title="Wake On Lan"
 ---
 <?
-$excludeip = isset($var['IPADDR']) ? $var['IPADDR'] : $eth0['IPADDR:0'];
+$net_cfg = parse_ini_file('/boot/config/network.cfg');
+$excludeip = is_array($net_cfg['IPADDR']) ? $net_cfg['IPADDR'][0] : $net_cfg['IPADDR'];
 $ifname = exec("ifconfig | awk 'BEGIN { ifname = 0 } /$excludeip/ { ifname = 1 } /^($|[^\t])/ { if(ifname) print buffer; buffer = $1; ifname = 0 } END { if(ifname) print buffer }' |  sed s/\:/\/g");
-$theme = $display["theme"]
+$theme = $display['theme']
 ?>
 
 <link type="text/css" rel="stylesheet" href="/plugins/wakeonlan/css/wakeonlan.css">
@@ -40,4 +41,3 @@ $theme = $display["theme"]
 var ifName    = "<?=$ifname?>";
 var excludeIP = "<?=$excludeip?>";
 </script>
-
