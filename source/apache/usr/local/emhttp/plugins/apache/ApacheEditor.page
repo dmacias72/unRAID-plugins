@@ -3,16 +3,20 @@ Title="Config Editor"
 Markdown="false"
 ---
 <?
-$httpd_path   = '/boot/config/plugins/apache/httpd';
-/*$current = 'httpd.conf';
-$edit_file   = "$httpd_path/$current";
-$config_file = '';
-if(file_exists($current_file))
-    $config_file = file_get_contents($current_file);
-*/
+$httpd_path = '/boot/config/plugins/apache/httpd';
+$httpd_file   = "$httpd_path/httpd.conf";
+$edit_file = '';
+if(file_exists($httpd_file))
+    $edit_file = file_get_contents($httpd_file);
 ?>
+
 <link rel="stylesheet" href="/plugins/apache/js/CodeMirror/lib/codemirror.css">
+<link rel="stylesheet" href="/plugins/apache/js/CodeMirror/addon/dialog/dialog.css">
 <link rel="stylesheet" href="/plugins/apache/js/CodeMirror/addon/hint/show-hint.css">
+<style type="text/css">
+    .CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
+    .CodeMirror pre.CodeMirror-placeholder { color: #999; }
+</style>
 
 <blockquote class="inline_help">
     <p>Apache Config Editor is used to get and set configuration parameters.</p>
@@ -20,10 +24,11 @@ if(file_exists($current_file))
 
 <form id="editform" method="POST">
 
-<i id="editfolder" style="cursor:pointer;" class="fa fa-folder-open-o fa-2x" data-pickcloseonfile="true" data-pickfilter="conf,ini,magic,types,proxiedhosts" data-pickroot="<?=$httpd_path;?>" data-pickfolders="false" required="required" ></i>
-<input id="editfile" style="" hidden="" readonly="" type="text" name="editfile" maxlength="60" value="<?=$apache_edit;?>" title="" placeholder="">
+<img id="editfolder" style="cursor:pointer;margin-left: 10px;" src="/webGui/images/explore.png" >
 
-<textarea id="editarea" name="editarea" placeholder="Copy &amp; Paste Apache Configuration Here." autofocus><?= htmlspecialchars($edit_file); ?></textarea>
+<input id="editfile" type="text" name="editfile" value="<?=$httpd_file;?>" style="background-color: #f0f0f0;" readonly="" data-pickcloseonfile="true" data-pickfilter="conf,ini,magic,types,proxiedhosts" data-pickroot="<?=$httpd_path;?>" data-pickfolders="false" required="required" >
+
+<textarea id="editdata" name="editdata" placeholder="Select Configuration File to Open." autofocus><?= htmlspecialchars($edit_file); ?></textarea>
 <input type="hidden" name="commit" value="1" />
 <dl>
     <dt></dt>
@@ -38,11 +43,14 @@ if(file_exists($current_file))
     </p>
 </blockquote>
 
-<script src="/plugins/ipmi/js/CodeMirror/lib/codemirror.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/display/placeholder.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/mode/properties/properties.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/hint/anyword-hint.js"></script>
+<script src="/plugins/apache/js/CodeMirror/lib/codemirror.js"></script>
+<script src="/plugins/apache/js/CodeMirror/addon/dialog/dialog.js"></script>
+<script src="/plugins/apache/js/CodeMirror/addon/display/placeholder.js"></script>
+<script src="/plugins/apache/js/CodeMirror/addon/hint/show-hint.js"></script>
+<script src="/plugins/apache/js/CodeMirror/addon/hint/anyword-hint.js"></script>
+<script src="/plugins/apache/js/CodeMirror/mode/properties/properties.js"></script>
+<script src="/plugins/apache/js/CodeMirror/addon/search/searchcursor.js"></script>
+<script src="/plugins/apache/js/CodeMirror/addon/search/search.js"></script>
 
 <script>
 $(function(){
@@ -51,7 +59,7 @@ $(function(){
         location = '/Settings/WebServer';
     });
 
-    var editor = CodeMirror.fromTextArea($('#editarea')[0], {
+    var editor = CodeMirror.fromTextArea($('#editdata')[0], {
         mode: 'properties',
         lineNumbers: true,
         gutters: ['CodeMirror-linenumbers'],
@@ -65,23 +73,29 @@ $(function(){
         editor.refresh();
     });
 
-    $("#editfolder").fileTreeAttach(null, null, function(folder) {
-        $("#editfile").val(folder).change(function () {alert();});
+    $('#editfile').fileTreeAttach(null, null, function(file) {
+        $('#editfile').val(file);
+    });
+
+    $('#editfile').change(function () {
+        var Editfile = $('#editfile').val();
+        $.getJSON('/plugins/apache/include/apache_edit.php', {editfile: Editfile}, function (data) {
+                editor.setValue(data);
+            }
+        );
     });
 
     // save config and commit to bmc
     $('#btnSubmit').click(function () {
         editor.save();
-        $.post('/plugins/apache/include/apache_config.php', $('#editform').serializeArray(),function (data) {
-            var Title = 'Apache Configuration';
+        $.post('/plugins/apache/include/apache_save.php', $('#editform').serializeArray(), function (data) {
+            var Title = 'Config File ';
 
             if(data.success)
-                swal({title:Title,text:'saved',type:'success',closeOnConfirm: true,},function() {
-                    location = '/Settings/WebServer';
+                swal({title: Title+'Saved', text: data.saved+'\n\nrestart web server to use new config.', timer: 2500, showConfirmButton: false, type:'success'
                 });
-
             if(data.error)
-                swal({title:Title,text:data.error,type:'error'});
+                swal({title:Title+'Error', text: data.error+'\n\nunable to save file', type:'error'});
 
         }, 'json');
     });
