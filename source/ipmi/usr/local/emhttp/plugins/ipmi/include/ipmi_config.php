@@ -38,15 +38,15 @@ $arg_sensors = (array_key_exists('s', $args) || array_key_exists('sensors', $arg
 
 $cmd_sensors = ($arg_sensors || array_key_exists('sensors', $_POST)) ? '-sensors' : '';
 
-$config_file = "$plg_path/ipmi$cmd_sensors.config";
-$cmd         = "/usr/sbin/ipmi$cmd_sensors-config --filename=$config_file ";
+$config_file = "$plg_path/ipmi{$cmd_sensors}.config";
+$cmd         = "/usr/sbin/ipmi{$cmd_sensors}-config --filename=$config_file ";
 $commit      = array_key_exists('commit', $_POST);
 
 // remove carriage returns
 $config = (array_key_exists('ipmicfg', $_POST)) ? str_replace("\r", '', $_POST['ipmicfg']) : '';
 
 // get previous config file contents
-$config_old = (is_file($config_file)) ? file_get_contents($config_file) : '';
+$config_old = (file_exists($config_file)) ? file_get_contents($config_file) : '';
 
 if(($arg_commit) && (!empty($config_old))){
     $config = $config_old;
