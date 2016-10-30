@@ -37,8 +37,8 @@ function ipmi_fan_sensors($ignore=null) {
 
 /* get all fan options for fan control */
 function get_fanctrl_options(){
-    global $fansensors, $fancfg, $board, $board_json, $board_file_status;
-    if($board == 'ASRock' || $board == 'ASRockRack') {
+    global $fansensors, $fancfg, $board, $board_json, $board_file_status, $board_asrock;
+    if($board_asrock) {
         $i = 0;
         foreach($fansensors as $id => $fan){
             if($i > 7) break;
@@ -48,7 +48,7 @@ function get_fanctrl_options(){
                 $temp    = $fansensors[$fancfg[$tempid]];
                 $templo  = 'TEMPLO_'.$name;
                 $temphi  = 'TEMPHI_'.$name;
-                $fanmin     = 'FANMIN_'.$name;
+                $fanmin  = 'FANMIN_'.$name;
 
                 // hidden fan id
                 echo '<input type="hidden" name="FAN_',$name,'" value="',$id,'"/>';
@@ -63,11 +63,12 @@ function get_fanctrl_options(){
                 echo '</span><span class="fanctrl-settings">&nbsp;</span>';
 
                 // check if board.json exists then if fan name is in board.json
+                $noconfig = '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
                 if($board_file_status){
                     if(!array_key_exists($name, $board_json[$board]['fans']))
-                        echo '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
-                }else {
-                    echo '<font class="red"><b><i> (fan is not configured!)</i></b></font>';
+                        echo $noconfig;
+                } else {
+                    echo $noconfig;
                 }
 
                 echo '</dd></dl>';
@@ -104,6 +105,29 @@ function get_fanctrl_options(){
                 $i++;
             }
         }
+    } elseif($board == 'Supermicro'){
+            // temperature sensor
+            echo '<dl>',
+            '<dt>Temperature sensor:</dt><dd>',
+            '<select name="TEMP_FAN">',
+            '<option value="0">Auto</option>',
+            get_temp_options($fancfg['TEMP_FAN'], true),
+            '</select></dd></dl>';
+
+            // low temperature threshold
+            echo '<dl>',
+            '<dt>Low temperature threshold (&deg;C):</dt>',
+            '<dd><select name="TEMPLO_FAN">',
+            get_temp_range('LO', $fancfg['TEMPLO_FAN']),
+            '</select></dd></dl>';
+
+            // high temperature threshold
+            echo '<dl>',
+            '<dt>High temperature threshold (&deg;C):</dt>',
+            '<dd><select name="TEMPHI_FAN">',
+            get_temp_range('HI', $fancfg['TEMPHI_FAN']),
+            '</select></dd></dl>';
+
     } else {
         echo '<dl><dt>&nbsp;</dt><dd><p><b><font class="red">Your board is not currently supported</font></b></p></dd></dl>';
     }
