@@ -1,4 +1,4 @@
 <?
-$cmd = "etherwake -i {$_POST['ifname']} {$_POST['mac']}";
+$cmd = "etherwake -b -i {$_POST['ifname']} {$_POST['mac']}";
 exec($cmd);
 ?>
