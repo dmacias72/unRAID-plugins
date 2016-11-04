@@ -45,8 +45,6 @@ Markdown="false"
     <p>Specify how long between checking the temperature sensors and executing fan speed changes.  Default is 3 minutes.</p>
 </blockquote>
 
-<input type="hidden" name="BOARD" value="<?=$board;?>">
-
 <?if ($netsvc == 'enable'):?>
 
 <dl>
@@ -108,7 +106,6 @@ Markdown="false"
 </div>
 &nbsp;
 
-
 <dl>
     <dt>&nbsp;</dt>
     <dd><input type="submit" value="Apply" onClick="verifyFANOPT(this.form)"><input type="button" value="Done" onClick="done()"></dd>
@@ -160,7 +157,6 @@ $(function(){
     });
 
     toggleFanCTRL();
-
 
     $('.fanctrl-temp')
         .each(function() {
