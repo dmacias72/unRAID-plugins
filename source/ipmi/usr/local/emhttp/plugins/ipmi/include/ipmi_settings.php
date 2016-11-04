@@ -22,18 +22,6 @@ $sensors     = ipmi_sensors($ignore);
 $allsensors  = ipmi_sensors();
 $fansensors  = ipmi_fan_sensors($ignore);
 
-/* get board info */
-$board_log = '/var/log/ipmiboard';
-if (file_exists($board_log))
-    $board = file_get_contents($board_log);
-else{
-    $board = ($ipmi || !empty($netopts)) ? trim(shell_exec("ipmi-fru $netopts | grep 'Manufacturer' | awk -F 'r:' '{print $2}'")) : 'unknown';
-    if ($board != 'unknown')
-        file_put_contents($board_log, $board);
-}
-
-$board_status = array_key_exists($board, $boards);
-
 // create a lockfile for ipmi dashboard
 $dashfile = "$plg_path/ipmidash";
 $dashlock = (file_exists($dashfile));

@@ -69,11 +69,7 @@ $debug  = (array_key_exists('debug', $args));
 $daemon = (array_key_exists('d', $args) || array_key_exists('daemon', $args));
 $quit   = (array_key_exists('quit', $args));
 
-
-if (file_exists($board_file)) {
-        $board_json = json_decode(file_get_contents($board_file), true);
-        $raw  = $board_json[$board]['raw'];
-}
+$raw  = (empty($board_json)) ? '' : $board_json[$board]['raw'];
 
 if(file_exists($lockfile)){
     $lock_pid = file($lockfile, FILE_IGNORE_NEW_LINES)[0];
@@ -121,7 +117,7 @@ if(!($force) && ($fanctrl == 'disable' )){
         exit(0);
 }
 
-if (!file_exists($board_file)) {
+if (!$board_file_status) {
     $msg = "Your $board motherboard is not supported or setup yet";
     logger($msg, $argq);
     exit(1);
