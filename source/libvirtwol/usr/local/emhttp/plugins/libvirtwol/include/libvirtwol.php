@@ -1,10 +1,10 @@
 <?
-$config_file        = "/boot/config/domain.cfg";
+$config_file        = '/boot/config/domain.cfg';
 $libvirtwol_cfg     = parse_ini_file($config_file);
-$libvirtwol_service = isset($libvirtwol_cfg['WOL']) ? $libvirtwol_cfg['WOL'] : "disable";
+$libvirtwol_service = isset($libvirtwol_cfg['WOL']) ? $libvirtwol_cfg['WOL'] : 'disable';
 $libvirtwol_running = trim(shell_exec( "ps ax | grep 'libvirtwol.py' | grep -v grep &>/dev/null && echo 1 || echo 0 2> /dev/null" ));
-$status_running     = "<span class='green'>Running</span>";
-$status_stopped     = "<span class='orange'>Stopped</span>";
+$status_running     = '<span class="green">Running</span>';
+$status_stopped     = '<span class="orange">Stopped</span>';
 $libvirtwol_status  = ($libvirtwol_running) ? $status_running : $status_stopped;
 ?>
 <div class="advanced">

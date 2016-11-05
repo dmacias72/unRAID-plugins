@@ -62,7 +62,7 @@ class LibVirtWakeOnLan:
 
     @staticmethod
     def GetMACAddress(s):
-    	  # added fix for ether proto 0x0842
+            # added fix for ether proto 0x0842
             size = len(s)
             bytes = map(lambda x: '%.2x' % x, map(ord, s))
             counted = 0
@@ -93,7 +93,7 @@ class LibVirtWakeOnLan:
                         newmac = ""
                         macpart = 0
                         maccounted += 1
-            
+
             if counted > 5 and maccounted > 5:
                 return macaddress
 
@@ -129,7 +129,7 @@ class LibVirtWakeOnLan:
         macaddress = LibVirtWakeOnLan.GetMACAddress(decoded['data'])
         if not macaddress:
             return
-        return  LibVirtWakeOnLan.StartServerByMACAddress(macaddress)
+        return LibVirtWakeOnLan.StartServerByMACAddress(macaddress)
 
 if __name__ == '__main__':
     from lvwolutils import Utils
@@ -151,8 +151,10 @@ if __name__ == '__main__':
     # added support for ether proto 0x0842
     p.setfilter('udp port 7 or udp port 9 or ether proto 0x0842', 0, 0)
 
-    try:
-        while 1:
+    while True:
+        try:
             p.dispatch(1, LibVirtWakeOnLan.InspectIPPacket)
-    except KeyboardInterrupt:
-        pass
+        except KeyboardInterrupt:
+            break
+        except Exception:
+            continue
