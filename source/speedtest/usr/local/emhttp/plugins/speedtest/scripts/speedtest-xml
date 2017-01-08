@@ -54,73 +54,81 @@ function debug($m){
 }
 
 echo "Internet bandwidth test started\n\n";
-//shell_exec("echo -e 'Internet bandwidth test started' | logger -tspeedtest");
-
-$options = '';
-if ($speedtest_version == 'linux'){
-    if(!$argv)
-        $options .= '-r';
-    $cmd = "/usr/local/emhttp/plugins/speedtest/scripts/speedtest-linux $options 2>/dev/null";
-    ob_start();
-    $results = '';
-    while(!feof($handle)) {
-        $buffer = trim(fgets($handle));
-        $msg = "$buffer\n\n";
-        echo "$msg";
-        ob_flush();
-}
-
-pclose($handle);
-
-ob_end_flush();
-
-}else{
-    if ( $speedtest_list == 'manual')
-        $options .= " --server $speedtest_server";
-    if ($speedtest_secure == 'secure')
-        $options .= ' --secure';
-    if ($speedtest_share == 'share')
-        $options .= ' --share'; 
-    if ($speedtest_units == 'bytes')
-            $options .= ' --bytes';
-    if ($speedtest_version != '0.3.1')
-            $options .= " --timeout $speedtest_timeout";
-
-    $cmd = "/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest_cli-${speedtest_version}.py  $options  2>/dev/null";
-
-
-$handle = popen($cmd, 'r');
+shell_exec("echo -e 'Internet bandwidth test started' | logger -tspeedtest");
 
 $xml = simplexml_load_file($speedtest_filename);
 $test = $xml->addChild('test');
 $test->addAttribute('name', round(microtime(true) * 1000));
 
-ob_start();
-$results = '';
-while(!feof($handle)) {
-    $buffer = trim(fgets($handle));
-    $msg = "$buffer\n\n";
-        //$output = explode(": ", $buffer);
-    if ((strpos($output[0], 'Hosted by')) !== false) {
-        $host = substr($output[0],10);
-        $test->addAttribute('host', $host);
-        $test->addAttribute('ping', $output[1]);
-        $result .= 'Ping: '.$output[1];
-        $msg .= "Testing download speed...\n\n";
-    }elseif ((strpos($buffer, 'Download')) !== false) {
-        $test->addAttribute('download', $output[1]);
-        $result .= ', Download: '.$output[1];
-        $msg .= "Testing upload speed...\n\n";
-    }elseif ((strpos($buffer, 'Upload')) !== false) {
-        $test->addAttribute('upload', $output[1]);
-        $result .= ', Upload: '.$output[1];
-    }elseif ((strpos($buffer, "Share results")) !== false) {
-        $test->addAttribute('share', $output[1]);
-    }elseif (((strpos($buffer, 'Testing download')) !== false) || ((strpos($buffer, 'Testing upload')) !== false)) {
-        $msg = "";}
-    echo "$msg";
+$options = '';
+if ( $speedtest_list == 'manual')
+    $options .= " --server $speedtest_server";
 
-    ob_flush();
+if ($speedtest_version == 'linux'){
+    if(!$argv)
+        $options .= '';
+    $cmd = "/usr/local/emhttp/plugins/speedtest/scripts/speedtest-linux $options 2>/dev/null";
+    $handle = popen($cmd, 'r');
+    ob_start();
+    $results = '';
+    while(!feof($handle)) {
+        $buffer = trim(fgets($handle));
+        $msg = "$buffer\n\n";
+        $output = explode(' | ', $buffer);
+        if ((strpos($output[0], 'Server: ')) !== false) {
+            $host = explode(' - ', substr($output[0],8))[1];
+            $test->addAttribute('host', $host);
+            //$test->addAttribute('host', $host);
+        }elseif ((strpos($buffer, 'Ping (Lowest): ')) !== false) {
+            $result .= $buffer;
+            $test->addAttribute('ping', explode(': ', $output[0])[1]);
+            $test->addAttribute('download', explode(': ', $output[1])[1]);
+            $test->addAttribute('upload', explode(': ', $output[2])[1]);
+        }
+        echo "$msg";
+        ob_flush();
+    }
+}else{
+    if ($speedtest_secure == 'secure')
+        $options .= ' --secure';
+    if ($speedtest_share == 'share')
+        $options .= ' --share';
+    if ($speedtest_units == 'bytes')
+            $options .= ' --bytes';
+    if ($speedtest_version != '0.3.1')
+            $options .= " --timeout $speedtest_timeout";
+
+    $cmd = "/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest-${speedtest_version}.py  $options  2>/dev/null";
+    $handle = popen($cmd, 'r');
+
+
+    ob_start();
+    $results = '';
+    while(!feof($handle)) {
+        $buffer = trim(fgets($handle));
+        $msg = "$buffer\n\n";
+        $output = explode(": ", $buffer);
+        if ((strpos($output[0], 'Hosted by')) !== false) {
+            $host = substr($output[0],10);
+            $test->addAttribute('host', $host);
+            $test->addAttribute('ping', $output[1]);
+            $result .= 'Ping (Lowest): '.$output[1];
+            $msg .= "Testing download speed...\n\n";
+        }elseif ((strpos($buffer, 'Download')) !== false) {
+            $test->addAttribute('download', $output[1]);
+            $result .= ' | Download (Max): '.$output[1];
+            $msg .= "Testing upload speed...\n\n";
+        }elseif ((strpos($buffer, 'Upload')) !== false) {
+            $test->addAttribute('upload', $output[1]);
+            $result .= ' | Upload (Max): '.$output[1];
+        }elseif ((strpos($buffer, "Share results")) !== false) {
+            $test->addAttribute('share', $output[1]);
+        }elseif (((strpos($buffer, 'Testing download')) !== false) || ((strpos($buffer, 'Testing upload')) !== false)) {
+            $msg = "";}
+        echo "$msg";
+
+        ob_flush();
+    }
 }
 
 pclose($handle);
@@ -134,5 +142,4 @@ shell_exec("echo -e 'Host: ${host}' | logger -tspeedtest");
 shell_exec("echo -e '${result}' | logger -tspeedtest");
 
 shell_exec("echo -e 'Internet bandwidth test completed' | logger -tspeedtest");
-}
 ?>
