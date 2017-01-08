@@ -16,9 +16,10 @@ require_once '/usr/local/emhttp/plugins/speedtest/include/scheduler_tab.php';
 Speedtest Script Version:
 : <select id="VERSION" name="VERSION" size="1" >
     <?=mk_option($speedtest_version, "linux", "$speedtest_linux");?>
+    <?=mk_option($speedtest_version, "1.0.1", "v1.0.1");?>
+    <?=mk_option($speedtest_version, "1.0.0", "v1.0.0");?>
     <?=mk_option($speedtest_version, "0.3.4", "v0.3.4");?>
     <?=mk_option($speedtest_version, "0.3.1", "v0.3.1");?>
-    <?=mk_option($speedtest_version, "1.0.0", "v1.0.0 (beta)");?>
   </select>
 
 > Choose a version of speedtest script to use.
@@ -45,7 +46,7 @@ Enable Secure Connection:
 
 
  Save Speed Values As:
-: <select id="UNITS" name="UNITS" size="1" >
+: <select id="UNITS" name="UNITS" size="1" class="speedtest-cli">
       <?=mk_option($speedtest_units, "bits", "bits");?>
       <?=mk_option($speedtest_units, "bytes", "bytes");?>
   </select>
@@ -139,10 +140,8 @@ $(function(){
         $('.serverlist').css('visibility','hidden')
 
     $('#VERSION').change(function () {
-        if ($('#LIST')[0].selectedIndex){
-            $('.speedtest-cli').prop('disabled', false);
-        }else
-            $('.speedtest-cli').prop('disabled', true)
+        var VersionSelect = $('#VERSION')[0].selectedIndex == 0;
+        $('.speedtest-cli').prop('disabled', VersionSelect);
     });
 
     if ($('#VERSION')[0].selectedIndex){
