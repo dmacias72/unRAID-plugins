@@ -1,2 +1,0 @@
-#!/bin/sh
-/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest_cli-0.3.4.py $@
