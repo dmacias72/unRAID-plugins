@@ -436,14 +436,17 @@ function parseDataXML(){
         url: '/boot/config/plugins/speedtest/speedtest.xml',
         success: function(xml) {
         $(xml).find('test').each(function(){
-            var Name = $(this).attr('name');
-            var HostArray = ($(this).attr('host')) ? $(this).attr("host").split(' [') : ['--','--'];
-            var Host = HostArray[0].trim();
-            var Distance = HostArray[1].replace(/]/g,'').trim();
-            var Ping = ($(this).attr('ping')) ? $(this).attr("ping") : '--';
-            var Download = ($(this).attr('download')) ? $(this).attr('download') : '--';
-            var Upload = ($(this).attr('upload')) ? $(this).attr('upload') : '--';
-            var Share = ($(this).attr('share')) ? $(this).attr('share') : '';
+            var Name      = $(this).attr('name');
+            var HostArray = ($(this).attr('host')) ? $(this).attr('host').split(' [') : ['--','--'];
+            var Host      = HostArray[0].trim();
+            var Distance  = '--';
+            if ((HostArray.length > 1)) {
+                Distance  = HostArray[1].replace(/]/g,'').trim();
+            }
+            var Ping      = ($(this).attr('ping')) ? $(this).attr('ping') : '--';
+            var Download  = ($(this).attr('download')) ? $(this).attr('download') : '--';
+            var Upload    = ($(this).attr('upload')) ? $(this).attr('upload') : '--';
+            var Share     = ($(this).attr('share')) ? $(this).attr('share') : '';
 
             $('#tblTests tbody').append(
                 "<tr id='"+Name+"' title='click to show image'>"+
@@ -518,7 +521,7 @@ function Delete(Row) {
             showCancelButton: true,
             closeOnConfirm: true,
         }, function() {
-        $.get(deleteNode, {id: Row}, function() {
+        $.post(deleteNode, {id: Row}, function() {
             $('#tblTests tbody').empty(); // empty table
             shareImage(false); // show blank image
             $('#chart').empty();
@@ -526,7 +529,7 @@ function Delete(Row) {
         );
         });
     } else {
-        $.get(deleteNode, {id: Row}, function() {
+        $.post(deleteNode, {id: Row}, function() {
             var tRow = $('#'+Row);
             // add class lastrow and show image of next row
             tRow.next('tr:not(.tablesorter-filter-row)').addClass('lastRow');
