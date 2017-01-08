@@ -1,7 +1,7 @@
 <?
-$command = '/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest_cli-0.3.4.py --list 2>/dev/null';
+$cmd = '/usr/sbin/speedtest --list 2>/dev/null';
 $select  = $_GET['select'];
-exec($command, $output);
+exec($cmd, $output);
 
 $options = '';
 $size = sizeof($output);
