@@ -22,7 +22,18 @@ else{
     if ($board !== 'unknown')
         file_put_contents($board_log, $board);
 }
+
+$boardname_log = '/var/log/boardname';
+if (file_exists($boardname_log))
+    $boardname = file_get_contents($boardname_log);
+else{
+    $boardname = ($ipmi || !empty($netopts)) ? trim(shell_exec("dmidecode -q -t 2|awk -F: '/^\tProduct Name:/{p=$2;} END{print p}'")) : 'unknown';
+    if ($boardname !== 'unknown')
+        file_put_contents($boardname_log, $boardname);
+}
+
 //$board = 'Supermicro';
+
 $board_status = array_key_exists($board, $boards);
 $board_asrock = ($board == 'ASRock' || $board == 'ASRockRack');
 
