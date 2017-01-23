@@ -4130,7 +4130,7 @@ infoDisplay () {
 	#########################
 	if [[ "$distro" == "unRAID" ]]; then
 		if [ -e /var/local/emhttp/var.ini ]; then
-			 source /var/local/emhttp/var.ini
+			 source /var/local/emhttp/var.ini 2>/dev/null
 		else
 			fsState="n/a"
 			mdNumDisks="n/a"
