@@ -6,7 +6,7 @@ Type="xmenu"
 <link type="text/css" rel="stylesheet" href="/plugins/cmdline/css/cmdline.css">
 
 <div>
-    <iframe id="shell" src="<?=$shellinabox_http?>://<?=$shellinabox_host?>:<?=$shellinabox_port;?>">
+    <iframe id="shell" src="<?=htmlspecialchars($shellinabox_http);?>://<?=htmlspecialchars($shellinabox_host);?>:<?=htmlspecialchars($shellinabox_port);?>">
     </iframe>
 </div>
 
@@ -14,7 +14,7 @@ Type="xmenu"
 $(function(){
     $('.tabs')
         .append('<div class="tab"><input type="radio" name="tabs2" id="tab2"><label for="tab2"><img class="icon" src="/plugins/cmdline/icons/settings.png">Settings</label></div>')
-        .append('<span class="status">Status: <?=$shellinabox_status;?> </span>');
+        .append('<span class="status">Status: <?=addslashes($shellinabox_status);?> </span>');
 
     // hide dummy tab
     $('#tab2').parent().hide();
@@ -27,7 +27,7 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
-        showNotice('Command Line <?=$version?> available. <a>Update</a>','cmdline');
+        showNotice('Command Line <?=addslashes(htmlspecialchars($version));?> available. <a>Update</a>','cmdline');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });

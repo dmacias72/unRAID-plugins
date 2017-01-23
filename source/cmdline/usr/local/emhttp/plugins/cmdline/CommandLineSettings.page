@@ -21,20 +21,20 @@ Enable Shellinabox Server <?=$shellinabox_version;?>:
 > from the unRAID webgui at /Tools/CommandLineTools.
 
 Port (<?=$shellinabox_port_status;?>):
-: <input id="PORT" type="text" class="shellinabox-run" name="PORT" maxlength="40" value="<?=$shellinabox_port;?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
+: <input id="PORT" type="text" class="shellinabox-run" name="PORT" maxlength="40" value="<?=htmlspecialchars($shellinabox_port);?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
 
 > Port to access Shellinabox Server.
 >
 > Default port is 4200.
 
 Run as User:
-: <select id="USERS" class="shellinabox-run" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$shellinabox_runas;?>');">
+: <select id="USERS" class="shellinabox-run" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=htmlspecialchars($shellinabox_runas);?>');">
   <?=mk_option($shellinabox_runas, "nobody", "nobody");?>
   <?php foreach($shellinabox_users as $shellinabox_user){echo mk_option($shellinabox_runas, trim($shellinabox_user), trim($shellinabox_user));};?>
-  <option value='other' <?=($shellinabox_runas != "root" && $shellinabox_runas != "nobody" && !in_array($shellinabox_runas, $shellinabox_users))?"selected=yes":"";?>>other</option>
+  <option value='other' <?=(htmlspecialchars($shellinabox_runas) != "root" && htmlspecialchars($shellinabox_runas) != "nobody" && !in_array(htmlspecialchars($shellinabox_runas), $shellinabox_users))?"selected=yes":"";?>>other</option>
   <?=mk_option($shellinabox_runas, "root", "root");?>
   </select>
-  <input type="hidden" id="RUNAS" name="RUNAS" maxlength="40" value=<?=$shellinabox_runas;?> >
+  <input type="hidden" id="RUNAS" name="RUNAS" maxlength="40" value=<?=htmlspecialchars($shellinabox_runas);?> >
 
 > Select username you want to run Shellinabox Server.
 
@@ -94,7 +94,7 @@ Enable Root Home Directory Backup:
 $(function(){
     $('.tabs')
         .append('<div class="tab"><input type="radio" name="tabs2" id="tab2"><label for="tab2"><img class="icon" src="/plugins/cmdline/icons/terminal.png">Terminal</label></div>')
-        .append('<span class="status">Status: <?=$shellinabox_status;?> </span>');
+        .append('<span class="status">Status: <?=addslashes($shellinabox_status);?> </span>');
 
     // hide dummy tab
     $('#tab2').parent().hide();
@@ -108,14 +108,14 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
-        showNotice('Command Line <?=$version?> available. <a>Update</a>','cmdline');
+        showNotice('Command Line <?=addslashes(htmlspecialchars($version));?> available. <a>Update</a>','cmdline');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });
     <?endif;?>
 
     checkRUNNING(document.cmdline_settings);
-    checkUSER(document.cmdline_settings,'<?=$shellinabox_runas;?>');
+    checkUSER(document.cmdline_settings,'<?=addslashes(htmlspecialchars($shellinabox_runas));?>');
 });
 
 function resetDATA(form) {
@@ -129,7 +129,7 @@ function resetDATA(form) {
 }
 
 function checkRUNNING(form) {
-    if ("<?=$shellinabox_running;?>" == true)
+    if ("<?=addslashes(htmlspecialchars($shellinabox_running));?>" == true)
     {
         $('.shellinabox-run').prop('disabled', true);
         form.btnApply.disabled = true;
