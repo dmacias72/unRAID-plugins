@@ -8,22 +8,12 @@ require_once '/usr/local/emhttp/plugins/speedtest/include/scheduler_tab.php';
 ?>
 <script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['corechart']}]}"></script>
 
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
-<script type="text/javascript" src="/plugins/tablesorter/js/jquery.tablesorter.combined.min.js"></script>
-<script type="text/javascript" src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
-<script type="text/javascript" src="/plugins/tablesorter/js/widgets/widget-chart.min.js"></script>
-<script type="text/javascript" src="/plugins/tablesorter/js/widgets/widget-columnSelector.min.js"></script>
-
-<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
-<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
-
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/tablesorter-<?=$display['theme'];?>.css">
 <link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/speedtest.css">
-<script type="text/javascript" src="/plugins/speedtest/js/jquery.strftime-min.js"></script>
-
-<link rel="stylesheet" href="/plugins/speedtest/css/bootstrap.css">
-<link rel="stylesheet" href="/plugins/speedtest/css/bootstrap-<?=$display["theme"];?>.css">
-<script src="/plugins/speedtest/js/bootstrap.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/bootstrap.css">
+<link type="text/css" rel="stylesheet" href="/plugins/speedtest/css/bootstrap-<?=$display['theme'];?>.css">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
 <blockquote class="inline_help">
     <p>Speedtest results page shows a history of tests in a table that can be sorted and filtered.</p>
@@ -119,6 +109,14 @@ require_once '/usr/local/emhttp/plugins/speedtest/include/scheduler_tab.php';
 </div>
 
 <br>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/jquery.tablesorter.combined.min.js" integrity="sha256-vrKUVFL6e2WKZ1sZ8oMOt3E7+x48uoubEk9qmBEGVH0=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/extras/jquery.tablesorter.pager.min.js" integrity="sha256-GEOAUtPueDbpdxe9Rtm6DSMLKi8DcQru5rAbO65dv3c=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/widgets/widget-chart.min.js" integrity="sha256-FBIGSKBnnU3JRQ1sTT1/XNVfZwlDauf6hvSB4ft04g4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/widgets/widget-columnSelector.min.js" integrity="sha256-YZaLMaAttjI/ucZCuXystuDHYuZ3VlDwV4bsNN/gtYg=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chrono/1.0.5/chrono.min.js" integrity="sha256-TpYymdlIwwYG9H9xazgrBWaySFRR3xKTZfbbjmEGeT0=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script>
 $(function(){
@@ -450,7 +448,7 @@ function parseDataXML(){
 
             $('#tblTests tbody').append(
                 "<tr id='"+Name+"' title='click to show image'>"+
-                "<td class='tdShare' data-sortValue='"+Name+"' >"+strftime('%Y-%m-%d %H:%M %a', new Date(parseInt(Name))).trim()+"</td>"+
+                "<td class='tdShare' data-sortValue='"+Name+"' >"+new Date(parseInt(Name)).format('Y-m-d H:i D').trim()+"</td>"+
                 "<td class='tdShare'>"+Host+"</td>"+ //Host
                 "<td class='tdShare'>"+Distance+"</td>"+ //Distance
                 "<td class='tdShare'>"+Ping+"</td>"+ //Ping
@@ -497,8 +495,8 @@ function parseDataXML(){
 // open shadowbox and begin speedtest
 function beginTEST() {
     // open shadowbox window (run in foreground)
-    var run = '/logging.htm?cmd=/plugins/speedtest/scripts/speedtest-xml&arg1=--verbose';
-    var options = {modal:true,onClose:parseDataXML/*function(){parseDataXML();document.location.reload(true)}*/};
+    var run = '/logging.htm?cmd=/plugins/speedtest/scripts/speedtest-xml&arg1=--verbose'+"&csrf_token=<?=$var['csrf_token']?>";
+    var options = {modal:true,onClose:parseDataXML};
     Shadowbox.open({content:run, player:'iframe', title:'Speedtest', height:400, width:600, options:options});
 }
 
