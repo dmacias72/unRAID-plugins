@@ -1,2 +1,2 @@
 #!/bin/sh
-/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest-1.0.1.py $@
+/usr/bin/python /usr/local/emhttp/plugins/speedtest/scripts/speedtest-1.0.2.py $@
