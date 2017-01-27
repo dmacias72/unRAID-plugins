@@ -159,7 +159,7 @@ function ipmi_sensors_fans() {
         $size_raw = sizeof($sensor_raw);
         $sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
 
-        if ($sensor['Type'] == 'Fan')
+        if ($sensor['Type'] === 'Fan')
             $sensors[$sensor['ID']] = $sensor;
     }
     return $sensors; // sensor readings
@@ -173,10 +173,14 @@ function ipmi_sensors_fans() {
 
 ####  DO YOUR STUFF HERE  ####
 
-$raw  = '00 3a 01';
-$auto = '00 00 00 00 00 00 00 00';
-$full = '64 64 64 64 64 64 64 64';
-$fans = [];
+$sockets = intval(trim(shell_exec("/usr/bin/lscpu | grep 'Socket(s):' | awk '{print $2}'")));
+$lun     = '00';
+$netfn   = '3a';
+$cmd     = '01';
+$raw     = '00 3a 01';
+$auto    = '00 00 00 00 00 00 00 00';
+$full    = '64 64 64 64 64 64 64 64';
+$fans    = [];
 
 fanlog('Checking IPMI fan Locations...');
 
@@ -216,10 +220,10 @@ $cmd = "ipmi-raw $raw $auto $fanopts 2>&1";
 shell_exec($cmd);
 
 $board_json = [ $board =>
-        [ 'raw'  => $raw,
-          'auto' => $auto,
-          'full' => $full,
-          'fans' => $fans
+        [ 'raw'   => $raw,
+          'auto'  => $auto,
+          'full'  => $full,
+          'fans'  => $fans,
     ]
 ];
 

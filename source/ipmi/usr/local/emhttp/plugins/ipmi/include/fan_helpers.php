@@ -28,7 +28,7 @@ function ipmi_fan_sensors($ignore=null) {
         $size_raw = sizeof($sensor_raw);
         $sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
 
-        if ($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan')
+        if ($sensor['Type'] === 'Temperature' || $sensor['Type'] === 'Fan')
             $sensors[$sensor['ID']] = $sensor;
     }
     return $sensors; // sensor readings
@@ -42,8 +42,8 @@ function get_fanctrl_options(){
         $i = 0;
         foreach($fansensors as $id => $fan){
             if($i > 7) break;
-            if ($fan['Type'] == 'Fan'){
-                $name    = $fan['Name'];
+            if ($fan['Type'] === 'Fan'){
+                $name    = htmlspecialchars($fan['Name']);
                 $tempid  = 'TEMP_'.$name;
                 $temp    = $fansensors[$fancfg[$tempid]];
                 $templo  = 'TEMPLO_'.$name;
@@ -78,7 +78,7 @@ function get_fanctrl_options(){
                 '<dt><dl><dd>Temperature sensor:</dd></dl></dt><dd>',
                 '<select name="',$tempid,'" class="fanctrl-temp fanctrl-settings">',
                 '<option value="0">Auto</option>',
-                get_temp_options($fancfg[$tempid], true),
+                get_temp_options($fancfg[$tempid]),
                 '</select></dd></dl>';
 
                 // low temperature threshold
@@ -105,13 +105,13 @@ function get_fanctrl_options(){
                 $i++;
             }
         }
-    } elseif($board == 'Supermicro'){
+    } elseif($board === 'Supermicro'){
             // temperature sensor
             echo '<dl>',
             '<dt>Temperature sensor:</dt><dd>',
             '<select name="TEMP_FAN">',
             '<option value="0">Auto</option>',
-            get_temp_options($fancfg['TEMP_FAN'], true),
+            get_temp_options($fancfg['TEMP_FAN']),
             '</select></dd></dl>';
 
             // low temperature threshold
@@ -134,20 +134,38 @@ function get_fanctrl_options(){
 }
 
 /* get select options for temp & fan sensor types from fan ip*/
-function get_temp_options($selected=null){
+function get_temp_options($selected=0){
     global $fansensors, $fanip;
     $options = '';
     foreach($fansensors as $id => $sensor){
-        if (($sensor['Type'] == 'Temperature') || ($sensor['Name'] == 'HDD Temperature')){
+        if (($sensor['Type'] === 'Temperature') || ($sensor['Name'] === 'HDD Temperature')){
             $name = $sensor['Name'];
             $options .= "<option value='$id'";
 
             // set saved option as selected
-            if ($selected == $id)
+            if (intval($selected) === $id)
                 $options .= ' selected';
 
         $options .= ">$name</option>";
         }
+    }
+    return $options;
+}
+
+/* get options for high or low temp thresholds */
+function get_temp_range($range, $selected=0){
+    $temps = [20,80];
+    if ($range === 'HI')
+      rsort($temps);
+    $options = "";
+    foreach(range($temps[0], $temps[1], 5) as $temp){
+        $options .= "<option value='$temp'";
+
+        // set saved option as selected
+        if (intval($selected) === $temp)
+            $options .= " selected";
+
+        $options .= ">$temp</option>";
     }
     return $options;
 }
@@ -157,7 +175,7 @@ function get_min_options($limit){
     $options = '';
         for($i = 1; $i <= 64; $i++){
             $options .= '<option value="'.$i.'"';
-            if($limit == $i)
+            if(intval($limit) === $i)
                 $options .= ' selected';
 
             $options .= '>'.$i.'</option>';
@@ -172,7 +190,7 @@ function get_fanip_options(){
     $ips = explode(',',$ips);
         foreach($ips as $ip){
             $options .= '<option value="'.$ip.'"';
-            if($fanip == $ip)
+            if($fanip === $ip)
                 $options .= ' selected';
 
             $options .= '>'.$ip.'</option>';

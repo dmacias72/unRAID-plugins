@@ -3,8 +3,8 @@ Title="Sensors"
 Markdown="false"
 ---
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/tablesorter-<?=htmlspecialchars($display["theme"]);?>.css">
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
 
 <div>
@@ -41,8 +41,8 @@ Markdown="false"
     </blockquote>
 </div>
 
-<script src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
-<script src="/plugins/tablesorter/js/extras/jquery.tablesorter.pager.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/jquery.tablesorter.combined.min.js" integrity="sha256-vrKUVFL6e2WKZ1sZ8oMOt3E7+x48uoubEk9qmBEGVH0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/extras/jquery.tablesorter.pager.min.js" integrity="sha256-GEOAUtPueDbpdxe9Rtm6DSMLKi8DcQru5rAbO65dv3c=" crossorigin="anonymous"></script>
 <script src="/webGui/javascript/jquery.switchbutton.js"></script>
 <script>
 $(function(){

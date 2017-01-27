@@ -112,7 +112,7 @@ if($argf){
         exit(0);
 }
 
-if(!($force) && ($fanctrl == 'disable' )){
+if(!($force) && ($fanctrl === 'disable' )){
         echo "$prog is not enabled in $fancfg_file\ntype: $prog -f to force start".PHP_EOL;
         exit(0);
 }
@@ -250,7 +250,7 @@ function ipmi_fan_sensors() {
         $size_raw = sizeof($sensor_raw);
         $sensor = ($size_raw < 6) ? []: array_combine($keys, array_slice($sensor_raw,0,6,true));
 
-        if ($sensor['Type'] == 'Temperature' || $sensor['Type'] == 'Fan')
+        if ($sensor['Type'] === 'Temperature' || $sensor['Type'] === 'Fan')
             $sensors[$sensor['ID']] = $sensor;
     }
     return $sensors; // sensor readings
@@ -278,11 +278,11 @@ while(TRUE){ while(TRUE){
         $temp = isset($fancfg["TEMP_$fan"]) ? $fancfg["TEMP_$fan"] : '';
 
         if(!empty($temp)) {
-            $templo  = (isset($fancfg["TEMPLO_$fan"])) ? $fancfg["TEMPLO_$fan"]  : 30;
-            $temphi  = (isset($fancfg["TEMPHI_$fan"])) ? $fancfg["TEMPHI_$fan"]  : 40;
-            $fanmin  = (isset($fancfg["FANMIN_$fan"])) ? $fancfg["FANMIN_$fan"]  : 1;
+            $templo  = (isset($fancfg["TEMPLO_$fan"])) ? intval($fancfg["TEMPLO_$fan"])  : 30;
+            $temphi  = (isset($fancfg["TEMPHI_$fan"])) ? intval($fancfg["TEMPHI_$fan"])  : 40;
+            $fanmin  = (isset($fancfg["FANMIN_$fan"])) ? intval($fancfg["FANMIN_$fan"])  : 1;
             $reading = floatval($sensors[$temp]['Reading']);
-            $name    = $sensors[$temp]['Name'];
+            $name    = htmlspecialchars($sensors[$temp]['Name']);
 
             if ($reading <= $templo){
                 $pct = 0;

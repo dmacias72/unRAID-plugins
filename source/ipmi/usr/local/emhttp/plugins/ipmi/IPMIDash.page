@@ -3,8 +3,8 @@ Title="IPMI Summary"
 Cond="file_exists('/boot/config/plugins/ipmi/ipmidash')"
 ---
 <link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/ipmi.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter.css">
-<link type="text/css" rel="stylesheet" href="/plugins/tablesorter/css/tablesorter-<?=$display["theme"];?>.css">
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/tablesorter.css">
+<link type="text/css" rel="stylesheet" href="/plugins/ipmi/css/tablesorter-<?=$display["theme"];?>.css">
 <style>
 table.ipmi thead tr th{width:16.6%;padding-left:10px;}
 table.ipmi tbody tr td{padding-left:10px;font-weight:bold;}
@@ -15,7 +15,7 @@ table.ipmi tbody tr td{padding-left:10px;font-weight:bold;}
 <tbody></tbody>
 </table>
 
-<script src="/plugins/tablesorter/js/jquery.tablesorter.combined.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.4/js/jquery.tablesorter.combined.min.js" integrity="sha256-vrKUVFL6e2WKZ1sZ8oMOt3E7+x48uoubEk9qmBEGVH0=" crossorigin="anonymous"></script>
 <script>
 $(function(){
     $('#tblIPMIDash').tablesorter({
@@ -48,12 +48,11 @@ function sensorArray(Refresh){
             var UpperNR = parseFloat(sensor.UpperNR);
             var Color   = 'green';
             var Units   = '';
-            var Type    = sensor.Type;
 
             // only process sensor if reading is valid
             if(sensor.Reading != 'N/A'){
                 var Reading = parseFloat(sensor.Reading);
-                if(Type == 'Voltage'){
+                if(sensor.Type == 'Voltage'){
                     Units += ' ';
 
                     // if voltage is less than lower non-critical
@@ -66,14 +65,14 @@ function sensorArray(Refresh){
                     if(Reading < LowerC || Reading > UpperC)
                         Color = 'red';
 
-                }else if(Type == 'Fan'){
+                }else if(sensor.Type == 'Fan'){
                     Units += ' ';
 
                     // if Fan RPMs are less than lower non-critical
                     if(Reading < LowerNC || Reading < LowerC || Reading < LowerNR)
                         Color = "red";
 
-                }else if(Type == 'Temperature'){
+                }else if(sensor.Type == 'Temperature'){
                     Units += '&deg;';
 
                     // if temperature is greater than upper non-critical show critical

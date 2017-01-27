@@ -58,17 +58,17 @@ Enable Network Connection(s):
 > Useful when monitoring local server as well as a backup server or two.
 
 <label class="seld-run ipmi-lan">IP Address(es):</label>
-: <input id="IPADDR" type="text" class="seld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=$ipaddr;?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$conn;?></label>
+: <input id="IPADDR" type="text" class="seld-run ipmi-lan ipmi-ipaddr" name="IPADDR" maxlength="66" value="<?=htmlspecialchars($ipaddr);?>" title="IPMI IP address" placeholder="" ><label class='ipmi-lan'><?=$conn;?></label>
 
 > Add up to four different IPMI IP addresses to monitor sensors and events.
 
 <label class="seld-run ipmi-lan">User Name:</label>
-: <input id="USER" type="text" class="seld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=$user;?>" title="username for network access IPMI" placeholder="username for network access" >
+: <input id="USER" type="text" class="seld-run ipmi-lan ipmi-user" name="USER" maxlength="40" value="<?=htmlspecialchars($user);?>" title="username for network access IPMI" placeholder="username for network access" >
 
 > Username for IPMI connections(s).
 
 <label class="seld-run ipmi-lan">Password:</label>
-: <input id="PASSWORD" type="password" class="seld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=$password;?>" title="password for network access IPMI" placeholder="password for network access" >
+: <input id="PASSWORD" type="password" class="seld-run ipmi-lan ipmi-password" name="PASSWORD" maxlength="40" value="<?=htmlspecialchars($password);?>" title="password for network access IPMI" placeholder="password for network access" >
 
 > Password for IPMI connection(s).
 
@@ -93,7 +93,7 @@ Global Available Sensors:
     <?=ipmi_get_enabled($ignore);?>
   </select>
 
-<input type="hidden" id="IGNORE" name="IGNORE" value="<?=$ignore;?>" />
+<input type="hidden" id="IGNORE" name="IGNORE" value="<?=htmlspecialchars($ignore);?>" />
 
 <input type="hidden" id="select-svc" value="">
 
@@ -110,9 +110,9 @@ Dashboard Sensors:
     <?=ipmi_get_enabled($dignore);?>
   </select>
 
-<input type="hidden" id="DIGNORE" name="DIGNORE" value="<?=$dignore;?>" />
+<input type="hidden" id="DIGNORE" name="DIGNORE" value="<?=htmlspecialchars($dignore);?>" />
 
-<input type="hidden" id="select-dash-svc" name="DASH" value="<?=$dash;?>">
+<input type="hidden" id="select-dash-svc" name="DASH" value="<?=htmlspecialchars($dash);?>">
 
 > Check sensors to show in Dashboard display. 
 >
@@ -169,7 +169,7 @@ Sensor #4:
 : <input type="submit" value="Apply"><input type="button" value="Done" onClick="done()">
 </form>
 
-<script type="text/javascript" src="/plugins/ipmi/js/jquery.mask.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.9/jquery.mask.min.js" integrity="sha256-j9bZfF4eKVp8Zrzq/zna8WWo5lroqN1yKEQ8qvBfK1A=" crossorigin="anonymous"></script>
 <script src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script>
@@ -180,7 +180,7 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('ipmi')):?>
-        showNotice('IPMI <?=$version?> available. <a>Update</a>','ipmi');
+        showNotice('IPMI <?=htmlspecialchars($version);?> available. <a>Update</a>','ipmi');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });
@@ -195,7 +195,7 @@ $(function(){
         .error(function() {
             $('.board-img').attr('src', '/plugins/ipmi/images/unknown.png');
         })
-        .attr('src', "/plugins/ipmi/images/<?=$board;?>.png");
+        .attr('src', "/plugins/ipmi/images/<?=htmlspecialchars($board);?>.png");
 
     $('#bmc-reset').on('click', resetBMC);
 
@@ -229,7 +229,7 @@ function DDCheckList(Select,Values,Message) {
             var Unchecked = 1;
             var Size = selector.options.length;
             for( i=1; i < Size; i++ ) {
-                if ((selector.options[i].selected == false) && (selector.options[i].value != '')){
+                if ((selector.options[i].selected === false) && (selector.options[i].value !== '')){
                     if (values != '')
                         values += ',';
                 values += selector.options[i].value;
@@ -238,7 +238,7 @@ function DDCheckList(Select,Values,Message) {
         }
         $(Values).val(values);
 
-            if(Size == Unchecked)
+            if(Size === Unchecked)
                 $(Select+'-svc').val('disable');
             else
                 $(Select+'-svc').val('enable');
@@ -278,7 +278,7 @@ function checkSELD(form) {
     form.COMMAND.value = '/usr/local/emhttp/plugins/ipmi/scripts/seld_start';
    }
 
-    if ("<?=$seld_run;?>" == true)
+    if ("<?=$seld_run;?>" === true)
     {
         $('.seld-run').prop('disabled', true);
         $('#btnApply').disabled = 'disabled';
@@ -307,7 +307,7 @@ function checkNETWORK(form) {
         $('.ipmi-lan').hide();
     else {
         $('.ipmi-lan').show();
-        $('.ipmi-lan').prop('disabled', (form.IPMISELD.value == 'enable'));
+        $('.ipmi-lan').prop('disabled', (form.IPMISELD.value === 'enable'));
    }
 }
 

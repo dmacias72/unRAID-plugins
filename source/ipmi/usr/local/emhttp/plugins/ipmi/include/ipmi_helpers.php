@@ -2,25 +2,25 @@
 require_once '/usr/local/emhttp/plugins/ipmi/include/ipmi_options.php';
 require_once '/usr/local/emhttp/plugins/ipmi/include/fan_helpers.php';
 
-$action = array_key_exists('action', $_GET) ? $_GET['action'] : '';
+$action = array_key_exists('action', $_GET) ? htmlspecialchars($_GET['action']) : '';
 $hdd_temp = get_highest_temp();
 
 if (!empty($action)) {
     $state = ['Critical' => 'red', 'Warning' => 'yellow', 'Nominal' => 'green', 'N/A' => 'blue'];
-    if ($action == 'ipmisensors'){
-        $return  = ['Sensors' => ipmi_sensors($ignore),'Network' => ($netsvc == 'enable'),'State' => $state];
+    if ($action === 'ipmisensors'){
+        $return  = ['Sensors' => ipmi_sensors($ignore),'Network' => ($netsvc === 'enable'),'State' => $state];
         echo json_encode($return);
     }
-    elseif($action == 'ipmievents'){
-        $return  = ['Events' => ipmi_events(),'Network' => ($netsvc == 'enable'),'State' => $state];
+    elseif($action === 'ipmievents'){
+        $return  = ['Events' => ipmi_events(),'Network' => ($netsvc === 'enable'),'State' => $state];
         echo json_encode($return);
     }
-    elseif($action == 'ipmiarch'){
-        $return  = ['Archives' => ipmi_events(true), 'Network' => ($netsvc == 'enable'), 'State' => $state];
+    elseif($action === 'ipmiarch'){
+        $return  = ['Archives' => ipmi_events(true), 'Network' => ($netsvc === 'enable'), 'State' => $state];
         echo json_encode($return);
     }
-    elseif($action == 'ipmidash') {
-        $return  = ['Sensors' => ipmi_sensors($dignore), 'Network' => ($netsvc == 'enable'),'State' => $state];
+    elseif($action === 'ipmidash') {
+        $return  = ['Sensors' => ipmi_sensors($dignore), 'Network' => ($netsvc === 'enable'),'State' => $state];
         echo json_encode($return);
     }
 }
@@ -34,26 +34,8 @@ function get_highest_temp(){
         if(is_numeric($temp))
             $highest_temp = ($temp > $highest_temp) ? $temp : $highest_temp;
     }
-    $return = ($highest_temp == 0) ? 'N/A': $highest_temp;
+    $return = ($highest_temp === 0) ? 'N/A': $highest_temp;
     return $return;
-}
-
-/* get options for high or low temp thresholds */
-function get_temp_range($range, $selected=null){
-    $temps = [20,80];
-    if ($range == 'HI')
-      rsort($temps);
-    $options = "";
-    foreach(range($temps[0], $temps[1], 5) as $temp){
-        $options .= "<option value='$temp'";
-
-        // set saved option as selected
-        if ($selected == $temp)
-            $options .= " selected";
-
-        $options .= ">$temp</option>";
-    }
-    return $options;
 }
 
 /* get an array of all sensors and their values */
@@ -64,7 +46,7 @@ function ipmi_sensors($ignore=null) {
     if(!($ipmi || !empty($netopts)))
         return [];
 
-    $ignored = (empty($ignore)) ? '' : "-R $ignore";
+    $ignored = (empty($ignore)) ? '' : '-R '.escapeshellarg($ignore);
     $cmd = '/usr/sbin/ipmi-sensors --output-sensor-thresholds --comma-separated-output '.
         "--output-sensor-state --no-header-output --interpret-oem-data $netopts $ignored 2>/dev/null";
     exec($cmd, $output, $return_var=null);
@@ -104,7 +86,7 @@ function ipmi_sensors($ignore=null) {
             $id = explode(':',$sensor['ID']);
             $sensor['IP'] = trim($id[0]);
             $sensor['ID'] = trim($id[1]);
-            if ($sensor['IP'] == 'localhost')
+            if ($sensor['IP'] === 'localhost')
                 $sensor['IP'] = '127.0.0.1';
 
             // add sensor to array of sensors
@@ -172,7 +154,7 @@ function ipmi_events($archive=null){
                 $event['ID'] = $event['Time'];
             else
                 $event['ID'] = trim($id[1]);
-            if ($event['IP'] == 'localhost')
+            if ($event['IP'] === 'localhost')
                 $event['IP'] = '127.0.0.1';
 
             // add event to array of events
@@ -187,11 +169,11 @@ function ipmi_get_options($selected=null){
     global $sensors;
     $options = "";
     foreach($sensors as $id => $sensor){
-        if (($sensor['Type'] == 'Temperature') || ($sensor['Type'] == 'Fan') || ($sensor['Type'] ==  'OEM Reserved')){
+        if (($sensor['Type'] === 'Temperature') || ($sensor['Type'] === 'Fan') || ($sensor['Type'] === 'OEM Reserved')){
             $name = $sensor['Name'];
-            $reading  = ($sensor['Type'] ==  'OEM Reserved') ? $sensor['Event'] : $sensor['Reading'];
-            $ip = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
-            $units    = is_numeric($reading)    ? $sensor['Units'] : '';
+            $reading  = ($sensor['Type'] === 'OEM Reserved') ? $sensor['Event'] : $sensor['Reading'];
+            $ip       = (empty($sensor['IP'])) ? '' : " (${sensor['IP']})";
+            $units    = is_numeric($reading) ? $sensor['Units'] : '';
             $options .= "<option value='$id'";
 
             // set saved option as selected
@@ -217,7 +199,7 @@ function ipmi_get_enabled($ignore){
     foreach($allsensors as $sensor){
         $id       = $sensor['ID'];
         $reading  = $sensor['Reading'];
-        $units    = ($reading == 'N/A') ? '' : " ${sensor['Units']}";
+        $units    = ($reading === 'N/A') ? '' : " ${sensor['Units']}";
         $ip       = (empty($netopts))   ? '' : " ${sensor['IP']}";
         $options .= "<option value='$id'";
 
