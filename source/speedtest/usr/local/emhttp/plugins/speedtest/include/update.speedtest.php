@@ -15,10 +15,10 @@
 require_once '/usr/local/emhttp/webGui/include/Wrappers.php';
 
 if ($_POST['mode']>0) {
-  $hour = isset($_POST['hour']) ? $_POST['hour'] : '*';
-  $min  = isset($_POST['min'])  ? $_POST['min']  : '*';
-  $dotm = isset($_POST['dotm']) ? $_POST['dotm'] : '*';
-  $day  = isset($_POST['day'])  ? $_POST['day']  : '*';
+  $hour = isset($_POST['hour']) ? intval($_POST['hour']) : '*';
+  $min  = isset($_POST['min'])  ? intval($_POST['min'])  : '*';
+  $dotm = isset($_POST['dotm']) ? intval($_POST['dotm']) : '*';
+  $day  = isset($_POST['day'])  ? intval($_POST['day'])  : '*';
   $cron = "# Generated speedtest schedule:\n$min $hour $dotm * $day /usr/sbin/speedtest-xml &> /dev/null\n\n";
 } else {
   $cron = "";

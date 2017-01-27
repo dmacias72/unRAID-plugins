@@ -102,7 +102,7 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('speedtest')):?>
-        showNotice('Speedtest <?=addslashes(htmlspecialchars($version))?> available. <a>Update</a>','speedtest');
+        showNotice('Speedtest <?=htmlspecialchars($version);?> available. <a>Update</a>','speedtest');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });
@@ -119,11 +119,11 @@ $(function(){
 
     // goto scheduler tab
     $('#tab4').click(function() {
-        $.cookie('one', "<?='tab'.$scheduler_tab?>", { expires:null, path: '/'});
+        $.cookie('one', "<?='tab'.intval($scheduler_tab);?>", { expires:null, path: '/'});
         location = '/Settings/Scheduler';
     });
 
-    var Selected = "<?=addslashes(htmlspecialchars($speedtest_server));?>";
+    var Selected = "<?=$speedtest_server;?>";
 
     $('#LIST').change(function () {
         if ($('#LIST')[0].selectedIndex){
@@ -153,7 +153,7 @@ $(function(){
 
 function resetDATA(form) {
     form.VERSION.value = '1.0.2';
-    form.TIMEOUT.value = '10';
+    form.TIMEOUT.value = 10;
     form.SECURE.value  = 'no';
     form.SHARE.value   = '--share';
     form.UNITS.value   = 'bits';
@@ -163,7 +163,7 @@ function resetDATA(form) {
 
 // list all available servers
 function getServerList(Select){
-    $.getJSON('/plugins/speedtest/include/speedtest-list.php', {select: Select, 'csrf_token': "<?=$var['csrf_token']?>"}, function(Options) {
+    $.getJSON('/plugins/speedtest/include/speedtest-list.php', {select: Select}, function(Options) {
         $('#SERVER').html(Options);
     });
 }
