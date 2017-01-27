@@ -19,9 +19,9 @@ if($ipmi || !empty($netopts)) {
     $ipmi_config = file_get_contents($config_file);
 }
 ?>
-<link type="text/css" rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/lib/codemirror.css">
-<link type="text/css" rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.css">
-<link type="text/css" rel="stylesheet" href="/plugins/ipmi/js/CodeMirror/addon/dialog/dialog.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.min.css" integrity="sha256-B4lcRQIA/hXjqRxuZHImRuHmb0IT1kscrY9mYJ7FsMs=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/show-hint.min.css" integrity="sha256-GttU7Ba1ZLRu9reNxZVI5T87aX1mDTcjLxhfR/clb1M=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/dialog/dialog.min.css" integrity="sha256-YJKyPh6e25gWJyCXgvzIKoFDE1i3lw9UqKwrk0h29wQ=" crossorigin="anonymous" />
 
 <style type="text/css">
     .CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
@@ -80,14 +80,14 @@ if($ipmi || !empty($netopts)) {
     </p>
 </blockquote>
 
-<script src="/plugins/ipmi/js/CodeMirror/lib/codemirror.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/dialog/dialog.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/display/placeholder.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/hint/show-hint.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/mode/properties/properties.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/hint/anyword-hint.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/search/searchcursor.js"></script>
-<script src="/plugins/ipmi/js/CodeMirror/addon/search/search.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.min.js" integrity="sha256-nP4BK+NXVKsqHwyv0YAYpYMGQMULLFsQAmrYhr9PUok=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/dialog/dialog.min.js" integrity="sha256-KbBuDRpfbnVjlUhzPVbdWqcaMQDwf9FjH5NGlSma2/Y=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/display/placeholder.min.js" integrity="sha256-dZ1hbx09AEbStymNkjE7umqi7DqhAtuC5cvId0603Yk=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/show-hint.min.js" integrity="sha256-lOBfrUiGFzYN0fjJph7p21pyXxNNCWN8jL/jrd6VpJc=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/properties/properties.min.js" integrity="sha256-sYjmbbbVaUIwHFPmA/ipJMFD64xAucwyitEVb0+8qjA=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/anyword-hint.min.js" integrity="sha256-QpELQ3xE5bkkc1rdv5i7pSBPSK06rljJXh0AHKHJSjw=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/searchcursor.min.js" integrity="sha256-+WHQ6GVZ+En4S8tktYbST09huK+qux1Gvhqq5b9Pq+I=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/search.min.js" integrity="sha256-jR746s3yEfafMDDa+uuOQ/9dh9KdTaSCnFDITGs0mIk=" crossorigin="anonymous"></script>
 
 <script>
 $(function(){
