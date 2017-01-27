@@ -106,7 +106,7 @@ function archiveArray(){
             '<td>'+ archive.Name  +'</td>'+ //sensor name
             '<td>'+ archive.Type  +'</td>'+ //archive type
             '<td>'+ archive.Event +'</td>'+ //archive description
-            '<td></td>'+//<a class="delete-archive"><i class="fa fa-trash" title="delete"></i></a></td>'+ //delete icon
+            '<td></td>'+
             '</tr>');
         });
 
