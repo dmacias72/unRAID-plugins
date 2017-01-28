@@ -21,7 +21,7 @@ Enable Shellinabox Server <?=$shellinabox_version;?>:
 > from the unRAID webgui at /Tools/CommandLineTools.
 
 Port (<?=$shellinabox_port_status;?>):
-: <input id="PORT" type="text" class="shellinabox-run" name="PORT" maxlength="40" value="<?=htmlspecialchars($shellinabox_port);?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
+: <input id="PORT" type="text" class="shellinabox-run" name="PORT" maxlength="40" value="<?=intval($shellinabox_port);?>" title="port must be 0-65535" placeholder="Default Port is 4200" >
 
 > Port to access Shellinabox Server.
 >
@@ -108,14 +108,14 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('cmdline')):?>
-        showNotice('Command Line <?=addslashes(htmlspecialchars($version));?> available. <a>Update</a>','cmdline');
+        showNotice('Command Line <?=htmlspecialchars($version);?> available. <a>Update</a>','cmdline');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });
     <?endif;?>
 
     checkRUNNING(document.cmdline_settings);
-    checkUSER(document.cmdline_settings,'<?=addslashes(htmlspecialchars($shellinabox_runas));?>');
+    checkUSER(document.cmdline_settings,'<?=htmlspecialchars($shellinabox_runas);?>');
 });
 
 function resetDATA(form) {
@@ -129,20 +129,19 @@ function resetDATA(form) {
 }
 
 function checkRUNNING(form) {
-    if ("<?=addslashes(htmlspecialchars($shellinabox_running));?>" == true)
-    {
-        $('.shellinabox-run').prop('disabled', true);
-        form.btnApply.disabled = true;
-   }else{
-    $('.shellinabox-run').prop('disabled', false);
- }
-
-    if (form.SERVICE.value == 'enable')
+    if (form.SERVICE.value === 'enable')
         form.command.value = '/usr/local/emhttp/plugins/cmdline/scripts/start';
     else {
         form.command.value = '/usr/local/emhttp/plugins/cmdline/scripts/stop';
-        form.btnApply.disabled = (form.SERVICE.value == 'enable');
+        $('#btnApply').prop('disabled', false);
     }
+    if ("<?=$shellinabox_running;?>" == true){
+        $('.shellinabox-run').prop('disabled', true);
+        $('#btnApply').disabled = 'disabled';
+    }else{
+        $('.shellinabox-run').prop('disabled', false);
+        $('#btnApply').prop('disabled', false);
+ }
 }
 
 function checkUSER(form, currentUSER) {
@@ -153,7 +152,7 @@ function checkUSER(form, currentUSER) {
     else
     {
         form.RUNAS.value = currentUSER;
-        if (form.RUNAS.value == 'root')
+        if (form.RUNAS.value === 'root')
             form.RUNAS.value = 'nobody';
         form.RUNAS.type = 'text';
         form.RUNAS.title = 'Run As User Cannot be Root';
@@ -164,16 +163,16 @@ function verifyDATA(form) {
     if (!jQuery.isNumeric(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
             form.PORT.value = 4200;
     }
-    if (form.RUNAS.value == null || form.RUNAS.value == ''){
+    if (form.RUNAS.value === null || form.RUNAS.value === ''){
         form.RUNAS.value = 'nobody';
         $shellinabox_runas = 'nobody';
     }
     form.SERVICE.value = form.SERVICE.value.replace(/ /g,'_');
-    form.IPADDR.value = form.IPADDR.value.replace(/ /g,'_');
-    form.SSL.value = form.SSL.value.replace(/ /g,'_');
-    form.SCREEN.value = form.SCREEN.value.replace(/ /g,'_');
-    form.PORT.value = form.PORT.value.replace(/ /g,'_');
-    form.RUNAS.value = form.RUNAS.value.replace(/ /g,'_');
+    form.IPADDR.value  = form.IPADDR.value.replace(/ /g,'_');
+    form.SSL.value     = form.SSL.value.replace(/ /g,'_');
+    form.SCREEN.value  = form.SCREEN.value.replace(/ /g,'_');
+    form.PORT.value    = form.PORT.value.replace(/ /g,'_');
+    form.RUNAS.value   = form.RUNAS.value.replace(/ /g,'_');
 }
 
 </script>
