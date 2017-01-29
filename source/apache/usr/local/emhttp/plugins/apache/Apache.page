@@ -1,29 +1,7 @@
 Menu="WebServer:1"
 Title="Web Server"
 ---
-<?
-$sName = 'httpd';
-$errorMsg = '';
-$apache_datasize = 0;
-$apache_cfg = parse_plugin_cfg("apache");
-$apache_service = isset($apache_cfg['SERVICE']) ? $apache_cfg['SERVICE'] : 'disable';
-$apache_docroot = isset($apache_cfg['DOCROOT']) ? $apache_cfg['DOCROOT'] : '/var/www/html';
-$apache_runas = isset($apache_cfg['RUNAS'])     ? $apache_cfg['RUNAS']   : 'nobody';
-$apache_port = (isset($apache_cfg['PORT']) && is_numeric($apache_cfg['PORT']) && $apache_cfg['PORT'] > 0 && $apache_cfg['PORT'] < 65535 ) ? $apache_cfg['PORT'] : 8088;
-$apache_running = trim(shell_exec( "[ -f /proc/`cat /var/run/httpd.pid 2> /dev/null`/exe ] && echo 'yes' || echo 'no' 2> /dev/null" ));
-$apache_version = shell_exec( "/usr/sbin/httpd -v | grep version | sed -e 's/^Server version: Apache\///'" );
-if (is_dir($apache_docroot)) {
-    $apache_datasize = trim(shell_exec("du -shm '$apache_docroot' | cut -f1 | sed 's/[^0-9]*//g'"));
-    if (trim(shell_exec("stat -f -c '%T' '$apache_docroot'")) == 'tmpfs' ){
-        $errorMsg = 'Your directory WILL NOT survive reboot!';
-    };
-} else
-    $errorMsg = 'Your directory does not exist.';
-$apache_version = ($apache_running == 'yes') ?
-    "<a style='color:green;' href='http://{$var['NAME']}:$apache_port' title='http://{$var['NAME']}:$apache_port' target='_blank'><b>$apache_version</b></a>":
-    "<b><font style='color:orange;'>$apache_version</font></b>";
-exec("awk -F':' '{ if ( $3 >= 1000 ) print $1}' /etc/passwd", $apache_users); // get array of group users
-?>
+<? require_once '/usr/local/emhttp/plugins/apache/include/apache_settings.php'; ?>
 <link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.filetree.css">
 <style type="text/css">
     .errortext{color: #EF3D47;display: none;}
@@ -36,7 +14,7 @@ exec("awk -F':' '{ if ( $3 >= 1000 ) print $1}' /etc/passwd", $apache_users); //
 <input type="hidden" id="command" name="#command" value="" />
 
 Enable Apache Server <?=$apache_version;?>:
-:   <select id="SERVICE" name="SERVICE" size="1" onChange="checkRUNNING(this.form);">
+:   <select id="SERVICE" name="SERVICE" size="1" >
         <?=mk_option($apache_service, "disable", "No");?>
         <?=mk_option($apache_service, "enable", "Yes");?>
     </select>
@@ -47,7 +25,7 @@ Enable Apache Server <?=$apache_version;?>:
 > or by clicking on the hyperlink below next to port.
 
 Document Root directory (<?=$apache_datasize;?>MB):
-: <input id="DOCROOT" class="apache-run" type="text" name="DOCROOT" maxlength="60" value="<?=$apache_docroot;?>" data-pickcloseonfile="true" data-pickfilter="." data-pickroot="/mnt/" data-pickfolders="true" required="required" title="must be on cache, array or other drive to survive reboot" placeholder="e.g. /mnt/cache/www for persistent data"><label class="errortext"><?=$errorMsg?></label>
+: <input id="DOCROOT" class="apache-run" type="text" name="DOCROOT" maxlength="60" value="<?=htmlspecialchars($apache_docroot);?>" data-pickcloseonfile="true" data-pickfilter="." data-pickroot="/mnt/" data-pickfolders="true" required="required" title="must be on cache, array or other drive to survive reboot" placeholder="e.g. /mnt/cache/www for persistent data"><label class="errortext"><?=htmlspecialchars($errorMsg);?></label>
 
 > Path to the Docroot of Apache Web Server.
 >
@@ -55,22 +33,22 @@ Document Root directory (<?=$apache_datasize;?>MB):
 
 
 Port:
-: <input type="text" class="apache-run" name="PORT" maxlength="40" value="<?=$apache_port;?>" title="port must be 0-65535" placeholder="Default Port is 8000" >
+: <input type="text" class="apache-run" name="PORT" maxlength="40" value="<?=$apache_port;?>" title="port must be 0-65535" placeholder="Default Port is 8088" >
 
 > Port to access Apache Web Server.
 >
 > Default port is 8088.
 
 Run as User:
-: <select id="USERS" class="apache-run" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=$apache_runas;?>');">
+: <select id="USERS" class="apache-run" title="select user, cannot be root" size="1" >
   <?=mk_option($apache_runas, "nobody", "nobody");?>
   <?php foreach($apache_users as $apache_user){echo mk_option($apache_runas, trim($apache_user), trim($apache_user));};?>
   <option value='other' <?=($apache_runas != "root" && $apache_runas != "nobody" && !in_array($apache_runas, $apache_users))?"selected=yes":"";?>>other</option>
   </select>
-  <input type="hidden" id="RUNAS" name="RUNAS" maxlength="40" value=<?=$apache_runas;?> >
+  <input type="hidden" id="RUNAS" name="RUNAS" maxlength="40" value="<?=htmlspecialchars($apache_runas);?>">
 
-<input id="DEFAULT" class="apache-run" type="submit" value="Default" onClick="resetDATA(this.form)">
-: <input id="btnApply" type="submit" value="Apply" style="margin-bottom:8px" onClick="verifyDATA(this.form);"><button type="button" style="margin-bottom:20px" onClick="done()">Done</button><input id="btnRestart" type="submit" value="Restart" style="margin-bottom:8px" onClick="Restart(this.form);">
+<input id="DEFAULT" class="apache-run" type="submit" value="Default"><button id="btnConnect" type="button">Connect</button>
+: <input id="btnApply" type="submit" value="Apply" style="margin-bottom:8px;"><button type="button" style="margin-bottom:20px;" onClick="done()">Done</button><input id="btnRestart" type="submit" value="Restart" style="margin-bottom:8px;">
 </form>
 
 > Select username you want to run Apache Web Server.
@@ -106,14 +84,23 @@ $(function(){
 
     // dynamix plugin update api
     <?if (function_exists('plugin_update_available') && $version = plugin_update_available('apache')):?>
-        showNotice('Apache <?=$version?> available. <a>Update</a>','apache');
+        showNotice('Apache <?=htmlspecialchars($version);?> available. <a>Update</a>','apache');
         $('#user-notice a').on('click', function () {
             $('#user-notice').empty();
         });
     <?endif;?>
 
-    checkRUNNING(document.apache_settings);
-    checkUSER(document.apache_settings,'<?=$apache_runas;?>');
+    checkRUNNING();
+    checkUSER();
+
+    $('#SERVICE').on('change', checkRUNNING);
+    $('#USERS').on('change', checkUSER);
+    $('#DEFAULT').on('click', resetDATA);
+    $('#btnApply').on('click', verifyDATA);
+    $('#btnRestart').on('click', Restart);
+    $('#btnConnect').on('click',function () {
+        window.open('http://'+"<?=htmlspecialchars($apache_name);?>"+':'+"<?=htmlspecialchars($apache_port);?>", '_blank').focus();
+    })
 
     $('.btnClear').on('click', Clear);
 
@@ -122,73 +109,74 @@ $(function(){
     });
 });
 
-function resetDATA(form) {
-    form.DOCROOT.value = '/var/www/html';
-    form.PORT.value    =  8088;
-    form.RUNAS.value   = 'nobody';
-    form.USERS.value   = 'nobody';
+function resetDATA() {
+    $('#DOCROOT').val('/var/www/html');
+    $('#PORT').val(8088);
+    $('#RUNAS').val('nobody');
+    $('#USERS').val('nobody');
 }
 
-function checkRUNNING(form) {
-    if ("<?=$apache_running;?>" == 'yes'){
+function checkRUNNING() {
+    if ($('#SERVICE').val() === 'enable'){
+        $('#command').val('/usr/local/emhttp/plugins/apache/scripts/start');
+    } else {
+        $('#command').val('/usr/local/emhttp/plugins/apache/scripts/stop');
+        $('#btnApply').prop('disabled', false);
+    }
+    if ("<?=$apache_running;?>" == true){
         $('.apache-run').prop('disabled', true);
-        form.btnApply.disabled   = true;
-        form.btnRestart.disabled = false;
+        $('#btnApply').disabled = 'disabled';
+        $('#btnRestart').prop('disabled', false);
+        $('#btnConnect').prop('disabled', false);
     }else{
         $('.apache-run').prop('disabled', false);
-        form.btnRestart.disabled = true;
-    }
-    if (form.SERVICE.value == 'enable'){
-        form.command.value = '/usr/local/emhttp/plugins/apache/scripts/start';
-    } else {
-        form.command.value = '/usr/local/emhttp/plugins/apache/scripts/stop';
-        form.btnApply.disabled = (form.SERVICE.value == 'enable');
+        $('#btnApply').prop('disabled', false);
+        $('#btnRestart').prop('disabled', true);
+        $('#btnConnect').prop('disabled', true);
     }
 }
 
-function checkUSER(form, currentUSER) {
-    if (form.USERS.value != 'other' ) {
-        form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
-        form.RUNAS.type  = 'hidden';
-    }
-    else
-    {
-        form.RUNAS.value = currentUSER;
-        if (form.RUNAS.value == 'root')
-            form.RUNAS.value = 'nobody';
-        form.RUNAS.type  = 'text';
-        form.RUNAS.title = 'Run As User Cannot be Root';
+function checkUSER() {
+    if ($('#USERS').val() != 'other' ) {
+        $('#RUNAS').val($('#USERS option:selected').val());
+        $('#RUNAS').prop('type', 'hidden');
+    }else{
+        $('#RUNAS').val("<?=htmlspecialchars($apache_runas);?>");
+        if ($('#RUNAS').val() === 'root')
+            $('#RUNAS').val('nobody');
+        $('#RUNAS').prop('type', 'text');
+        $('#RUNAS').prop('title', 'Run As User Cannot be Root');
     }
 }
 
-function verifyDATA(form) {
-    if (form.DOCROOT.value == null || !(/\S/.test(form.DOCROOT.value))){
-        form.DOCROOT.value = '/var/www/html';
+function verifyDATA() {
+    if ($('#DOCROOT').val() === null || !(/\S/.test($('#DOCROOT').val()))){
+        $('#DOCROOT').val('/var/www/html');
     }
-    if (!jQuery.isNumeric(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
-            form.PORT.value = 8088;
+    if (!jQuery.isNumeric($('#PORT').val()) || $('#PORT').val() < 0 || $('#PORT').val() > 65535){
+            $('#PORT').val(8088);
     }
-    if (form.RUNAS.value == null || form.RUNAS.value == '' || form.RUNAS.value == 'root' ){
-        form.RUNAS.value = 'nobody';
-        $apache_runas    = 'nobody';
+    if ($('#RUNAS').val() === null || $('#RUNAS').val() === '' || $('#RUNAS').val() === 'root' ){
+        $('#RUNAS').val('nobody');
+        $apache_runas = 'nobody';
     }
-    if (form.DOCROOT.value == ''){
-        form.DOCROOT.value = '/mnt/';
+    if ($('#DOCROOT').val() === ''){
+        $('#DOCROOT').val('/mnt/');
     }
-    form.SERVICE.value = form.SERVICE.value.replace(/ /g,"_");
-    form.DOCROOT.value = form.DOCROOT.value.replace(/ /g,"_");
-    form.PORT.value    = form.PORT.value.replace(/ /g,"_");
-    form.RUNAS.value   = form.RUNAS.value.replace(/ /g,"_");
+    $('#SERVICE').val( $('#SERVICE').val().replace(/ /g,"_") );
+    $('#DOCROOT').val( $('#DOCROOT').val().replace(/ /g,"_") );
+    $('#RUNAS').val( $('#RUNAS').val().replace(/ /g,"_") );
 }
 
 function Clear(){
     var par = $(this).parent().parent();
     var log = par.children('td:nth-child(1)').text().trim();
-    $.get('/plugins/apache/include/ClearLogFile.php', {log: log},function() {
+    $.post('/plugins/apache/include/ClearLogFile.php', {log: log},function() {
         par.children('td:nth-child(2)').html('0');
     });
 }
 
-function Restart(form){
-    form.command.value = '/usr/local/emhttp/plugins/apache/scripts/restart'}
+function Restart(){
+    $('#command').val('/usr/local/emhttp/plugins/apache/scripts/restart');
+}
 </script>
