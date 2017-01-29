@@ -3,16 +3,16 @@ Title="Config Editor"
 Markdown="false"
 ---
 <?
-$httpd_path = '/boot/config/plugins/apache/httpd';
+$httpd_path   = '/boot/config/plugins/apache/httpd';
 $httpd_file   = "$httpd_path/httpd.conf";
 $edit_file = '';
 if(file_exists($httpd_file))
     $edit_file = file_get_contents($httpd_file);
 ?>
 
-<link rel="stylesheet" href="/plugins/apache/js/CodeMirror/lib/codemirror.css">
-<link rel="stylesheet" href="/plugins/apache/js/CodeMirror/addon/dialog/dialog.css">
-<link rel="stylesheet" href="/plugins/apache/js/CodeMirror/addon/hint/show-hint.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.min.css" integrity="sha256-B4lcRQIA/hXjqRxuZHImRuHmb0IT1kscrY9mYJ7FsMs=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/show-hint.min.css" integrity="sha256-GttU7Ba1ZLRu9reNxZVI5T87aX1mDTcjLxhfR/clb1M=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/dialog/dialog.min.css" integrity="sha256-YJKyPh6e25gWJyCXgvzIKoFDE1i3lw9UqKwrk0h29wQ=" crossorigin="anonymous" />
 <style type="text/css">
     .CodeMirror { border: 1px solid #eee; cursor: text; margin-top: 15px; margin-bottom: 10px; }
     .CodeMirror pre.CodeMirror-placeholder { color: #999; }
@@ -39,9 +39,9 @@ if(file_exists($httpd_file))
 
 <img id="editfolder" style="cursor:pointer;margin-left: 10px;" src="/webGui/images/explore.png" >
 
-<input id="editfile" type="text" name="editfile" value="<?=$httpd_file;?>" style="background-color: #f0f0f0;" readonly="" data-pickcloseonfile="true" data-pickfilter="conf,ini,magic,types,proxiedhosts" data-pickroot="<?=$httpd_path;?>" data-pickfolders="false" required="required" >
+<input id="editfile" type="text" name="editfile" value="<?=htmlspecialchars($httpd_file);?>" style="background-color: #f0f0f0;" readonly="" data-pickcloseonfile="true" data-pickfilter="conf,ini,magic,types,proxiedhosts" data-pickroot="<?=$httpd_path;?>" data-pickfolders="false" required="required" >
 
-<textarea id="editdata" name="editdata" placeholder="Select Configuration File to Open." autofocus><?= htmlspecialchars($edit_file); ?></textarea>
+<textarea id="editdata" name="editdata" placeholder="Select Configuration File to Open." autofocus><?=htmlspecialchars($edit_file);?></textarea>
 <input type="hidden" name="commit" value="1" />
 <dl>
     <dt></dt>
@@ -56,14 +56,14 @@ if(file_exists($httpd_file))
     </p>
 </blockquote>
 
-<script src="/plugins/apache/js/CodeMirror/lib/codemirror.js"></script>
-<script src="/plugins/apache/js/CodeMirror/addon/dialog/dialog.js"></script>
-<script src="/plugins/apache/js/CodeMirror/addon/display/placeholder.js"></script>
-<script src="/plugins/apache/js/CodeMirror/addon/hint/show-hint.js"></script>
-<script src="/plugins/apache/js/CodeMirror/addon/hint/anyword-hint.js"></script>
-<script src="/plugins/apache/js/CodeMirror/mode/properties/properties.js"></script>
-<script src="/plugins/apache/js/CodeMirror/addon/search/searchcursor.js"></script>
-<script src="/plugins/apache/js/CodeMirror/addon/search/search.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/codemirror.min.js" integrity="sha256-nP4BK+NXVKsqHwyv0YAYpYMGQMULLFsQAmrYhr9PUok=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/dialog/dialog.min.js" integrity="sha256-KbBuDRpfbnVjlUhzPVbdWqcaMQDwf9FjH5NGlSma2/Y=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/display/placeholder.min.js" integrity="sha256-dZ1hbx09AEbStymNkjE7umqi7DqhAtuC5cvId0603Yk=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/show-hint.min.js" integrity="sha256-lOBfrUiGFzYN0fjJph7p21pyXxNNCWN8jL/jrd6VpJc=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/mode/properties/properties.min.js" integrity="sha256-sYjmbbbVaUIwHFPmA/ipJMFD64xAucwyitEVb0+8qjA=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/hint/anyword-hint.min.js" integrity="sha256-QpELQ3xE5bkkc1rdv5i7pSBPSK06rljJXh0AHKHJSjw=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/searchcursor.min.js" integrity="sha256-+WHQ6GVZ+En4S8tktYbST09huK+qux1Gvhqq5b9Pq+I=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.23.0/addon/search/search.min.js" integrity="sha256-jR746s3yEfafMDDa+uuOQ/9dh9KdTaSCnFDITGs0mIk=" crossorigin="anonymous"></script>
 
 <script>
 $(function(){
@@ -90,7 +90,7 @@ $(function(){
         $('#editfile').val(file);
     });
 
-    $('#editfile').change(function () {
+    $('#editfile').on('change', function () {
         var Editfile = $('#editfile').val();
         $.getJSON('/plugins/apache/include/apache_edit.php', {editfile: Editfile}, function (data) {
                 editor.setValue(data);
@@ -98,7 +98,7 @@ $(function(){
         );
     });
 
-    // save config and commit to bmc
+    // save config
     $('#btnSubmit').click(function () {
         editor.save();
         $.post('/plugins/apache/include/apache_save.php', $('#editform').serializeArray(), function (data) {

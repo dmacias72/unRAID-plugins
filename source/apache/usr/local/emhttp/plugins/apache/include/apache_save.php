@@ -1,15 +1,20 @@
 <?
-$editfile = $_POST['editfile'];
+$base = '/boot/config/plugins/apache/httpd/';
+$editfile = realpath($_POST['editfile']);
 
-// remove carriage returns
-$editdata = (array_key_exists('editdata', $_POST)) ? str_replace("\r", '', $_POST['editdata']) : '';
+if(!strpos($editfile, $base) && file_exists($editfile) && array_key_exists('editdata', $_POST)){
+    // remove carriage returns
+    $editdata = str_replace("\r", '', $_POST['editdata']);
 
-// get previous config file contents and save them
-$editdata_old = (file_exists($editfile)) ? file_get_contents($editfile) : '';
-file_put_contents($editfile.'.old', $editdata_old);
+    // get previous config file contents and save them
+    $editdata_old = (file_exists($editfile)) ? file_get_contents($editfile) : '';
+    file_put_contents($editfile.'.old', $editdata_old);
 
-// save file contents
-$return_var = file_put_contents($editfile, $editdata);
+    // save file contents
+    $return_var = file_put_contents($editfile, $editdata);
+}else{
+    $return_var = false;
+}
 
 if($return_var)
     $return = ['success' => true, 'saved' => $editfile];
