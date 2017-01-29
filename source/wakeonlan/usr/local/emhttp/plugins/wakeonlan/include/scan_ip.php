@@ -1,6 +1,6 @@
 <?
-    $ip = $_GET['ip'];
+    $ip = escapeshellarg($_GET['ip']);
     $cmd = "/usr/bin/nmap -sP $ip | grep 'Host is up' && echo 'on' || echo 'blink'";
-    $status = exec($cmd);
+    $status = trim(exec($cmd));
     echo json_encode($status);
 ?>
