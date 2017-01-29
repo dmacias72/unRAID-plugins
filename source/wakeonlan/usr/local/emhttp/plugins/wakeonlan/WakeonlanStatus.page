@@ -33,6 +33,14 @@ Title="Wake On Lan"
 
 <script>
 $(function(){
+    // dynamix plugin update api
+    <?if (function_exists('plugin_update_available') && $version = plugin_update_available('wakeonlan')):?>
+        showNotice('Wake On Lan <?=htmlspecialchars($version);?> available. <a>Update</a>','wakonlan');
+        $('#user-notice a').on('click', function () {
+            $('#user-notice').empty();
+        });
+    <?endif;?>
+
     //setup tablesorter
     $('#tblData').tablesorter({
         headers:{0:{sorter:false},2:{sorter:'ipv4Address'},3:{sorter:'MAC'},4:{sorter:false}},
