@@ -3,7 +3,7 @@ $file = '/boot/config/plugins/speedtest/speedtest.xml';
 if (file_exists($file)) {
     $id = htmlspecialchars($_POST['id']);
     if ($id === 'all'){
-        $xml = new SimpleXMLElement("<tests></tests>");
+        $xml = new SimpleXMLElement('<tests></tests>');
         $xml->asXML($file);
     }else {
         $xml = simplexml_load_file($file);

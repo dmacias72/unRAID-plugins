@@ -23,7 +23,8 @@ Speedtest Script Version:
     <?=mk_option($speedtest_version, "linux", "$speedtest_linux");?>
   </select>
 
-> Choose a version of speedtest script to use.
+> Choose a version of speedtest script to use. Version 0.3.1 to 1.0.2 use Sivel's script.
+> The last selection uses a different script by Zpeters and has no image support.
 
 Speedtest Timeout in Seconds:
 : <select id="TIMEOUT" name="TIMEOUT" size="1" class="speedtest-cli">
@@ -84,7 +85,7 @@ Select Speedtest Server:
         <option value=""> ...loading speedtest.net server list </option>
   </select>
 
-<input id="DEFAULT" type="submit" value="Default" onClick="resetDATA(this.form)">
+<input id="DEFAULT" type="submit" value="Default">
 : <input id="btnApply" type="submit" value="Apply" ><input type="button" value="Done" onClick="done()">
 
 > Default button resets settings to default values.
@@ -149,16 +150,18 @@ $(function(){
     }else
             $('.speedtest-cli').prop('disabled', false)
 
+    $('#DEFAULT').on('click', resetDATA);
+
 });
 
-function resetDATA(form) {
-    form.VERSION.value = '1.0.2';
-    form.TIMEOUT.value = 10;
-    form.SECURE.value  = 'no';
-    form.SHARE.value   = '--share';
-    form.UNITS.value   = 'bits';
-    form.LIST.value    = 'auto';
-    form.SERVER.value  = '';
+function resetDATA() {
+    $('#VERSION').val('1.0.2');
+    $('#TIMEOUT').val(10);
+    $('#SECURE').val('no');
+    $('#SHARE').val('--share');
+    $('#UNITS').val('bits');
+    $('#LIST').val('auto');
+    $('#SERVER').val('');
 }
 
 // list all available servers
