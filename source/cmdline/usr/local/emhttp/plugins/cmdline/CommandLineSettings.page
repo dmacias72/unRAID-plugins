@@ -9,7 +9,7 @@ Title="Command Line"
 <input type="hidden" id="command" name="#command" value="" />
 
 Enable Shellinabox Server <?=$shellinabox_version;?>:
-: <select id="SERVICE" name="SERVICE" size="1" onChange="checkRUNNING(this.form);">
+: <select id="SERVICE" name="SERVICE" size="1">
   <?=mk_option($shellinabox_service, "disable", "No");?>
   <?=mk_option($shellinabox_service, "enable", "Yes");?>
   </select>
@@ -28,7 +28,7 @@ Port (<?=$shellinabox_port_status;?>):
 > Default port is 4200.
 
 Run as User:
-: <select id="USERS" class="shellinabox-run" title="select user, cannot be root" size="1" onChange="checkUSER(this.form, '<?=htmlspecialchars($shellinabox_runas);?>');">
+: <select id="USERS" class="shellinabox-run" title="select user, cannot be root" size="1">
   <?=mk_option($shellinabox_runas, "nobody", "nobody");?>
   <?php foreach($shellinabox_users as $shellinabox_user){echo mk_option($shellinabox_runas, trim($shellinabox_user), trim($shellinabox_user));};?>
   <option value='other' <?=(htmlspecialchars($shellinabox_runas) != "root" && htmlspecialchars($shellinabox_runas) != "nobody" && !in_array(htmlspecialchars($shellinabox_runas), $shellinabox_users))?"selected=yes":"";?>>other</option>
@@ -86,8 +86,8 @@ Enable Root Home Directory Backup:
 > This is useful for ssh authorized_keys, bash history, midnight commander settings, htop config and whatever else you keep in /root.
 
 
-<input id="DEFAULT" class="shellinabox-run" type="submit" value="Default" onClick="resetDATA(this.form)">
-: <input id="btnApply" type="submit" value="Apply" onClick="verifyDATA(this.form)"><input type="button" value="Done" onClick="done()"><!--<button id="btnCert" type="button" onclick="window.location.href='http://<?=$shellinabox_host;?>/boot/config/plugins/cmdline/<?=$shellinabox_cert;?>'"> Download Cert </button>-->
+<input id="DEFAULT" class="shellinabox-run" type="submit" value="Default">
+: <input id="btnApply" type="submit" value="Apply"><input type="button" value="Done" onClick="done()"><!--<button id="btnCert" type="button" onclick="window.location.href='http://<?=$shellinabox_host;?>/boot/config/plugins/cmdline/<?=$shellinabox_cert;?>'"> Download Cert </button>-->
 </form>
 
 <script type="text/javascript">
@@ -114,25 +114,27 @@ $(function(){
         });
     <?endif;?>
 
-    checkRUNNING(document.cmdline_settings);
-    checkUSER(document.cmdline_settings,'<?=htmlspecialchars($shellinabox_runas);?>');
+    $('#SERVICE').on('change', checkRUNNING);
+    $('#USERS').on('change', checkUSER);
+    $('#DEFAULT').on('click', resetDATA);
+    $('#btnApply').on('click', verifyDATA);
 });
 
-function resetDATA(form) {
-    form.IPADDR.value = 'disable';
-    form.SSL.value    = 'disable';
-    form.SCREEN.value = 'disable';
-    form.BACKUP.value = 'disable';
-    form.PORT.value   =  4200;
-    form.RUNAS.value  = 'nobody';
-    form.USERS.value  = 'nobody';
+function resetDATA() {
+    $('#IPADDR').val('disable');
+    $('#SSL').val('disable');
+    $('#SCREEN').val('disable');
+    $('#BACKUP').val('disable');
+    $('#PORT').val(4200);
+    $('#RUNAS').val('nobody');
+    $('#USERS').val('nobody');
 }
 
-function checkRUNNING(form) {
-    if (form.SERVICE.value === 'enable')
-        form.command.value = '/usr/local/emhttp/plugins/cmdline/scripts/start';
-    else {
-        form.command.value = '/usr/local/emhttp/plugins/cmdline/scripts/stop';
+function checkRUNNING() {
+    if ($('#SERVICE').val() === 'enable'){
+        $('#command').val('/usr/local/emhttp/plugins/cmdline/scripts/start');
+    } else {
+        $('#command').val('/usr/local/emhttp/plugins/cmdline/scripts/stop');
         $('#btnApply').prop('disabled', false);
     }
     if ("<?=$shellinabox_running;?>" == true){
@@ -141,38 +143,34 @@ function checkRUNNING(form) {
     }else{
         $('.shellinabox-run').prop('disabled', false);
         $('#btnApply').prop('disabled', false);
- }
-}
-
-function checkUSER(form, currentUSER) {
-    if (form.USERS.value != 'other' ) {
-        form.RUNAS.value = form.USERS.options[form.USERS.selectedIndex].value;
-        form.RUNAS.type  = 'hidden';
-    }
-    else
-    {
-        form.RUNAS.value = currentUSER;
-        if (form.RUNAS.value === 'root')
-            form.RUNAS.value = 'nobody';
-        form.RUNAS.type = 'text';
-        form.RUNAS.title = 'Run As User Cannot be Root';
     }
 }
 
-function verifyDATA(form) {
-    if (!jQuery.isNumeric(form.PORT.value) || form.PORT.value < 0 || form.PORT.value > 65535){
-            form.PORT.value = 4200;
+function checkUSER() {
+    if ($('#USERS').val() != 'other' ) {
+        $('#RUNAS').val($('#USERS option:selected').val());
+        $('#RUNAS').prop('type', 'hidden');
+    }else{
+        $('#RUNAS').val("<?=htmlspecialchars($apache_runas);?>");
+        if ($('#RUNAS').val() === 'root')
+            $('#RUNAS').val('nobody');
+        $('#RUNAS').prop('type', 'text');
+        $('#RUNAS').prop('title', 'Run As User Cannot be Root');
     }
-    if (form.RUNAS.value === null || form.RUNAS.value === ''){
-        form.RUNAS.value = 'nobody';
+}
+
+function verifyDATA() {
+    if (!jQuery.isNumeric($('#PORT').val()) || $('#PORT').val() < 0 || $('#PORT').val() > 65535){
+            $('#PORT').val(4200);
+    }
+    if ($('#RUNAS').val() === null || $('#RUNAS').val() === '' || $('#RUNAS').val() === 'root' ){
+        $('#RUNAS').val('nobody');
         $shellinabox_runas = 'nobody';
     }
-    form.SERVICE.value = form.SERVICE.value.replace(/ /g,'_');
-    form.IPADDR.value  = form.IPADDR.value.replace(/ /g,'_');
-    form.SSL.value     = form.SSL.value.replace(/ /g,'_');
-    form.SCREEN.value  = form.SCREEN.value.replace(/ /g,'_');
-    form.PORT.value    = form.PORT.value.replace(/ /g,'_');
-    form.RUNAS.value   = form.RUNAS.value.replace(/ /g,'_');
+    $('#SERVICE').val( $('#SERVICE').val().replace(/ /g,"_") );
+    $('#IPADDR').val( $('#IPADDR').val().replace(/ /g,"_") );
+    $('#SSL').val( $('#SSL').val().replace(/ /g,"_") );
+    $('#SCREEN').val( $('#SCREEN').val().replace(/ /g,"_") );
+    $('#RUNAS').val( $('#RUNAS').val().replace(/ /g,"_") );
 }
-
 </script>
