@@ -15,7 +15,7 @@
 require_once '/usr/local/emhttp/webGui/include/Wrappers.php';
 
 if ($_POST['mode']>0) {
-  $hour = isset($_POST['hour']) ? intval($_POST['hour']) : '*';
+  $hour = isset($_POST['hour']) ? htmlspecialchars($_POST['hour']) : '*';
   $min  = isset($_POST['min'])  ? intval($_POST['min'])  : '*';
   $dotm = isset($_POST['dotm']) ? intval($_POST['dotm']) : '*';
   $day  = isset($_POST['day'])  ? intval($_POST['day'])  : '*';
