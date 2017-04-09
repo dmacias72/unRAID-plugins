@@ -15,16 +15,15 @@ require_once '/usr/local/emhttp/plugins/speedtest/include/scheduler_tab.php';
 
 Speedtest Script Version:
 : <select id="VERSION" name="VERSION" size="1" >
+    <?=mk_option($speedtest_version, "1.0.3", "v1.0.3");?>
     <?=mk_option($speedtest_version, "1.0.2", "v1.0.2");?>
     <?=mk_option($speedtest_version, "1.0.1", "v1.0.1");?>
     <?=mk_option($speedtest_version, "1.0.0", "v1.0.0");?>
     <?=mk_option($speedtest_version, "0.3.4", "v0.3.4");?>
     <?=mk_option($speedtest_version, "0.3.1", "v0.3.1");?>
-    <?=mk_option($speedtest_version, "linux", "$speedtest_linux");?>
   </select>
 
-> Choose a version of speedtest script to use. Version 0.3.1 to 1.0.2 use Sivel's script.
-> The last selection uses a different script by Zpeters and has no image support.
+> Choose a version of speedtest script to use.
 
 Speedtest Timeout in Seconds:
 : <select id="TIMEOUT" name="TIMEOUT" size="1" class="speedtest-cli">
