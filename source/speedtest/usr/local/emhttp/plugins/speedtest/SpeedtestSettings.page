@@ -81,7 +81,7 @@ Select Speedtest Server:
 
 &nbsp;
 : <select class="serverlist" id="SERVER" name="SERVER" size="1">
-        <option value=""> ...loading speedtest.net server list </option>
+        <option value="0"> ...loading speedtest.net server list </option>
   </select>
 
 <input id="DEFAULT" type="submit" value="Default">
@@ -160,7 +160,7 @@ function resetDATA() {
     $('#SHARE').val('--share');
     $('#UNITS').val('bits');
     $('#LIST').val('auto');
-    $('#SERVER').val('');
+    $('#SERVER').val(0);
 }
 
 // list all available servers
