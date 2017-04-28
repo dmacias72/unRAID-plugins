@@ -114,7 +114,7 @@ Dashboard Sensors:
 
 <input type="hidden" id="select-dash-svc" name="DASH" value="<?=htmlspecialchars($dash);?>">
 
-> Check sensors to show in Dashboard display. 
+> Check sensors to show in Dashboard display.
 >
 > Unchecked sensors will not be displayed.
 
