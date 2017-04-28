@@ -26,11 +26,11 @@ if (!empty($disp_sensors)){
 
             if($readings[$disp_sensor]['Type'] === 'Temperature'){
                 // if temperature is greater than upper non-critical show critical
-                if ($disp_reading > $UpperNC)
+                if ($disp_reading > $UpperNC && $UpperNC != 0)
                     $Color = 'orange';
 
                     // if temperature is greater than upper critical show non-recoverable
-                if ($disp_reading > $UpperC)
+                if ($disp_reading > $UpperC && $UpperC != 0)
                     $Color = 'red';
 
                 $displays[] = "<img src='/plugins/ipmi/icons/cpu.png' title='$disp_name ($disp_id)' class='icon'><font color='$Color'>".
