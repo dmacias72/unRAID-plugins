@@ -16,9 +16,9 @@ USER_CSS="Color:+$CSS/color.css,Monochrome:-$CSS/monochrome.css;White:+$CSS/whit
 
 # add screenfetch to bash profile
 if [ "$SCREEN" == "enable" ]; then
-    if ! grep "/usr/sbin/screenfetch" $PROFILE >/dev/null 2>&1
+    if ! grep "/usr/sbin/screenfetch" $PROFILE >/dev/null 2>&1; then
         #append command to file
-        then echo -e "\n/usr/sbin/screenfetch" >> $PROFILE
+        echo -e "\n/usr/sbin/screenfetch" >> $PROFILE
     else
         #uncomment command
         sed -e '/\/usr\/sbin\/screenfetch/s/^#//g' -i $PROFILE
@@ -81,7 +81,7 @@ shellinaboxd_restart() {
 
 # Restore home directory
 shellinaboxd_restore() {
-    if [[ "$BACKUP" == "enable" && ! -e "/root/.bash_history" ]]; then	
+    if [[ "$BACKUP" == "enable" && ! -e "/root/.bash_history" ]]; then
         # restore home directory
         echo "restoring home directory..."
         sleep 1
@@ -91,7 +91,7 @@ shellinaboxd_restore() {
 
 # Backup home directory:
 shellinaboxd_backup() {
-    if [ "$BACKUP" == "enable" ]; then	
+    if [ "$BACKUP" == "enable" ]; then
         # backup home directory
         echo "saving home directory..."
         sleep 1
