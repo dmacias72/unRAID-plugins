@@ -3,11 +3,11 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "wakeonlan">
 <!ENTITY author    "dmacias72">
-<!ENTITY version   "2017.04.09">
+<!ENTITY version   "2017.07.23">
 <!ENTITY launch    "Settings/Wakeonlan">
-<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-plugins/master">
-<!ENTITY pluginURL "&gitURL;/plugins/&name;.plg">
-<!ENTITY pkgURL    "&gitURL;/source/packages">
+<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-WOL/master">
+<!ENTITY pluginURL "&gitURL;/plugin/&name;.plg">
+<!ENTITY pkgURL    "&gitURL;/packages">
 <!ENTITY plgPATH   "/boot/config/plugins/&name;">
 <!ENTITY plgNAME   "&name;-&version;-x86_64-1">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
@@ -17,7 +17,13 @@
 
 <CHANGES>
 ##&name;
-###&version;
+###2017.07.23
+- move to separate WOL repository
+- restructure, streamline and remove depreciated code
+- add individual cell editing
+- use ping instead of nmap for status check.
+- update namp to 7.50
+###2017.04.09
 - fix empty ip address resulting in failed scan
 ###2017.01.29a
 - harden code for XSS and CSRF vulnerabilities
@@ -74,7 +80,12 @@ This plugin uses etherwake for wake on lan
 <MD5>435837a5bf0401a937d6ec93e458333b</MD5>
 </FILE>
 
-<FILE Name="&plgPATH;/nmap-7.40-x86_64-1.txz" Min="6.2" Run="upgradepkg --install-new">
+<FILE Name="&plgPATH;/nmap-7.50-x86_64-1.txz" Min="6.3" Run="upgradepkg --install-new">
+<URL>&pkgURL;/nmap-7.50-x86_64-1.txz</URL>
+<MD5>baf79e52dc2bb6267edd2cda89e62539</MD5>
+</FILE>
+
+<FILE Name="&plgPATH;/nmap-7.40-x86_64-1.txz" Min="6.2" Max="6.2.99" Run="upgradepkg --install-new">
 <URL>&pkgURL;/nmap-7.40-x86_64-1.txz</URL>
 <MD5>d48d79e1e57aaeb7aee322c78ad9b9a6</MD5>
 </FILE>
@@ -129,7 +140,6 @@ find &plgPATH;/ -type f -iname "&name;*.md5" ! -iname "*&version;*" -delete
 echo ""
 echo "-----------------------------------------------------------"
 echo " &name; has been installed."
-echo " This plugin requires Dynamix webGui to operate"
 echo " Copyright 2016-2017, &author;"
 echo " Version: &version;"
 echo "-----------------------------------------------------------"
