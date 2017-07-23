@@ -2,7 +2,6 @@
 $file = '/boot/config/plugins/wakeonlan/wakeonlan.xml';
 
 if(file_exists($file)){
-
     $Host = '//*/address[@addr='.escapeshellarg($_POST['oldmac']).']/parent::*';
 
     $xml = simplexml_load_file($file);
