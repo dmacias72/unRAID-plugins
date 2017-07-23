@@ -19,7 +19,7 @@ Title="Network Scan"
 : <button type="button" id="btnScan"/>scan</button><button type="button" id="btnClear"/>Clear</button>
 </form>
 
-<div id="preload">
+<div id="preload" style="display: none;">
    <img src='/plugins/dynamix/images/loading.gif'>
 </div>
 
@@ -48,15 +48,20 @@ $(function(){
 
 function Add(){
     var tr =$(this);
-    var hostName   = tr.children('td:nth-child(1)').html();
-    var ipAddress  = tr.children('td:nth-child(2)').html();
+    var hostName = tr.children('td:nth-child(1)').html();
+    var ipAddress = tr.children('td:nth-child(2)').html();
     var macAddress = tr.children('td:nth-child(3)').html();
     $.post('/plugins/wakeonlan/include/add_node.php',{name:hostName, ip:ipAddress, mac:macAddress},function () {
             slideRow(tr);
             addRow(hostName, ipAddress, macAddress);
             $('#tblData').trigger('update');
-        }
-    );
+            $('.edit').makeEditable();
+            $('.wake').click(Wake);
+            $('.delete').click(Delete);
+            $.getJSON('/plugins/wakeonlan/include/scan_ip.php', {ip: ipAddress}, function(ipStatus) {
+                $('#'+macAddress.replace(/:/g,'')).children('td:nth-child(1)').html('<img src="/plugins/dynamix/images/green-'+ipStatus+'.png"/>');
+            });
+    });
 }
 
 function parseScan(){
@@ -88,12 +93,11 @@ function parseScan(){
                     '<td>'+hostName+'</td>'+
                     '<td>'+ipAddress+'</td>'+
                     '<td>'+macAddress+'</td></tr>');
-
                 }
             });
 
-            $('.addRow').on('click', Add);
             $('#tblScan').trigger('update');
+            $('.addRow').on('click', Add);
 
         }, 'xml'
     );
@@ -109,5 +113,4 @@ function Scan(){
         }
    );
 }
-
 </script>
