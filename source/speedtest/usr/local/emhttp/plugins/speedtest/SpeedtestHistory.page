@@ -17,10 +17,10 @@ require_once '/usr/local/emhttp/plugins/speedtest/include/scheduler_tab.php';
 
 <style>
 table.tablesorter tbody tr:nth-child(odd) {
-    background-color: #<?=($display['theme'] == 'white' || $display['theme'] == 'azure') ? 'F0F0F0' : '202020';?>;
+    background-color: #<?=($display['theme'] == 'white' || $display['theme'] == 'azure') ? 'F0F0F0' : '212421';?>;
 }
 table.tablesorter tbody tr:nth-child(even) {
-    background-color: #<?=($display['theme'] == 'white' || $display['theme'] == 'azure') ? 'E0E0E0' : '1b1d1b';?>;
+    background-color: #<?=($display['theme'] == 'white' || $display['theme'] == 'azure') ? 'e4e2e4' : '1b1d1b';?>;
 }
 </style>
 
@@ -76,7 +76,7 @@ table.tablesorter tbody tr:nth-child(even) {
     </blockquote>
 </div>
 
-<div>
+<div class="wrapper">
  <table class="tablesorter hover-highlight tbltests" id="tblTests">
         <thead>
             <tr>
@@ -119,10 +119,10 @@ table.tablesorter tbody tr:nth-child(even) {
 
 <br>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.14/js/jquery.tablesorter.combined.min.js" integrity="sha256-Ul0fApVKRIGL7cePK/x7jd+/7nkSImsPRIc1ltPRah4=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.14/js/extras/jquery.tablesorter.pager.min.js" integrity="sha256-jkVgfYuH8sw4gTXCDEJMANM9Kf2xZLFWALNiAQ1AyZQ=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.14/js/widgets/widget-chart.min.js" integrity="sha256-N9HyiXC7lP1NySJtDgztqIXVY8Al0pu8YZMAnHkY/V4=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.14/js/widgets/widget-columnSelector.min.js" integrity="sha256-SUP46i89mUYKfS01ifjELMecIl5t8jDoqJkqlOnkL3k=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/jquery.tablesorter.combined.min.js" integrity="sha256-yZK2xfWbDpFuKS9ePpiTtRQlWree+/wtT/xevo8L8WE=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/extras/jquery.tablesorter.pager.min.js" integrity="sha256-jkVgfYuH8sw4gTXCDEJMANM9Kf2xZLFWALNiAQ1AyZQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/widgets/widget-chart.min.js" integrity="sha256-N9HyiXC7lP1NySJtDgztqIXVY8Al0pu8YZMAnHkY/V4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/widgets/widget-columnSelector.min.js" integrity="sha256-Y1CESU9GKdSBephHSajVT17qwcGfbTDjM7tFnpAZ+cA=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chrono/1.0.5/chrono.min.js" integrity="sha256-TpYymdlIwwYG9H9xazgrBWaySFRR3xKTZfbbjmEGeT0=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
@@ -346,11 +346,13 @@ $(function(){
         sortReset: true,
         sortRestart : true,
         sortInitialOrder: 'desc',
-        widgets: ['saveSort', 'filter', 'stickyHeaders', 'Chart'],
+        widgets: ['saveSort','filter','stickyHeaders','Chart'],
         widgetOptions: {
             chart_incRows: DataType,
             chart_ignoreColumns: [0,1,2,3,6,7],
             chart_sort: [[0,0]],
+            stickyHeaders_offset: ($('#header').css("position") === "fixed") ? '90' : '0',
+            stickyHeaders_attachTo: null,
             stickyHeaders_filteredToTop: true,
             filter_hideEmpty: true,
             filter_liveSearch: true,
