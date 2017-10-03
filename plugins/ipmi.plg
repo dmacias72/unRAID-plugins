@@ -3,11 +3,11 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "ipmi">
 <!ENTITY author    "dmacias72">
-<!ENTITY version   "2016.10.24">
+<!ENTITY version   "2017.10.02">
 <!ENTITY launch    "Settings/IPMI">
-<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-plugins/master">
-<!ENTITY pluginURL "&gitURL;/plugins/&name;.plg">
-<!ENTITY pkgURL    "&gitURL;/source/packages">
+<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/IPMI-unRAID/master">
+<!ENTITY pluginURL "&gitURL;/plugin/&name;.plg">
+<!ENTITY pkgURL    "&gitURL;/packages">
 <!ENTITY plgPATH   "/boot/config/plugins/&name;">
 <!ENTITY plgNAME   "&name;-&version;-x86_64-1">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
@@ -17,7 +17,34 @@
 
 <CHANGES>
 ##&name;
-###&version;
+###2017.10.02
+- fix css and stickyheaders for new themes
+- move cdnjs to local
+- properly fix dropdown checklist tab refresh/switch
+###2017.06.26
+- revert previous changes till for more testing
+###2017.06.25
+- change Temperature Polling Times.  You will need to change settings, save and restart fan control.
+- add fan max speed
+###2017.06.24
+- remove tablesorter package
+###2017.06.19
+- fix Supermicro auto fan setting
+- stopping fan control returns fans to original mode
+- update ipmifan auto and full speed functions
+###2017.06.18a
+- add zone fan control support for Supermicro X10 and X11 boards
+- add support for new 6.4 themes
+- combine Sensor Editor and Config Editor and move to Settings page
+- restructure Settings page vars and forms
+- fix incorrect colors vs readings when missing thresholds
+- change bmc reset from warm to cold reset
+- update codemirror cdn
+- update freeipmi to 1.5.5
+- remove board log file and switch to dmidecode for board info instead of ipmi-fru
+- misc fixes and code improvements
+###2017.01.27
+- update and harden code for security
 - update codemirror for sensor and config editor
 - add: search and replace functions for config editor
 ###2016.10.22
@@ -206,20 +233,12 @@
 </CHANGES>
 
 <!--
-The 'tablesorter' package file.
--->
-<FILE Name="/boot/config/plugins/tablesorter/tablesorter-2.27.6-x86_64-1.txz" Run="/sbin/upgradepkg --install-new">
-<URL>&gitURL;/archive/tablesorter-2.27.6-x86_64-1.txz</URL>
-<MD5>ead9fb4c4a317e7d6426b3521f0e0c0b</MD5>
-</FILE>
-
-<!--
 This plugin uses freeipmi to display sensor readings
 -->
 
-<FILE Name="&plgPATH;/freeipmi-1.5.3-x86_64-1.txz" Min="6.2" Run="/sbin/upgradepkg --install-new">
-<URL>&pkgURL;/freeipmi-1.5.3-x86_64-1.txz</URL>
-<MD5>1aa566b9a1c0561b82f27118ee3d8f14</MD5>
+<FILE Name="&plgPATH;/freeipmi-1.5.5-x86_64-1.txz" Min="6.2" Run="/sbin/upgradepkg --install-new">
+<URL>&pkgURL;/freeipmi-1.5.5-x86_64-1.txz</URL>
+<MD5>c92fb30938eaa9d20cb3116e8e1cd5c2</MD5>
 </FILE>
 
 <FILE Name="&plgPATH;/freeipmi-1.4.11-x86_64-3.txz" Min="6.1" Max="6.1.99" Run="/sbin/upgradepkg --install-new">
@@ -260,7 +279,6 @@ The 'plugin' fan config file.
 FANCONTROL="disable"
 FANPOLL="3"
 FANIP=""
-IPMIBOARD=""
 ]]>
 </INLINE>
 </FILE>
@@ -380,7 +398,7 @@ done
 echo ""
 echo "-----------------------------------------------------------"
 echo " &name; has been removed."
-echo " Copyright 2016, &author;"
+echo " Copyright 2015-2017, &author;"
 echo " Version: &version;"
 echo "-----------------------------------------------------------"
 echo ""
