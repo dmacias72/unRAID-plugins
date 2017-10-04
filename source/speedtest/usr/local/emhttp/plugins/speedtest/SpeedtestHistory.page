@@ -119,12 +119,12 @@ table.tablesorter tbody tr:nth-child(even) {
 
 <br>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/jquery.tablesorter.combined.min.js" integrity="sha256-yZK2xfWbDpFuKS9ePpiTtRQlWree+/wtT/xevo8L8WE=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/extras/jquery.tablesorter.pager.min.js" integrity="sha256-jkVgfYuH8sw4gTXCDEJMANM9Kf2xZLFWALNiAQ1AyZQ=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/widgets/widget-chart.min.js" integrity="sha256-N9HyiXC7lP1NySJtDgztqIXVY8Al0pu8YZMAnHkY/V4=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.29.0/js/widgets/widget-columnSelector.min.js" integrity="sha256-Y1CESU9GKdSBephHSajVT17qwcGfbTDjM7tFnpAZ+cA=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/chrono/1.0.5/chrono.min.js" integrity="sha256-TpYymdlIwwYG9H9xazgrBWaySFRR3xKTZfbbjmEGeT0=" crossorigin="anonymous"></script>
-<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/plugins/speedtest/js/jquery.tablesorter.combined.min.js"></script>
+<script src="/plugins/speedtest/js/jquery.tablesorter.pager.min.js"></script>
+<script src="/plugins/speedtest/js/widget-chart.min.js"></script>
+<script src="/plugins/speedtest/js/widget-columnSelector.min.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/chrono.min.js"></script>
+<script type="text/javascript" src="/plugins/speedtest/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/webGui/javascript/jquery.switchbutton.js"></script>
 
 <script>
