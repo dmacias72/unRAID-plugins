@@ -3,11 +3,11 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "cmdline">
 <!ENTITY author    "dmacias72">
-<!ENTITY version   "2017.05.21">
+<!ENTITY version   "2017.10.12">
 <!ENTITY launch    "Settings/CommandLineSettingsTabs">
-<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-plugins/master">
-<!ENTITY pluginURL "&gitURL;/plugins/&name;.plg">
-<!ENTITY pkgURL    "&gitURL;/source/packages">
+<!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-cmdline/master">
+<!ENTITY pluginURL "&gitURL;/plugin/&name;.plg">
+<!ENTITY pkgURL    "&gitURL;/packages">
 <!ENTITY plgPATH   "/boot/config/plugins/&name;">
 <!ENTITY plgNAME   "&name;-&version;-x86_64-1">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
@@ -21,6 +21,10 @@ This Plugin installs and controls shellinabox for unRaid 6.1  All dependencies a
 
 <CHANGES>
 ##&name;
+###2017.10.12
+- move to separate repo
+- update shellinabox package to latest 2.20
+- fix: disable setting when running
 ###2017.05.21
 - fix screenfetch not added to bash profile
 ###2017.02.05
@@ -110,9 +114,9 @@ This Plugin installs and controls shellinabox for unRaid 6.1  All dependencies a
 </CHANGES>
 
 
-<FILE Name="&plgPATH;/shellinabox-2.20-x86_64-3.txz" Min="6.1" Run="upgradepkg --install-new">
-<URL>&pkgURL;/shellinabox-2.20-x86_64-3.txz</URL>
-<MD5>69dbef133f81930c16d0376b9dd39588</MD5>
+<FILE Name="&plgPATH;/shellinabox-2.20-x86_64-4.txz" Min="6.1" Run="upgradepkg --install-new">
+<URL>&pkgURL;/shellinabox-2.20-x86_64-4.txz</URL>
+<MD5>f6a96b2ad8937d8e20a551821548d865</MD5>
 </FILE>
 
 <FILE Name="&plgPATH;/&name;.cfg">
@@ -144,6 +148,15 @@ The 'plugin' package MD5 hash.
 <URL>&gitURL;/archive/&plgNAME;.md5</URL>
 </FILE>
 
+<!-- WORKAROUND -->
+<FILE Name="/tmp/start_service" Mode="0770">
+<INLINE>
+#!/bin/bash
+# start shellinabox daemon
+/etc/rc.d/rc.shellinaboxd startup
+</INLINE>
+</FILE>
+
 <!--
 The 'install' script.
 -->
@@ -152,8 +165,8 @@ The 'install' script.
 #Verify unRAID Version
 source /etc/unraid-version
 if [[ ${version:0:3} == 6.0 ]]; then
-  echo "unRAID version 6.1 or higher is required"
-  exit 1
+    echo "unRAID version 6.1 or higher is required"
+    exit 1
 fi
 
 # Verify and install plugin package
@@ -168,21 +181,24 @@ else
     # upgrade package
     upgradepkg --install-new &plgPATH;/&plgNAME;.txz
 
- # start shellinabox daemon
-/etc/rc.d/rc.shellinaboxd startup
+    # stop shellinabox daemon
+    /etc/rc.d/rc.shellinaboxd stop
 
- # Cleaning old source files
- find &plgPATH;/ -type f -iname "&name;*.txz" ! -iname "*&version;*" -delete
- find &plgPATH;/ -type f -iname "&name;*.md5" ! -iname "*&version;*" -delete
+    # start shellinabox daemon
+    echo "checking command line settings..."
+    at -M -f /tmp/start_service now 2>/dev/null
 
- echo ""
- echo "-----------------------------------------------------------"
- echo " &name; has been installed."
- echo " This plugin requires Dynamix webGui to operate"
- echo " Copyright 2015-2017, &author;"
- echo " Version: &version;"
- echo "-----------------------------------------------------------"
- echo ""
+    # Cleaning old source files
+    find &plgPATH;/ -type f -iname "&name;*.txz" ! -iname "*&version;*" -delete
+    find &plgPATH;/ -type f -iname "&name;*.md5" ! -iname "*&version;*" -delete
+
+    echo ""
+    echo "-----------------------------------------------------------"
+    echo " &name; has been installed."
+    echo " Copyright 2015-2017, &author;"
+    echo " Version: &version;"
+    echo "-----------------------------------------------------------"
+    echo ""
 
 fi
 </INLINE>
@@ -199,7 +215,7 @@ The 'remove' script.
 removepkg &plgPATH;/*.txz
 rm -rf &emhttp;
 rm -f &plgPATH;/*.txz \
-  &plgPATH;/*.md5
+    &plgPATH;/*.md5
 
 echo ""
 echo "-----------------------------------------------------------"
