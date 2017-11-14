@@ -130,7 +130,7 @@ table.tablesorter tbody tr:nth-child(even) {
 <script>
 $(function(){
     //var DateTimeFormat = "<?=$display['date']?>"+(("<?=$display['date']?>"!='%c') ? ", "+"<?=$display['time']?>" : "");
-    var Units = ("<?=$speedtest_units;?>" == 'bits') ? "Mbit/s" : "Mbytes";
+    var Units = ("<?=$speedtest_units;?>" == 'bits') ? "Mbit/s" : "Mbyte/s";
 
     // append tabs for settings and scheduler and chart switch
     $('.tabs')
@@ -449,13 +449,29 @@ function parseDataXML(){
             var HostArray = ($(this).attr('host')) ? $(this).attr('host').split(' [') : ['--','--'];
             var Host      = HostArray[0].trim();
             var Distance  = '--';
-            if ((HostArray.length > 1)) {
+            if (HostArray.length > 1)
                 Distance  = HostArray[1].replace(/]/g,'').trim();
+
+            var Ping      = ($(this).attr('ping')) ? $(this).attr('ping') : '--';
+            var Units     = ("<?=$speedtest_units;?>" == 'bits') ? 'Mbit/s' : 'Mbyte/s';
+            var DArray    = ($(this).attr('download')) ? $(this).attr('download').split(' ') : [0,Units];
+            var UArray    = ($(this).attr('upload')) ? $(this).attr('upload').split(' ') : [0,Units];
+            var Share     = ($(this).attr('share')) ? $(this).attr('share') : '';
+            var Download  = parseFloat(DArray[0]);
+            var Upload    = parseFloat(UArray[0]);
+
+            if(DArray[1] !== Units){
+                if(DArray[1] == 'Mbit/s')
+                    Download = (Download * .125).toFixed(2);
+                if(DArray[1] == 'Mbyte/s')
+                    Download = (Download * 8).toFixed(2);
             }
-            var Ping      = ($(this).attr('ping'))     ? $(this).attr('ping')     : '--';
-            var Download  = ($(this).attr('download')) ? $(this).attr('download') : '--';
-            var Upload    = ($(this).attr('upload'))   ? $(this).attr('upload')   : '--';
-            var Share     = ($(this).attr('share'))    ? $(this).attr('share')    : '';
+            if(UArray[1] !== Units){
+                if(UArray[1] == 'Mbit/s')
+                    Upload = (Upload * .125).toFixed(2);
+                if(UArray[1] == 'Mbyte/s')
+                    Upload = (Upload * 8).toFixed(2);
+            }
 
             $('#tblTests tbody').append(
                 "<tr id='"+Name+"' title='click to show image'>"+
@@ -463,8 +479,8 @@ function parseDataXML(){
                 "<td class='tdShare'>"+Host+"</td>"+ //Host
                 "<td class='tdShare'>"+Distance+"</td>"+ //Distance
                 "<td class='tdShare'>"+Ping+"</td>"+ //Ping
-                "<td class='tdShare'>"+Download+"</td>"+ //Download
-                "<td class='tdShare'>"+Upload+"</td>"+ //Upload
+                "<td class='tdShare'>"+Download+' '+Units+"</td>"+ //Download
+                "<td class='tdShare'>"+Upload+' '+Units+"</td>"+ //Upload
                 "<td class='tdShare'>"+Share+"</td>"+ //Share
                 "<td><a class='delete' title='delete'><i class='fa fa-trash'></i></a></td>"+ //delete icon
                 "</tr>");
