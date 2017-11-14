@@ -188,9 +188,9 @@ This Plugin installs speedtest-cli for unRaid 6.1  All dependencies are installe
 - initial commit
 </CHANGES>
 
-<FILE Name="&plgPATH;/python-2.7.13-x86_64-1.txz" Min="6.4" Run="upgradepkg --install-new">
-<URL>&gitURL;/packages/6.4/python-2.7.13-x86_64-1.txz</URL>
-<MD5>67d18569672de5dd48e4dda2f7ce0e88</MD5>
+<FILE Name="&plgPATH;/python-2.7.14-x86_64-1.txz" Min="6.4" Run="upgradepkg --install-new">
+<URL>&gitURL;/packages/6.4/python-2.7.14-x86_64-1.txz</URL>
+<MD5>e67b2e27b293a45f3685be152e784772</MD5>
 </FILE>
 
 <FILE Name="&plgPATH;/python-2.7.13a-x86_64-2.txz" Min="6.2" Max="6.3.99" Run="upgradepkg --install-new">
