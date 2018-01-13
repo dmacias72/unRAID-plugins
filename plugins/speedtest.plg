@@ -6,9 +6,11 @@
 <!ENTITY version   "2018.01.13">
 <!ENTITY launch    "Settings/SpeedtestSettingsTabs">
 <!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-&name;/master">
+<!ENTITY ngitURL   "https://raw.githubusercontent.com/&author;/unRAID-NerdPack;/master">
 <!ENTITY pluginURL "&gitURL;/plugin/&name;.plg">
-<!ENTITY pkgURL    "&gitURL;/source/packages">
+<!ENTITY pkgURL    "&gitURL;/packages">
 <!ENTITY plgPATH   "/boot/config/plugins/&name;">
+<!ENTITY plgPATH   "/boot/config/plugins/NerdPack/packages">
 <!ENTITY plgNAME   "&name;-&version;-x86_64-1">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -191,27 +193,27 @@ This Plugin installs speedtest-cli for unRaid 6.1  All dependencies are installe
 - initial commit
 </CHANGES>
 
-<FILE Name="&plgPATH;/python-2.7.14a-x86_64-1.txz" Min="6.4" Run="upgradepkg --install-new">
-<URL>&gitURL;/packages/6.4/python-2.7.14a-x86_64-1.txz</URL>
+<FILE Name="&nplgPATH;/6.4/python-2.7.14a-x86_64-1.txz" Min="6.4" Run="upgradepkg --install-new">
+<URL>&ngitURL;/packages/6.4/python-2.7.14a-x86_64-1.txz</URL>
 <MD5>1b07bf5c48df7b5601f8f5c4e997911f</MD5>
 </FILE>
 
-<FILE Name="&plgPATH;/python-2.7.13b-x86_64-2.txz" Min="6.3" Max="6.3.99" Run="upgradepkg --install-new">
-<URL>&gitURL;/packages/6.3/python-2.7.13b-x86_64-2.txz</URL>
+<FILE Name="&nplgPATH;/6.3/python-2.7.13b-x86_64-2.txz" Min="6.3" Max="6.3.99" Run="upgradepkg --install-new">
+<URL>&ngitURL;/packages/6.3/python-2.7.13b-x86_64-2.txz</URL>
 <MD5>aec22a295487f44e1551894ba98760c2</MD5>
 </FILE>
 
-<FILE Name="&plgPATH;/python-2.7.13a-x86_64-2.txz" Min="6.2" Max="6.2.99" Run="upgradepkg --install-new">
-<URL>&gitURL;/packages/6.2/python-2.7.13a-x86_64-2.txz</URL>
+<FILE Name="&nplgPATH;/6.2/python-2.7.13a-x86_64-2.txz" Min="6.2" Max="6.2.99" Run="upgradepkg --install-new">
+<URL>&ngitURL;/packages/6.2/python-2.7.13a-x86_64-2.txz</URL>
 <MD5>576078a891a9c50d19e04b1b2249dc05</MD5>
 </FILE>
 
-<FILE Name="&plgPATH;/python-2.7.9-x86_64-1.txz" Max="6.1.99" Run="/sbin/upgradepkg --install-new">
-<URL>&gitURL;/packages/6.1/python-2.7.9-x86_64-1.txz</URL>
+<FILE Name="&nplgPATH;/6.1/python-2.7.9-x86_64-1.txz" Max="6.1.99" Run="/sbin/upgradepkg --install-new">
+<URL>&ngitURL;/packages/6.1/python-2.7.9-x86_64-1.txz</URL>
 <MD5>7d5f6d12757c59e5f08ca25bd63aab78</MD5>
 </FILE>
 
-<FILE Name="&plgPATH;/pyOpenSSL-0.15.1-x86_64-1_slack.txz" Min="6.1" Run="/sbin/upgradepkg --install-new">
+<FILE Name="&nplgPATH;/pyOpenSSL-0.15.1-x86_64-1_slack.txz" Min="6.1" Run="/sbin/upgradepkg --install-new">
 <URL>&pkgURL;/pyOpenSSL-0.15.1-x86_64-1_slack.txz</URL>
 <MD5>b422874df919df6baa10774bd2ddc2cc</MD5>
 </FILE>
