@@ -3,14 +3,12 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "speedtest">
 <!ENTITY author    "dmacias72">
-<!ENTITY version   "2018.01.13a">
+<!ENTITY version   "2018.01.13c">
 <!ENTITY launch    "Settings/SpeedtestSettingsTabs">
 <!ENTITY gitURL    "https://raw.githubusercontent.com/&author;/unRAID-&name;/master">
-<!ENTITY ngitURL   "https://raw.githubusercontent.com/&author;/unRAID-NerdPack;/master">
 <!ENTITY pluginURL "&gitURL;/plugin/&name;.plg">
 <!ENTITY pkgURL    "&gitURL;/packages">
 <!ENTITY plgPATH   "/boot/config/plugins/&name;">
-<!ENTITY plgPATH   "/boot/config/plugins/NerdPack/packages">
 <!ENTITY plgNAME   "&name;-&version;-x86_64-1">
 <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -23,10 +21,12 @@ This Plugin installs speedtest-cli for unRaid 6.1  All dependencies are installe
 
 <CHANGES>
 ##&name;
-###2018.01.13a
+###2018.01.13c
 - update speedtest to version 1.0.7
 - update python to 2.7.14a
 - add notifications and alerts
+- require NerdPack Python 2
+- add notification of missing python
 ###2017.11.14
 - convert download and upload speeds based on units in settings
 ###2017.10.03
@@ -193,27 +193,7 @@ This Plugin installs speedtest-cli for unRaid 6.1  All dependencies are installe
 - initial commit
 </CHANGES>
 
-<FILE Name="&nplgPATH;/6.4/python-2.7.14a-x86_64-1.txz" Min="6.4" Run="upgradepkg --install-new">
-<URL>&ngitURL;/packages/6.4/python-2.7.14a-x86_64-1.txz</URL>
-<MD5>1b07bf5c48df7b5601f8f5c4e997911f</MD5>
-</FILE>
-
-<FILE Name="&nplgPATH;/6.3/python-2.7.13b-x86_64-2.txz" Min="6.3" Max="6.3.99" Run="upgradepkg --install-new">
-<URL>&ngitURL;/packages/6.3/python-2.7.13b-x86_64-2.txz</URL>
-<MD5>aec22a295487f44e1551894ba98760c2</MD5>
-</FILE>
-
-<FILE Name="&nplgPATH;/6.2/python-2.7.13a-x86_64-2.txz" Min="6.2" Max="6.2.99" Run="upgradepkg --install-new">
-<URL>&ngitURL;/packages/6.2/python-2.7.13a-x86_64-2.txz</URL>
-<MD5>576078a891a9c50d19e04b1b2249dc05</MD5>
-</FILE>
-
-<FILE Name="&nplgPATH;/6.1/python-2.7.9-x86_64-1.txz" Max="6.1.99" Run="/sbin/upgradepkg --install-new">
-<URL>&ngitURL;/packages/6.1/python-2.7.9-x86_64-1.txz</URL>
-<MD5>7d5f6d12757c59e5f08ca25bd63aab78</MD5>
-</FILE>
-
-<FILE Name="&nplgPATH;/pyOpenSSL-0.15.1-x86_64-1_slack.txz" Min="6.1" Run="/sbin/upgradepkg --install-new">
+<FILE Name="&plgPATH;/pyOpenSSL-0.15.1-x86_64-1_slack.txz" Min="6.1" Run="/sbin/upgradepkg --install-new">
 <URL>&pkgURL;/pyOpenSSL-0.15.1-x86_64-1_slack.txz</URL>
 <MD5>b422874df919df6baa10774bd2ddc2cc</MD5>
 </FILE>
@@ -281,12 +261,13 @@ find &plgPATH;/ -type f -iname "&name;*.txz" ! -iname "*&version;*" -delete
 find &plgPATH;/ -type f -iname "&name;*.md5" ! -iname "*&version;*" -delete
 
 echo ""
-echo "-----------------------------------------------------------"
+echo "--------------------------------------------------------------------------------------"
 echo " &name; has been installed."
-echo " This plugin requires Dynamix webGui to operate"
+echo " This plugin requires NerdPack's Python 2 to operate"
+echo " http://raw.githubusercontent.com/dmacias72/unRAID-NerdPack/master/plugin/NerdPack.plg"
 echo " Copyright 2015-2018, &author;"
 echo " Version: &version;"
-echo "-----------------------------------------------------------"
+echo "--------------------------------------------------------------------------------------"
 echo ""
 
 fi
@@ -298,7 +279,7 @@ The 'remove' script.
 -->
 <FILE Run="/bin/bash" Method="remove">
 <INLINE>
-removepkg &plgPATH;/&plgNAME;.txz
+removepkg &plgPATH;/*.txz
 rm -rf &emhttp;
 rm -f &plgPATH;/*.txz \
   &plgPATH;/*.md5
